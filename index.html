@@ -3206,6 +3206,8 @@ function showLandingScreen() {
   const textGrad='linear-gradient(to top, rgba(0,0,0,0.75) 0%, rgba(0,0,0,0.2) 50%, transparent 100%)';
 
   preview.className='showcase';
+  preview.style.maxWidth='100%';
+  preview.style.width='100%';
   preview.innerHTML=
     '<div style="position:relative;min-height:100vh;display:grid;grid-template-columns:1fr 1fr;isolation:isolate">'
       // Outdoor half
@@ -3314,6 +3316,9 @@ function enterCollection(which) {
   // Restore cinematic background
   const bgEl=document.querySelector('.bg-cinematic');
   if(bgEl) bgEl.style.opacity='1';
+  // Reset showcase width
+  const prev=g('showcase-preview');
+  if(prev){prev.style.maxWidth='';prev.style.width='';}
   updatePreview();
   window.scrollTo({top:0,behavior:'smooth'});
   // Add a back-to-landing button
