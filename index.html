@@ -583,6 +583,7 @@ img { image-rendering: auto; }
           </div>
           <input type="file" id="outdoor-landing-img-input" accept="image/*" style="display:none" onchange="handleLandingImg('outdoor',this)" />
         </div>
+        <div class="field-group"><label class="field-label">Outdoor — Landing Video URL</label><input class="field-input" id="outdoor-landing-video" type="text" placeholder="Paste video URL (.mp4)" oninput="state.outdoorLandingVideo=this.value;scheduleAutoSave()" /></div>
         <div class="field-group"><label class="field-label">Active — Collection Name</label><input class="field-input" id="active-collection-name" type="text" placeholder="e.g. Active" oninput="state.activeCollectionName=this.value;scheduleAutoSave()" /></div>
         <div class="field-group">
           <label class="field-label">Active — Landing Image</label>
@@ -594,6 +595,7 @@ img { image-rendering: auto; }
           </div>
           <input type="file" id="active-landing-img-input" accept="image/*" style="display:none" onchange="handleLandingImg('active',this)" />
         </div>
+        <div class="field-group"><label class="field-label">Active — Landing Video URL</label><input class="field-input" id="active-landing-video" type="text" placeholder="Paste video URL (.mp4)" oninput="state.activeLandingVideo=this.value;scheduleAutoSave()" /></div>
         <p class="section-label" style="margin-top:4px">Outdoor — Background Images</p>
         <div class="field-group">
           <label class="field-label" style="margin-bottom:10px">One image per section — appears behind the canvas</label>
@@ -1021,6 +1023,7 @@ let state = {
   activeBgSectionImgs: {},
   // split screen landing images
   outdoorLandingImg: '', activeLandingImg: '',
+  outdoorLandingVideo: '', activeLandingVideo: '',
   outdoorCollectionName: 'Outdoor',
   landingHeadline: 'Spring Summer 2026',
 };
@@ -1516,7 +1519,7 @@ async function openPitch(id) {
   state.activeCatWarmVideo=data.active_cat_warm_video||''; state.activeCatAirVideo=data.active_cat_air_video||'';
   state.activeSellingPoints=data.active_selling_points||[]; state.activeProducts=data.active_products||[];
   state.activeBgSectionImgs=data.active_bg_section_imgs||{};
-  state.outdoorLandingImg=data.outdoor_landing_img||''; state.activeLandingImg=data.active_landing_img||'';
+  state.outdoorLandingImg=data.outdoor_landing_img||''; state.activeLandingImg=data.active_landing_img||''; state.outdoorLandingVideo=data.outdoor_landing_video||''; state.activeLandingVideo=data.active_landing_video||'';
   state.outdoorCollectionName=data.outdoor_collection_name||'Outdoor';
   state.landingHeadline=data.landing_headline||'Spring Summer 2026';
   if(g('active-opening')) g('active-opening').value=state.activeOpening;
@@ -1532,6 +1535,8 @@ async function openPitch(id) {
   if(g('active-collection-name')) g('active-collection-name').value=state.activeCollectionName;
   if(g('outdoor-collection-name')) g('outdoor-collection-name').value=state.outdoorCollectionName;
   if(g('landing-headline')) g('landing-headline').value=state.landingHeadline;
+  if(g('outdoor-landing-video')) g('outdoor-landing-video').value=state.outdoorLandingVideo||'';
+  if(g('active-landing-video')) g('active-landing-video').value=state.activeLandingVideo||'';
   if(state.activeOpeningImg){const ap=g('active-opening-img-preview');if(ap)ap.innerHTML='<img src="'+state.activeOpeningImg+'" style="width:100%;height:100%;object-fit:cover" />';}
   if(state.activeTechDefaultImg){const atp=g('active-tech-default-img-preview');if(atp)atp.innerHTML='<img src="'+state.activeTechDefaultImg+'" style="width:100%;height:100%;object-fit:cover" />';}
   if(state.outdoorLandingImg){const olp=g('outdoor-landing-img-preview');if(olp)olp.innerHTML='<img src="'+state.outdoorLandingImg+'" style="width:100%;height:100%;object-fit:cover" />';}
@@ -1847,6 +1852,8 @@ async function savePitch() {
     active_bg_section_imgs:state.activeBgSectionImgs||{},
     outdoor_landing_img:state.outdoorLandingImg||'',
     active_landing_img:state.activeLandingImg||'',
+    outdoor_landing_video:g('outdoor-landing-video')?.value||state.outdoorLandingVideo||'',
+    active_landing_video:g('active-landing-video')?.value||state.activeLandingVideo||'',
     outdoor_collection_name:g('outdoor-collection-name')?.value||state.outdoorCollectionName||'Outdoor',
     landing_headline:g('landing-headline')?.value||state.landingHeadline||'Spring Summer 2026',
     updated_at:new Date().toISOString()
@@ -3166,7 +3173,7 @@ async function loadPresentationView(token) {
   state.activeCatWarmVideo=data.active_cat_warm_video||''; state.activeCatAirVideo=data.active_cat_air_video||'';
   state.activeSellingPoints=data.active_selling_points||[]; state.activeProducts=data.active_products||[];
   state.activeBgSectionImgs=data.active_bg_section_imgs||{};
-  state.outdoorLandingImg=data.outdoor_landing_img||''; state.activeLandingImg=data.active_landing_img||'';
+  state.outdoorLandingImg=data.outdoor_landing_img||''; state.activeLandingImg=data.active_landing_img||''; state.outdoorLandingVideo=data.outdoor_landing_video||''; state.activeLandingVideo=data.active_landing_video||'';
   state.outdoorCollectionName=data.outdoor_collection_name||'Outdoor';
   state.landingHeadline=data.landing_headline||'Spring Summer 2026';
   document.querySelector("header").style.display="none";
@@ -3192,6 +3199,8 @@ function showLandingScreen() {
   const activeName=state.activeCollectionName||'Active';
   const outdoorImg=state.outdoorLandingImg||'';
   const activeImg=state.activeLandingImg||'';
+  const outdoorVid=g('outdoor-landing-video')?.value||state.outdoorLandingVideo||'';
+  const activeVid=g('active-landing-video')?.value||state.activeLandingVideo||'';
   const outdoorCount=(state.products||[]).filter(p=>p.category==='warm'||p.layer==='base'||p.layer==='Base Layer');
   const activeCount=(state.activeProducts||[]);
   const textGrad='linear-gradient(to top, rgba(0,0,0,0.75) 0%, rgba(0,0,0,0.2) 50%, transparent 100%)';
@@ -3208,8 +3217,9 @@ function showLandingScreen() {
     +'<div style="display:grid;grid-template-columns:1fr 1fr;min-height:75vh">'
       // Outdoor
       +'<div onclick="enterCollection(\'outdoor\')" style="position:relative;overflow:hidden;cursor:pointer;background:#0D1018;border-right:1px solid rgba(255,255,255,0.08)">'
+        +(outdoorVid?'<video autoplay muted loop playsinline style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;opacity:0;transition:opacity 1.2s ease" oncanplay="this.style.opacity=1"><source src="'+outdoorVid+'" type="video/mp4"></video>':'')
         +(outdoorImg?'<img src="'+outdoorImg+'" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:center top;opacity:1;transition:transform 0.8s ease" class="landing-bg-img" />'
-          :'<div style="position:absolute;inset:0;background:linear-gradient(135deg,#0D1018 0%,#1A2030 100%)"></div>')
+          :(!outdoorVid?'<div style="position:absolute;inset:0;background:linear-gradient(135deg,#0D1018 0%,#1A2030 100%)"></div>':''))
         +'<div style="position:absolute;inset:0;background:'+textGrad+'"></div>'
         +'<div style="position:absolute;inset:0;background:rgba(0,0,0,0);transition:background 0.4s" class="landing-hover-overlay"></div>'
         +'<div style="position:absolute;bottom:0;left:0;right:0;padding:44px 44px 48px;z-index:2">'
@@ -3222,8 +3232,9 @@ function showLandingScreen() {
       +'</div>'
       // Active
       +'<div onclick="enterCollection(\'active\')" style="position:relative;overflow:hidden;cursor:pointer;background:#180810">'
+        +(activeVid?'<video autoplay muted loop playsinline style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;opacity:0;transition:opacity 1.2s ease" oncanplay="this.style.opacity=1"><source src="'+activeVid+'" type="video/mp4"></video>':'')
         +(activeImg?'<img src="'+activeImg+'" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:center top;opacity:1;transition:transform 0.8s ease" class="landing-bg-img" />'
-          :'<div style="position:absolute;inset:0;background:linear-gradient(135deg,#180810 0%,#2A1020 100%)"></div>')
+          :(!activeVid?'<div style="position:absolute;inset:0;background:linear-gradient(135deg,#180810 0%,#2A1020 100%)"></div>':''))
         +'<div style="position:absolute;inset:0;background:'+textGrad+'"></div>'
         +'<div style="position:absolute;inset:0;background:rgba(0,0,0,0);transition:background 0.4s" class="landing-hover-overlay"></div>'
         +'<div style="position:absolute;bottom:0;left:0;right:0;padding:44px 44px 48px;z-index:2">'
