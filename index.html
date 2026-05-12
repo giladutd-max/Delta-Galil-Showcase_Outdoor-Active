@@ -3137,7 +3137,7 @@ document.addEventListener('keydown',e=>{if(e.key==='Escape'){closeLightbox();clo
 
 // ── PRESENTATION VIEW (clean, no UI) ──
 async function loadPresentationView(token) {
-  const {data,error}=await sbAnon.from("pitches").select("*").eq("share_token",token).single();
+  const {data,error}=await sb.from("pitches").select("*").eq("share_token",token).single();
   if (error||!data){showToast("Pitch not found","error");await loadDashboard();return;}
   state.pitchId=data.id; state.shareToken=data.share_token;
   state.template=data.template; state.palette=data.palette||0;
@@ -3192,8 +3192,8 @@ function showLandingScreen() {
   const activeName=state.activeCollectionName||'Active';
   const outdoorImg=state.outdoorLandingImg||'';
   const activeImg=state.activeLandingImg||'';
-  const outdoorCount=state.products||[];
-  const activeCount=state.activeProducts||[];
+  const outdoorCount=(state.products||[]).filter(p=>p.category==='warm'||p.layer==='base'||p.layer==='Base Layer');
+  const activeCount=(state.activeProducts||[]);
   const textGrad='linear-gradient(to top, rgba(0,0,0,0.75) 0%, rgba(0,0,0,0.2) 50%, transparent 100%)';
 
   preview.className='showcase';
