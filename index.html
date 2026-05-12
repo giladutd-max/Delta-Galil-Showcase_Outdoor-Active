@@ -1077,7 +1077,7 @@ function renderWarmthPicker() {
 
 function warmthFlameCol(n, type='w') { return METER_FILTERS[type][n-1]; }
 
-const METER_ICONS = { w: 'https://dkgzhmpuqzykzebzcqdr.supabase.co/storage/v1/object/public/product-images/Flame_two.png', d: 'https://dkgzhmpuqzykzebzcqdr.supabase.co/storage/v1/object/public/product-images/drop.png', b: 'https://dkgzhmpuqzykzebzcqdr.supabase.co/storage/v1/object/public/product-images/breathable%20new5.png' };
+const METER_ICONS = { w: 'https://dkgzhmpuqzykzebzcqdr.supabase.co/storage/v1/object/public/product-images/flame%20two.jpg', d: 'https://dkgzhmpuqzykzebzcqdr.supabase.co/storage/v1/object/public/product-images/drop.png', b: 'https://dkgzhmpuqzykzebzcqdr.supabase.co/storage/v1/object/public/product-images/breathable%20new5.png' };
 const METER_ASPECT = { w: 1.2, d: 1.0, b: 1.0 };
 const METER_SIZE_MULT = { w: 1, d: 1, b: 1 };
 
@@ -1085,7 +1085,7 @@ function warmthFlameSVG(size, active, fill, picker=false, isDark=false, type='w'
   const mult = METER_SIZE_MULT[type] || 1;
   const w = Math.round(size * mult);
   const h = Math.round(size * METER_ASPECT[type||'w'] * mult);
-  const src = METER_ICONS[type] || '/Flame_two.png';
+  const src = METER_ICONS[type] || METER_ICONS.w;
   if (active) {
     return `<img src="${src}" width="${w}" height="${h}" style="display:block;filter:${fill};vertical-align:bottom" />`;
   } else {
