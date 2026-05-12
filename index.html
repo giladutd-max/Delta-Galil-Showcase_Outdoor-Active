@@ -3211,7 +3211,7 @@ function showLandingScreen() {
       // Outdoor half
       +'<div onclick="enterCollection(\'outdoor\')" style="position:relative;overflow:hidden;cursor:pointer;min-height:100vh;background:#0D1018;border-right:1px solid rgba(255,255,255,0.08)">'
         +(outdoorImg?'<div style="position:absolute;inset:0;z-index:0;background:url(\''+outdoorImg+'\') center/cover no-repeat"></div>':'<div style="position:absolute;inset:0;z-index:0;background:linear-gradient(160deg,#0D1018 0%,#1A2030 100%)"></div>')
-        +(outdoorVid?'<video autoplay muted loop playsinline style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;opacity:0;transition:opacity 1.2s ease;z-index:1" oncanplay="this.style.opacity=1"><source src="'+outdoorVid+'" type="video/mp4"></video>':'')
+        +(outdoorVid?'<video autoplay muted loop playsinline style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;opacity:0;transition:opacity 1.2s ease;z-index:1" oncanplay="this.style.opacity=0.6"><source src="'+outdoorVid+'" type="video/mp4"></video>':'')
         +'<div style="position:absolute;inset:0;z-index:2;background:linear-gradient(to bottom,rgba(0,0,0,0.2) 0%,rgba(0,0,0,0.05) 40%,rgba(0,0,0,0.55) 100%)"></div>'
         +'<div style="position:absolute;inset:0;z-index:3;background:rgba(0,0,0,0);transition:background 0.4s" class="landing-hover-overlay"></div>'
         +'<div style="position:absolute;bottom:0;left:0;right:0;padding:40px 44px 48px;z-index:4">'
@@ -3225,7 +3225,7 @@ function showLandingScreen() {
       // Active half
       +'<div onclick="enterCollection(\'active\')" style="position:relative;overflow:hidden;cursor:pointer;min-height:100vh;background:#180810">'
         +(activeImg?'<div style="position:absolute;inset:0;z-index:0;background:url(\''+activeImg+'\') center/cover no-repeat"></div>':'<div style="position:absolute;inset:0;z-index:0;background:linear-gradient(160deg,#180810 0%,#2A1020 100%)"></div>')
-        +(activeVid?'<video autoplay muted loop playsinline style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;opacity:0;transition:opacity 1.2s ease;z-index:1" oncanplay="this.style.opacity=1"><source src="'+activeVid+'" type="video/mp4"></video>':'')
+        +(activeVid?'<video autoplay muted loop playsinline style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;opacity:0;transition:opacity 1.2s ease;z-index:1" oncanplay="this.style.opacity=0.6"><source src="'+activeVid+'" type="video/mp4"></video>':'')
         +'<div style="position:absolute;inset:0;z-index:2;background:linear-gradient(to bottom,rgba(0,0,0,0.2) 0%,rgba(0,0,0,0.05) 40%,rgba(0,0,0,0.55) 100%)"></div>'
         +'<div style="position:absolute;inset:0;z-index:3;background:rgba(0,0,0,0);transition:background 0.4s" class="landing-hover-overlay"></div>'
         +'<div style="position:absolute;bottom:0;left:0;right:0;padding:40px 44px 48px;z-index:4">'
