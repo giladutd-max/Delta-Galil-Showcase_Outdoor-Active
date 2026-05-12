@@ -3287,15 +3287,20 @@ function enterCollection(which) {
     state.techDefaultVideo=state.activeTechDefaultVideo||'';
     state.sellingPoints=state.activeSellingPoints||[];
     state.bgSectionImgs=state.activeBgSectionImgs||{};
-    // Update hidden fields
-    if(g('pitch-opening')) g('pitch-opening').value=state.opening;
-    if(g('opening-video')) g('opening-video').value=state.openingVideo;
-    if(g('pitch-vision')) g('pitch-vision').value=state.vision;
-    if(g('pitch-vision-quote')) g('pitch-vision-quote').value=state.visionQuote;
-    if(g('pitch-vision-video')) g('pitch-vision-video').value=state.visionVideo;
-    if(g('tech-default-video')) g('tech-default-video').value=state.techDefaultVideo;
-    switchBgImage('collection');
   }
+  // Always sync all state values to input fields so updatePreview reads them correctly
+  if(g('pitch-opening')) g('pitch-opening').value=state.opening||'';
+  if(g('opening-video')) g('opening-video').value=state.openingVideo||'';
+  if(g('opening-mobile-video')) g('opening-mobile-video').value=state.openingMobileVideo||'';
+  if(g('pitch-vision')) g('pitch-vision').value=state.vision||'';
+  if(g('pitch-vision-quote')) g('pitch-vision-quote').value=state.visionQuote||'';
+  if(g('pitch-vision-video')) g('pitch-vision-video').value=state.visionVideo||'';
+  if(g('tech-default-video')) g('tech-default-video').value=state.techDefaultVideo||'';
+  if(g('cat-warm-video')) g('cat-warm-video').value=state.catWarmVideo||'';
+  if(g('cat-air-video')) g('cat-air-video').value=state.catAirVideo||'';
+  if(g('cat-warm-name')) g('cat-warm-name').value=state.catWarmName||'';
+  if(g('cat-air-name')) g('cat-air-name').value=state.catAirName||'';
+  if(_activeMode) switchBgImage('collection');
   updatePreview();
   window.scrollTo({top:0,behavior:'smooth'});
   // Add a back-to-landing button
