@@ -562,13 +562,39 @@ img { image-rendering: auto; }
   </header>
   <div class="app-body">
     <aside class="sidebar">
-      <div class="sidebar-tabs">
-        <button class="sidebar-tab active" onclick="switchTab('pitch',this)">Pitch</button>
-        <button class="sidebar-tab" onclick="switchTab('products',this)">Products</button>
-        <button class="sidebar-tab" onclick="switchTab('templates',this)">Templates</button>
+      <div class="sidebar-tabs" style="flex-wrap:wrap">
+        <button class="sidebar-tab active" onclick="switchTab('pitch',this)" style="font-size:10px">Outdoor</button>
+        <button class="sidebar-tab" onclick="switchTab('products',this)" style="font-size:10px">O · Products</button>
+        <button class="sidebar-tab" onclick="switchTab('active',this)" style="font-size:10px;border-top:2px solid rgba(196,168,130,0.2)">Active</button>
+        <button class="sidebar-tab" onclick="switchTab('active-products',this)" style="font-size:10px;border-top:2px solid rgba(196,168,130,0.2)">A · Products</button>
+        <button class="sidebar-tab" onclick="switchTab('templates',this)" style="font-size:10px;border-top:2px solid rgba(196,168,130,0.2);flex:2">Templates</button>
       </div>
       <div id="tab-pitch" class="sidebar-content">
-        <p class="section-label">Background Images</p>
+        <p class="section-label">Landing Screen</p>
+        <div class="field-group"><label class="field-label">Headline</label><input class="field-input" id="landing-headline" type="text" placeholder="e.g. Spring Summer 2026" oninput="state.landingHeadline=this.value;scheduleAutoSave()" /></div>
+        <div class="field-group"><label class="field-label">Outdoor — Collection Name</label><input class="field-input" id="outdoor-collection-name" type="text" placeholder="e.g. Outdoor" oninput="state.outdoorCollectionName=this.value;scheduleAutoSave()" /></div>
+        <div class="field-group">
+          <label class="field-label">Outdoor — Landing Image</label>
+          <div style="display:flex;gap:8px;align-items:center;margin-bottom:6px">
+            <div id="outdoor-landing-img-preview" style="flex:1;height:64px;border:1.5px dashed var(--light);border-radius:4px;display:flex;align-items:center;justify-content:center;cursor:pointer;overflow:hidden" onclick="document.getElementById('outdoor-landing-img-input').click()">
+              <span style="font-size:11px;color:var(--mid)">Click to upload</span>
+            </div>
+            <button onclick="state.outdoorLandingImg='';document.getElementById('outdoor-landing-img-preview').innerHTML='<span style=\'font-size:11px;color:var(--mid)\'>Click to upload</span>';scheduleAutoSave();" style="font-size:11px;color:#E24B4A;background:none;border:1px solid rgba(226,75,74,0.3);border-radius:2px;padding:6px 10px;cursor:pointer;font-family:DM Sans,sans-serif">✕</button>
+          </div>
+          <input type="file" id="outdoor-landing-img-input" accept="image/*" style="display:none" onchange="handleLandingImg('outdoor',this)" />
+        </div>
+        <div class="field-group"><label class="field-label">Active — Collection Name</label><input class="field-input" id="active-collection-name" type="text" placeholder="e.g. Active" oninput="state.activeCollectionName=this.value;scheduleAutoSave()" /></div>
+        <div class="field-group">
+          <label class="field-label">Active — Landing Image</label>
+          <div style="display:flex;gap:8px;align-items:center;margin-bottom:6px">
+            <div id="active-landing-img-preview" style="flex:1;height:64px;border:1.5px dashed var(--light);border-radius:4px;display:flex;align-items:center;justify-content:center;cursor:pointer;overflow:hidden" onclick="document.getElementById('active-landing-img-input').click()">
+              <span style="font-size:11px;color:var(--mid)">Click to upload</span>
+            </div>
+            <button onclick="state.activeLandingImg='';document.getElementById('active-landing-img-preview').innerHTML='<span style=\'font-size:11px;color:var(--mid)\'>Click to upload</span>';scheduleAutoSave();" style="font-size:11px;color:#E24B4A;background:none;border:1px solid rgba(226,75,74,0.3);border-radius:2px;padding:6px 10px;cursor:pointer;font-family:DM Sans,sans-serif">✕</button>
+          </div>
+          <input type="file" id="active-landing-img-input" accept="image/*" style="display:none" onchange="handleLandingImg('active',this)" />
+        </div>
+        <p class="section-label" style="margin-top:4px">Outdoor — Background Images</p>
         <div class="field-group">
           <label class="field-label" style="margin-bottom:10px">One image per section — appears behind the canvas</label>
           
@@ -601,7 +627,7 @@ img { image-rendering: auto; }
             <span id="bg-blur-val" style="font-size:11px;color:var(--mid);min-width:28px">8px</span>
           </div>
         </div>
-        <p class="section-label">Opening Screen</p>
+        <p class="section-label" style="margin-top:8px">Outdoor — Opening Screen</p>
         <div class="field-group"><label class="field-label">Opening Sentence</label><textarea class="field-input" id="pitch-opening" placeholder="e.g. Where performance meets identity." oninput="scheduleAutoSave()" style="min-height:60px"></textarea></div>
         <div class="field-group">
           <label class="field-label">Opening Background Image</label>
@@ -631,7 +657,7 @@ img { image-rendering: auto; }
           <label class="field-label">Mobile Background Video URL <span style="font-size:9px;color:var(--mid);font-weight:400;letter-spacing:0">— shown on phones instead</span></label>
           <input class="field-input" id="opening-mobile-video" type="text" placeholder="Paste mobile video URL (.mp4)" oninput="state.openingMobileVideo=this.value;scheduleAutoSave();updatePreview()" />
         </div>
-        <p class="section-label" style="margin-top:8px">Collection Details</p>
+        <p class="section-label" style="margin-top:8px">Outdoor — Collection Details</p>
         <div class="field-group"><label class="field-label">Collection Name</label><input class="field-input" id="pitch-title" type="text" placeholder="e.g. Spring Essentials 2026" oninput="scheduleAutoSave()" /></div>
         <div class="field-group"><label class="field-label">Client / Occasion</label><input class="field-input" id="pitch-client" type="text" placeholder="e.g. H&M — Q2 Review" oninput="scheduleAutoSave()" /></div>
         <div class="field-group"><label class="field-label">Tagline</label><input class="field-input" id="pitch-tagline" type="text" placeholder="e.g. Comfort Meets Craft" oninput="scheduleAutoSave()" /></div>
@@ -670,13 +696,94 @@ img { image-rendering: auto; }
         <button onclick="addTechItem()" style="font-size:11px;color:var(--accent-dark);background:none;border:1px dashed var(--light);padding:7px 14px;border-radius:2px;cursor:pointer;font-family:DM Sans,sans-serif;width:100%;margin-top:4px;transition:all 0.2s">+ Add technology</button>
       </div>
       <div id="tab-products" class="sidebar-content" style="display:none">
-        <p class="section-label">Products <span id="product-count" style="color:var(--accent-dark);font-weight:400">0</span></p>
+        <p class="section-label">Outdoor Products <span id="product-count" style="color:var(--accent-dark);font-weight:400">0</span></p>
         <div id="products-list"></div>
         <button class="upload-zone" onclick="document.getElementById('file-input').click()">
           <div class="upload-zone-icon">+</div>
           <div class="upload-zone-text"><strong>Add product</strong><br/>Upload image to get started</div>
         </button>
         <input type="file" id="file-input" accept="image/*" onchange="handleFileUpload(this)" />
+      </div>
+
+      <!-- ── ACTIVE TAB ── -->
+      <div id="tab-active" class="sidebar-content" style="display:none">
+        <p class="section-label">Active — Background Images</p>
+        <div class="field-group">
+          <label class="field-label" style="margin-bottom:10px">One image per section — appears behind the canvas</label>
+          <div style="display:flex;flex-direction:column;gap:10px;margin-bottom:12px">
+            <div style="display:flex;align-items:center;gap:8px">
+              <div style="font-size:10px;letter-spacing:0.1em;text-transform:uppercase;color:var(--mid);width:80px;flex-shrink:0">Collection</div>
+              <div id="bg-thumb-active-collection" onclick="triggerActiveBgUpload('collection')" style="width:48px;height:48px;border:1.5px dashed var(--border);border-radius:4px;cursor:pointer;overflow:hidden;display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:18px;color:var(--mid)">+</div>
+              <input type="file" id="bg-input-active-collection" accept="image/*" style="display:none" onchange="handleActiveBgSection('collection',this)" />
+            </div>
+            <div style="display:flex;align-items:center;gap:8px">
+              <div style="font-size:10px;letter-spacing:0.1em;text-transform:uppercase;color:var(--mid);width:80px;flex-shrink:0">Vision</div>
+              <div id="bg-thumb-active-vision" onclick="triggerActiveBgUpload('vision')" style="width:48px;height:48px;border:1.5px dashed var(--border);border-radius:4px;cursor:pointer;overflow:hidden;display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:18px;color:var(--mid)">+</div>
+              <input type="file" id="bg-input-active-vision" accept="image/*" style="display:none" onchange="handleActiveBgSection('vision',this)" />
+            </div>
+            <div style="display:flex;align-items:center;gap:8px">
+              <div style="font-size:10px;letter-spacing:0.1em;text-transform:uppercase;color:var(--mid);width:80px;flex-shrink:0">Technology</div>
+              <div id="bg-thumb-active-tech" onclick="triggerActiveBgUpload('tech')" style="width:48px;height:48px;border:1.5px dashed var(--border);border-radius:4px;cursor:pointer;overflow:hidden;display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:18px;color:var(--mid)">+</div>
+              <input type="file" id="bg-input-active-tech" accept="image/*" style="display:none" onchange="handleActiveBgSection('tech',this)" />
+            </div>
+          </div>
+        </div>
+        <p class="section-label" style="margin-top:8px">Active — Opening Screen</p>
+        <div class="field-group"><label class="field-label">Opening Sentence</label><textarea class="field-input" id="active-opening" placeholder="e.g. Move freely, always." oninput="scheduleAutoSave()" style="min-height:60px"></textarea></div>
+        <div class="field-group">
+          <label class="field-label">Opening Background Image</label>
+          <div style="display:flex;gap:8px;align-items:center;margin-bottom:6px">
+            <div id="active-opening-img-preview" style="flex:1;height:80px;border:1.5px dashed var(--light);border-radius:4px;display:flex;align-items:center;justify-content:center;cursor:pointer;overflow:hidden" onclick="document.getElementById('active-opening-img-input').click()">
+              <span style="font-size:11px;color:var(--mid)">Click to upload background</span>
+            </div>
+            <button onclick="state.activeOpeningImg='';document.getElementById('active-opening-img-preview').innerHTML='<span style=\'font-size:11px;color:var(--mid)\'>Click to upload background</span>';scheduleAutoSave();" style="font-size:11px;color:#E24B4A;background:none;border:1px solid rgba(226,75,74,0.3);border-radius:2px;padding:6px 10px;cursor:pointer;font-family:DM Sans,sans-serif;white-space:nowrap">✕ Remove</button>
+          </div>
+          <input type="file" id="active-opening-img-input" accept="image/*" style="display:none" onchange="handleActiveOpeningImage(this)" />
+        </div>
+        <div class="field-group">
+          <label class="field-label">Opening Background Video URL</label>
+          <input class="field-input" id="active-opening-video" type="text" placeholder="Paste video URL (.mp4)" oninput="state.activeOpeningVideo=this.value;scheduleAutoSave()" />
+        </div>
+        <p class="section-label" style="margin-top:8px">Active — Collection Details</p>
+        <div class="field-group"><label class="field-label">Apparel Category Name</label><input class="field-input" id="active-cat-warm-name" type="text" placeholder="e.g. Apparel" oninput="state.activeCatWarmName=this.value;scheduleAutoSave()" /></div>
+        <div class="field-group"><label class="field-label">Apparel — Background Video URL</label><input class="field-input" id="active-cat-warm-video" type="text" placeholder="Paste video URL (.mp4)" oninput="state.activeCatWarmVideo=this.value;scheduleAutoSave()" /></div>
+        <div class="field-group"><label class="field-label">Accessories Category Name</label><input class="field-input" id="active-cat-air-name" type="text" placeholder="e.g. Accessories" oninput="state.activeCatAirName=this.value;scheduleAutoSave()" /></div>
+        <div class="field-group"><label class="field-label">Accessories — Background Video URL</label><input class="field-input" id="active-cat-air-video" type="text" placeholder="Paste video URL (.mp4)" oninput="state.activeCatAirVideo=this.value;scheduleAutoSave()" /></div>
+        <p class="section-label" style="margin-top:8px">Active — Vision</p>
+        <div class="field-group"><label class="field-label">Pull Quote</label><input class="field-input" id="active-vision-quote" type="text" placeholder="e.g. Engineered for life in motion." oninput="scheduleAutoSave()" /></div>
+        <div class="field-group"><label class="field-label">Vision Text</label><textarea class="field-input" id="active-vision" placeholder="What's the story behind Active?..." oninput="scheduleAutoSave()" style="min-height:100px"></textarea></div>
+        <div class="field-group"><label class="field-label">Vision Background Video URL</label><input class="field-input" id="active-vision-video" type="text" placeholder="Paste video URL (.mp4)" oninput="state.activeVisionVideo=this.value;scheduleAutoSave()" /></div>
+        <p class="section-label" style="margin-top:8px">Active — Why This Collection</p>
+        <div id="active-selling-points-list"></div>
+        <button onclick="addActiveSellingPoint()" style="font-size:11px;color:var(--accent-dark);background:none;border:1px dashed var(--light);padding:7px 14px;border-radius:2px;cursor:pointer;font-family:DM Sans,sans-serif;width:100%;margin-top:4px;transition:all 0.2s">+ Add selling point</button>
+        <p class="section-label" style="margin-top:16px">Active — Technology</p>
+        <div class="field-group">
+          <label class="field-label">Default Image <span style="font-size:9px;color:var(--mid);font-weight:400;letter-spacing:0">— shown before hover</span></label>
+          <div style="display:flex;gap:8px;align-items:center;margin-bottom:6px">
+            <div id="active-tech-default-img-preview" style="flex:1;height:80px;border:1.5px dashed var(--light);border-radius:4px;display:flex;align-items:center;justify-content:center;cursor:pointer;overflow:hidden" onclick="document.getElementById('active-tech-default-img-input').click()">
+              <span style="font-size:11px;color:var(--mid)">Click to upload image</span>
+            </div>
+            <button onclick="state.activeTechDefaultImg='';document.getElementById('active-tech-default-img-preview').innerHTML='<span style=\'font-size:11px;color:var(--mid)\'>Click to upload image</span>';scheduleAutoSave();" style="font-size:11px;color:#E24B4A;background:none;border:1px solid rgba(226,75,74,0.3);border-radius:2px;padding:6px 10px;cursor:pointer;font-family:DM Sans,sans-serif;white-space:nowrap">✕</button>
+          </div>
+          <input type="file" id="active-tech-default-img-input" accept="image/*" style="display:none" onchange="handleActiveTechDefaultImg(this)" />
+        </div>
+        <div class="field-group">
+          <label class="field-label">Default Video URL</label>
+          <input class="field-input" id="active-tech-default-video" type="text" placeholder="Paste video URL (.mp4)" oninput="state.activeTechDefaultVideo=this.value;scheduleAutoSave()" />
+        </div>
+        <div id="active-tech-items-list"></div>
+        <button onclick="addActiveTechItem()" style="font-size:11px;color:var(--accent-dark);background:none;border:1px dashed var(--light);padding:7px 14px;border-radius:2px;cursor:pointer;font-family:DM Sans,sans-serif;width:100%;margin-top:4px;transition:all 0.2s">+ Add technology</button>
+      </div>
+
+      <!-- ── ACTIVE PRODUCTS TAB ── -->
+      <div id="tab-active-products" class="sidebar-content" style="display:none">
+        <p class="section-label">Active Products <span id="active-product-count" style="color:var(--accent-dark);font-weight:400">0</span></p>
+        <div id="active-products-list"></div>
+        <button class="upload-zone" onclick="document.getElementById('active-file-input').click()">
+          <div class="upload-zone-icon">+</div>
+          <div class="upload-zone-text"><strong>Add Active product</strong><br/>Upload image to get started</div>
+        </button>
+        <input type="file" id="active-file-input" accept="image/*" onchange="handleActiveFileUpload(this)" />
       </div>
       <div id="tab-templates" class="sidebar-content" style="display:none">
         <p class="section-label">Choose Template</p>
@@ -902,6 +1009,20 @@ let state = {
   techDefaultImg: '', techDefaultVideo: '', techItems: [], catWarmVideo: '', catAirVideo: '', catWarmName: 'Base Layer', catAirName: 'Mid Layer', bgImages: [], bgSectionImgs: {}, bgOpacity: 0.35, bgBlur: 8,
   sellingPoints: [],
   products: [],
+  // ── ACTIVE COLLECTION ──
+  activeCollectionName: 'Active',
+  activeOpening: '', activeOpeningImg: '', activeOpeningVideo: '',
+  activeVision: '', activeVisionQuote: '', activeVisionVideo: '',
+  activeTechDefaultImg: '', activeTechDefaultVideo: '', activeTechItems: [],
+  activeCatWarmName: 'Apparel', activeCatAirName: 'Accessories',
+  activeCatWarmVideo: '', activeCatAirVideo: '',
+  activeSellingPoints: [],
+  activeProducts: [],
+  activeBgSectionImgs: {},
+  // split screen landing images
+  outdoorLandingImg: '', activeLandingImg: '',
+  outdoorCollectionName: 'Outdoor',
+  landingHeadline: 'Spring Summer 2026',
 };
 let currentUser = null;
 let autoSaveTimer = null;
@@ -1339,6 +1460,36 @@ async function openPitch(id) {
   if(g('cat-air-video')) g('cat-air-video').value=state.catAirVideo||'';
   if(g('cat-warm-name')) g('cat-warm-name').value=state.catWarmName||'Base Layer';
   if(g('cat-air-name')) g('cat-air-name').value=state.catAirName||'Mid Layer';
+  // Active collection
+  state.activeCollectionName=data.active_collection_name||'Active';
+  state.activeOpening=data.active_opening||''; state.activeOpeningImg=data.active_opening_img||''; state.activeOpeningVideo=data.active_opening_video||'';
+  state.activeVision=data.active_vision||''; state.activeVisionQuote=data.active_vision_quote||''; state.activeVisionVideo=data.active_vision_video||'';
+  state.activeTechDefaultImg=data.active_tech_default_img||''; state.activeTechDefaultVideo=data.active_tech_default_video||''; state.activeTechItems=data.active_tech_items||[];
+  state.activeCatWarmName=data.active_cat_warm_name||'Apparel'; state.activeCatAirName=data.active_cat_air_name||'Accessories';
+  state.activeCatWarmVideo=data.active_cat_warm_video||''; state.activeCatAirVideo=data.active_cat_air_video||'';
+  state.activeSellingPoints=data.active_selling_points||[]; state.activeProducts=data.active_products||[];
+  state.activeBgSectionImgs=data.active_bg_section_imgs||{};
+  state.outdoorLandingImg=data.outdoor_landing_img||''; state.activeLandingImg=data.active_landing_img||'';
+  state.outdoorCollectionName=data.outdoor_collection_name||'Outdoor';
+  state.landingHeadline=data.landing_headline||'Spring Summer 2026';
+  if(g('active-opening')) g('active-opening').value=state.activeOpening;
+  if(g('active-opening-video')) g('active-opening-video').value=state.activeOpeningVideo;
+  if(g('active-vision')) g('active-vision').value=state.activeVision;
+  if(g('active-vision-quote')) g('active-vision-quote').value=state.activeVisionQuote;
+  if(g('active-vision-video')) g('active-vision-video').value=state.activeVisionVideo;
+  if(g('active-tech-default-video')) g('active-tech-default-video').value=state.activeTechDefaultVideo;
+  if(g('active-cat-warm-name')) g('active-cat-warm-name').value=state.activeCatWarmName;
+  if(g('active-cat-air-name')) g('active-cat-air-name').value=state.activeCatAirName;
+  if(g('active-cat-warm-video')) g('active-cat-warm-video').value=state.activeCatWarmVideo;
+  if(g('active-cat-air-video')) g('active-cat-air-video').value=state.activeCatAirVideo;
+  if(g('active-collection-name')) g('active-collection-name').value=state.activeCollectionName;
+  if(g('outdoor-collection-name')) g('outdoor-collection-name').value=state.outdoorCollectionName;
+  if(g('landing-headline')) g('landing-headline').value=state.landingHeadline;
+  if(state.activeOpeningImg){const ap=g('active-opening-img-preview');if(ap)ap.innerHTML='<img src="'+state.activeOpeningImg+'" style="width:100%;height:100%;object-fit:cover" />';}
+  if(state.activeTechDefaultImg){const atp=g('active-tech-default-img-preview');if(atp)atp.innerHTML='<img src="'+state.activeTechDefaultImg+'" style="width:100%;height:100%;object-fit:cover" />';}
+  if(state.outdoorLandingImg){const olp=g('outdoor-landing-img-preview');if(olp)olp.innerHTML='<img src="'+state.outdoorLandingImg+'" style="width:100%;height:100%;object-fit:cover" />';}
+  if(state.activeLandingImg){const alp=g('active-landing-img-preview');if(alp)alp.innerHTML='<img src="'+state.activeLandingImg+'" style="width:100%;height:100%;object-fit:cover" />';}
+  renderActiveTechItems(); renderActiveSellingPoints(); renderActiveProductsList();
   // restore template selection
   document.querySelectorAll('.template-card').forEach(c=>{
     c.classList.toggle('selected', c.getAttribute('onclick').includes("'"+state.template+"'"));
@@ -1629,6 +1780,28 @@ async function savePitch() {
     bg_section_imgs:state.bgSectionImgs||{},
     bg_opacity:state.bgOpacity||0.35,
     bg_blur:state.bgBlur||8,
+    // Active collection
+    active_collection_name:state.activeCollectionName||'Active',
+    active_opening:g('active-opening')?.value||state.activeOpening||'',
+    active_opening_img:state.activeOpeningImg||'',
+    active_opening_video:g('active-opening-video')?.value||state.activeOpeningVideo||'',
+    active_vision:g('active-vision')?.value||state.activeVision||'',
+    active_vision_quote:g('active-vision-quote')?.value||state.activeVisionQuote||'',
+    active_vision_video:g('active-vision-video')?.value||state.activeVisionVideo||'',
+    active_tech_default_img:state.activeTechDefaultImg||'',
+    active_tech_default_video:g('active-tech-default-video')?.value||state.activeTechDefaultVideo||'',
+    active_tech_items:state.activeTechItems||[],
+    active_cat_warm_name:g('active-cat-warm-name')?.value||state.activeCatWarmName||'Apparel',
+    active_cat_air_name:g('active-cat-air-name')?.value||state.activeCatAirName||'Accessories',
+    active_cat_warm_video:g('active-cat-warm-video')?.value||state.activeCatWarmVideo||'',
+    active_cat_air_video:g('active-cat-air-video')?.value||state.activeCatAirVideo||'',
+    active_selling_points:state.activeSellingPoints||[],
+    active_products:state.activeProducts||[],
+    active_bg_section_imgs:state.activeBgSectionImgs||{},
+    outdoor_landing_img:state.outdoorLandingImg||'',
+    active_landing_img:state.activeLandingImg||'',
+    outdoor_collection_name:g('outdoor-collection-name')?.value||state.outdoorCollectionName||'Outdoor',
+    landing_headline:g('landing-headline')?.value||state.landingHeadline||'Spring Summer 2026',
     updated_at:new Date().toISOString()
   }).eq('id',state.pitchId);
   if (error) { setSaveStatus(''); showToast('Save failed','error'); return; }
@@ -1823,9 +1996,18 @@ async function saveProduct() {
   } else if (pendingHoverFile) {
     hoverImgUrl = await uploadImageToStorage(pendingHoverFile) || '';
   }
-  state.products.push({id:Date.now(),name,fabric:g('modal-fabric').value.trim(),desc:g('modal-desc').value.trim(),special:g('modal-special')?.value.trim()||'',video:g('modal-video')?.value.trim()||'',img:imgUrl,extraImgs,hoverImg:hoverImgUrl,warmth:pendingWarmthRating,dry:pendingDryRating,breath:pendingBreathRating,techs:[...pendingTechs],emoji:'📦',category:g('modal-category')?.value||'',layer:g('modal-layer')?.value||''});
-  g('modal-save-btn').textContent='Add Product'; g('modal-save-btn').disabled=false;
-  closeModal(); renderProductsList(); updatePreview(); scheduleAutoSave();
+  const _newProd={id:Date.now(),name,fabric:g('modal-fabric').value.trim(),desc:g('modal-desc').value.trim(),special:g('modal-special')?.value.trim()||'',video:g('modal-video')?.value.trim()||'',img:imgUrl,extraImgs,hoverImg:hoverImgUrl,warmth:pendingWarmthRating,dry:pendingDryRating,breath:pendingBreathRating,techs:[...pendingTechs],emoji:'📦',category:g('modal-category')?.value||'',layer:g('modal-layer')?.value||''};
+  if(window._savingForActive){
+    state.activeProducts=state.activeProducts||[];
+    state.activeProducts.push(_newProd);
+    window._savingForActive=false;
+    g('modal-save-btn').textContent='Add Product'; g('modal-save-btn').disabled=false;
+    closeModal(); renderActiveProductsList(); scheduleAutoSave();
+  } else {
+    state.products.push(_newProd);
+    g('modal-save-btn').textContent='Add Product'; g('modal-save-btn').disabled=false;
+    closeModal(); renderProductsList(); updatePreview(); scheduleAutoSave();
+  }
 }
 function removeProduct(id){state.products=state.products.filter(p=>p.id!==id);renderProductsList();updatePreview();scheduleAutoSave();}
 
@@ -1880,6 +2062,205 @@ function handleTechDefaultImg(inp) {
   uploadImageToStorage(file).then(publicUrl=>{
     if(publicUrl){state.techDefaultImg=publicUrl;scheduleAutoSave();}
   });
+}
+
+// ── ACTIVE COLLECTION HANDLERS ──
+function handleLandingImg(side, inp) {
+  if (!inp.files[0]) return;
+  const file=inp.files[0];
+  const url=URL.createObjectURL(file);
+  const preview=g(side+'-landing-img-preview');
+  if(preview) preview.innerHTML='<img src="'+url+'" style="width:100%;height:100%;object-fit:cover" />';
+  uploadImageToStorage(file).then(publicUrl=>{
+    if(publicUrl){
+      if(side==='outdoor') state.outdoorLandingImg=publicUrl;
+      else state.activeLandingImg=publicUrl;
+      scheduleAutoSave();
+    }
+  });
+}
+function handleActiveOpeningImage(inp) {
+  if (!inp.files[0]) return;
+  const file=inp.files[0];
+  const url=URL.createObjectURL(file);
+  const preview=g('active-opening-img-preview');
+  if(preview) preview.innerHTML='<img src="'+url+'" style="width:100%;height:100%;object-fit:cover" />';
+  uploadImageToStorage(file).then(publicUrl=>{
+    if(publicUrl){state.activeOpeningImg=publicUrl;scheduleAutoSave();}
+  });
+}
+function handleActiveTechDefaultImg(inp) {
+  if (!inp.files[0]) return;
+  const file=inp.files[0];
+  const url=URL.createObjectURL(file);
+  const preview=g('active-tech-default-img-preview');
+  if(preview) preview.innerHTML='<img src="'+url+'" style="width:100%;height:100%;object-fit:cover" />';
+  uploadImageToStorage(file).then(publicUrl=>{
+    if(publicUrl){state.activeTechDefaultImg=publicUrl;scheduleAutoSave();}
+  });
+}
+function triggerActiveBgUpload(section) {
+  const inp=g('bg-input-active-'+section);
+  if(inp) inp.click();
+}
+function handleActiveBgSection(section, inp) {
+  if(!inp.files[0]) return;
+  const file=inp.files[0];
+  const url=URL.createObjectURL(file);
+  const thumb=g('bg-thumb-active-'+section);
+  if(thumb) thumb.innerHTML='<img src="'+url+'" style="width:100%;height:100%;object-fit:cover" />';
+  uploadImageToStorage(file).then(publicUrl=>{
+    if(publicUrl){
+      state.activeBgSectionImgs=state.activeBgSectionImgs||{};
+      state.activeBgSectionImgs[section]=publicUrl;
+      scheduleAutoSave();
+    }
+  });
+}
+function addActiveTechItem() {
+  const id=Date.now();
+  state.activeTechItems=state.activeTechItems||[];
+  state.activeTechItems.push({id,label:'',name:'',desc:'',video:'',color:'#C4A882'});
+  renderActiveTechItems();
+  scheduleAutoSave();
+}
+function removeActiveTechItem(id) {
+  state.activeTechItems=state.activeTechItems.filter(t=>t.id!==id);
+  renderActiveTechItems();
+  scheduleAutoSave();
+}
+function updateActiveTechItem(id,field,val) {
+  const item=state.activeTechItems.find(t=>t.id===id);
+  if(!item) return;
+  if(field==='desc') val=val.slice(0,180);
+  item[field]=val;
+  scheduleAutoSave();
+}
+function renderActiveTechItems() {
+  const list=g('active-tech-items-list'); if(!list) return;
+  state.activeTechItems=state.activeTechItems||[];
+  list.innerHTML=state.activeTechItems.map((t,i)=>
+    '<div style="border:1px solid var(--border);border-radius:4px;padding:12px;margin-bottom:8px;background:var(--cream)">'
+      +'<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">'
+        +'<span style="font-size:10px;letter-spacing:0.1em;text-transform:uppercase;color:var(--mid)">Tech '+(i+1)+'</span>'
+        +'<button onclick="removeActiveTechItem('+t.id+')" style="font-size:14px;color:var(--light);background:none;border:none;cursor:pointer;padding:0">×</button>'
+      +'</div>'
+      +'<input class="field-input" style="margin-bottom:6px" placeholder="Label (e.g. DryTech)" value="'+(t.label||'').replace(/"/g,'&quot;')+'" oninput="updateActiveTechItem('+t.id+',\'label\',this.value)" />'
+      +'<input class="field-input" style="margin-bottom:6px" placeholder="Name" value="'+(t.name||'').replace(/"/g,'&quot;')+'" oninput="updateActiveTechItem('+t.id+',\'name\',this.value)" />'
+      +'<textarea class="field-input" style="margin-bottom:6px;min-height:56px" placeholder="Description (max 120 chars)" oninput="updateActiveTechItem('+t.id+',\'desc\',this.value);this.value=this.value.slice(0,120)" maxlength="180">'+(t.desc||'')+'</textarea>'
+      +'<input class="field-input" style="margin-bottom:8px" placeholder="Video URL (.mp4)" value="'+(t.video||'').replace(/"/g,'&quot;')+'" oninput="updateActiveTechItem('+t.id+',\'video\',this.value)" />'
+      +'<div style="display:flex;align-items:center;gap:10px">'
+        +'<span style="font-size:10px;letter-spacing:0.08em;text-transform:uppercase;color:var(--mid);flex-shrink:0">Hover colour</span>'
+        +'<input type="color" value="'+(t.color||'#C4A882')+'" '
+          +'oninput="updateActiveTechItem('+t.id+',\'color\',this.value);this.nextElementSibling.textContent=this.value;" '
+          +'style="width:32px;height:26px;border:1px solid var(--border);border-radius:3px;cursor:pointer;padding:1px 2px;background:var(--warm-white)" />'
+        +'<span style="font-size:11px;color:var(--mid);font-family:monospace">'+(t.color||'#C4A882')+'</span>'
+      +'</div>'
+    +'</div>'
+  ).join('');
+}
+function addActiveSellingPoint() {
+  const id=Date.now();
+  state.activeSellingPoints=state.activeSellingPoints||[];
+  state.activeSellingPoints.push({id,icon:'⭐',text:'',front:''});
+  renderActiveSellingPoints();
+  scheduleAutoSave();
+}
+function removeActiveSellingPoint(id) {
+  state.activeSellingPoints=state.activeSellingPoints.filter(s=>s.id!==id);
+  renderActiveSellingPoints();
+  scheduleAutoSave();
+}
+function renderActiveSellingPoints() {
+  const list=g('active-selling-points-list'); if(!list) return;
+  state.activeSellingPoints=state.activeSellingPoints||[];
+  list.innerHTML=state.activeSellingPoints.map((sp,i)=>
+    '<div class="sp-item" style="flex-direction:column;gap:6px;padding:10px">'
+      +'<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px">'
+        +'<span style="font-size:10px;letter-spacing:0.1em;text-transform:uppercase;color:var(--mid)">Card '+String(i+1).padStart(2,'0')+'</span>'
+        +'<button class="sp-remove" onclick="removeActiveSellingPoint('+sp.id+')">×</button>'
+      +'</div>'
+      +'<label style="font-size:10px;letter-spacing:0.08em;text-transform:uppercase;color:var(--mid)">Front (word/phrase)</label>'
+      +'<input class="field-input" style="margin-bottom:6px" placeholder="e.g. Performance" oninput="updateActiveSPFront('+sp.id+',this.value);scheduleAutoSave()" value="'+(sp.front||'').replace(/"/g,'&quot;')+'" />'
+      +'<label style="font-size:10px;letter-spacing:0.08em;text-transform:uppercase;color:var(--mid)">Back (data/insight)</label>'
+      +'<textarea class="field-input" placeholder="e.g. 82% demand activewear that moves with them" oninput="updateActiveSP('+sp.id+',this.value);scheduleAutoSave()">'+sp.text+'</textarea>'
+    +'</div>'
+  ).join('');
+}
+function updateActiveSP(id,val){const sp=state.activeSellingPoints.find(s=>s.id===id);if(sp)sp.text=val;}
+function updateActiveSPFront(id,val){const sp=state.activeSellingPoints.find(s=>s.id===id);if(sp)sp.front=val;}
+
+// Active products list
+function renderActiveProductsList() {
+  g('active-product-count').textContent=(state.activeProducts||[]).length;
+  const list=g('active-products-list'); if(!list) return;
+  list.innerHTML=(state.activeProducts||[]).map((p,i)=>`
+    <div class="product-item" draggable="true" data-id="${p.id}">
+      <div style="color:var(--light);font-size:13px;padding:0 6px 0 0;cursor:grab;flex-shrink:0">⠿</div>
+      <div class="product-thumb">${p.img?'<img src="'+p.img+'" loading="lazy" />':p.emoji}</div>
+      <div class="product-info"><div class="product-info-name">${p.name}</div><div class="product-info-fabric">${p.fabric||'No fabric info'}</div></div>
+      <div style="display:flex;gap:4px;flex-shrink:0">
+        <button class="product-remove" style="color:var(--mid);font-size:13px;padding:4px 6px" onclick="editActiveProduct(${p.id})" title="Edit">✎</button>
+        <button class="product-remove" onclick="removeActiveProduct(${p.id})" title="Remove">×</button>
+      </div>
+    </div>`).join('');
+}
+function removeActiveProduct(id){state.activeProducts=state.activeProducts.filter(p=>p.id!==id);renderActiveProductsList();scheduleAutoSave();}
+function handleActiveFileUpload(inp) {
+  if (!inp.files[0]) return;
+  const file=inp.files[0];
+  const localUrl=URL.createObjectURL(file);
+  pendingImg=localUrl; pendingFile=file;
+  window._savingForActive=true;
+  openModal();
+  g('modal-img-preview').innerHTML='<img src="'+localUrl+'" />';
+  g('modal-extra-imgs').style.display='block';
+  inp.value='';
+}
+function editActiveProduct(id) {
+  const p=state.activeProducts.find(x=>x.id===id); if(!p) return;
+  window._editingActiveProduct=id;
+  window._savingForActive=true;
+  pendingImg=p.img||null; pendingExtraFiles=[];
+  pendingHoverFile=null; pendingHoverImg=p.hoverImg||null;
+  pendingWarmthRating=p.warmth||0; pendingDryRating=p.dry||0; pendingBreathRating=p.breath||0;
+  g('modal-name').value=p.name||'';
+  if(g('modal-category')) g('modal-category').value=p.category||'';
+  if(g('modal-layer')) g('modal-layer').value=p.layer||'';
+  g('modal-fabric').value=p.fabric||'';
+  g('modal-desc').value=p.desc||'';
+  if(g('modal-special')) g('modal-special').value=p.special||'';
+  if(g('modal-video')) g('modal-video').value=p.video||'';
+  pendingTechs=[...(p.techs||[])];
+  g('modal-img-preview').innerHTML=p.img?'<img src="'+p.img+'" /><div style="position:absolute;inset:0;background:rgba(0,0,0,0.3);display:flex;align-items:center;justify-content:center;color:white;font-size:12px;letter-spacing:0.06em;text-transform:uppercase">Click to change</div>':'<div class="img-preview-placeholder"><span>'+p.emoji+'</span>Click to upload image</div>';
+  g('modal-img-preview').style.position='relative';
+  g('modal-extra-thumbs').innerHTML=''; removedExtraUrls=[];
+  if(p.extraImgs&&p.extraImgs.length){g('modal-extra-imgs').style.display='block';p.extraImgs.forEach((src,i)=>{const thumb=document.createElement('div');thumb.style.cssText='position:relative;width:48px;height:48px;border-radius:2px;overflow:hidden;flex-shrink:0';thumb.dataset.src=src;thumb.innerHTML=`<img src="${src}" style="width:100%;height:100%;object-fit:cover" /><button onclick="removeExistingExtra(this)" style="position:absolute;top:0;right:0;background:rgba(0,0,0,0.65);color:white;border:none;width:16px;height:16px;font-size:10px;cursor:pointer">×</button>`;g('modal-extra-thumbs').appendChild(thumb);});}
+  else{g('modal-extra-imgs').style.display='block';}
+  g('modal-save-btn').textContent='Update Product';
+  g('modal-save-btn').onclick=()=>updateActiveProduct(id);
+  g('modal-overlay').classList.add('open');
+  const hp=g('modal-hover-preview');
+  if(hp) hp.innerHTML=p.hoverImg?'<img src="'+p.hoverImg+'" style="width:100%;height:100%;object-fit:cover" />'+'<div id="modal-hover-replace" style="display:flex;position:absolute;inset:0;background:rgba(0,0,0,0.3);align-items:center;justify-content:center;color:white;font-size:11px;text-transform:uppercase">Click to replace</div>':'<span style="font-size:11px;color:var(--mid)">Click to upload hover image</span>';
+  renderWarmthPicker(); renderMeterPicker('dry',pendingDryRating,'d'); renderMeterPicker('breath',pendingBreathRating,'b'); renderTechList();
+}
+async function updateActiveProduct(id) {
+  const name=g('modal-name').value.trim(); if(!name){g('modal-name').focus();return;}
+  const idx=state.activeProducts.findIndex(x=>x.id===id); if(idx===-1) return;
+  g('modal-save-btn').textContent='Saving...'; g('modal-save-btn').disabled=true;
+  let imgUrl=state.activeProducts[idx].img;
+  if(pendingFile){imgUrl=await uploadImageToStorage(pendingFile);if(!imgUrl){g('modal-save-btn').textContent='Update Product';g('modal-save-btn').disabled=false;return;}}
+  const newExtras=[];
+  for(const ef of pendingExtraFiles.filter(Boolean)){const url=await uploadImageToStorage(ef.file);if(url)newExtras.push(url);}
+  const existingExtras=(state.activeProducts[idx].extraImgs||[]).filter(url=>!removedExtraUrls.includes(url));
+  let hoverImgUrl=state.activeProducts[idx].hoverImg||'';
+  if(pendingHoverImg)hoverImgUrl=pendingHoverImg;
+  else if(pendingHoverFile)hoverImgUrl=await uploadImageToStorage(pendingHoverFile)||hoverImgUrl;
+  state.activeProducts[idx]={...state.activeProducts[idx],name,fabric:g('modal-fabric').value.trim(),desc:g('modal-desc').value.trim(),special:g('modal-special')?.value.trim()||'',video:g('modal-video')?.value.trim()||'',img:imgUrl,extraImgs:[...existingExtras,...newExtras],hoverImg:hoverImgUrl,warmth:pendingWarmthRating,dry:pendingDryRating,breath:pendingBreathRating,techs:[...pendingTechs],category:g('modal-category')?.value||'',layer:g('modal-layer')?.value||''};
+  g('modal-save-btn').textContent='Add Product'; g('modal-save-btn').disabled=false;
+  g('modal-save-btn').onclick=saveProduct;
+  window._savingForActive=false; window._editingActiveProduct=null;
+  closeModal(); renderActiveProductsList(); scheduleAutoSave();
 }
 function addTechItem() {
   const id=Date.now();
@@ -2729,6 +3110,18 @@ async function loadPresentationView(token) {
   state.whyStat2=data.why_stat2||""; state.whyStat2Label=data.why_stat2_label||"";
   state.whyVideo=data.why_video||"";
   state.sellingPoints=data.selling_points||[]; state.techDefaultImg=data.tech_default_img||""; state.techDefaultVideo=data.tech_default_video||""; state.catWarmVideo=data.cat_warm_video||""; state.catAirVideo=data.cat_air_video||""; state.catWarmName=data.cat_warm_name||"Base Layer"; state.catAirName=data.cat_air_name||"Mid Layer"; state.bgSectionImgs=data.bg_section_imgs||{}; state.bgOpacity=data.bg_opacity||0.35; state.bgBlur=data.bg_blur||8; state.techItems=data.tech_items||[];
+  // Active
+  state.activeCollectionName=data.active_collection_name||'Active';
+  state.activeOpening=data.active_opening||''; state.activeOpeningImg=data.active_opening_img||''; state.activeOpeningVideo=data.active_opening_video||'';
+  state.activeVision=data.active_vision||''; state.activeVisionQuote=data.active_vision_quote||''; state.activeVisionVideo=data.active_vision_video||'';
+  state.activeTechDefaultImg=data.active_tech_default_img||''; state.activeTechDefaultVideo=data.active_tech_default_video||''; state.activeTechItems=data.active_tech_items||[];
+  state.activeCatWarmName=data.active_cat_warm_name||'Apparel'; state.activeCatAirName=data.active_cat_air_name||'Accessories';
+  state.activeCatWarmVideo=data.active_cat_warm_video||''; state.activeCatAirVideo=data.active_cat_air_video||'';
+  state.activeSellingPoints=data.active_selling_points||[]; state.activeProducts=data.active_products||[];
+  state.activeBgSectionImgs=data.active_bg_section_imgs||{};
+  state.outdoorLandingImg=data.outdoor_landing_img||''; state.activeLandingImg=data.active_landing_img||'';
+  state.outdoorCollectionName=data.outdoor_collection_name||'Outdoor';
+  state.landingHeadline=data.landing_headline||'Spring Summer 2026';
   document.querySelector("header").style.display="none";
   document.querySelector(".sidebar").style.display="none";
   document.querySelector(".canvas-label").style.display="none";
@@ -2739,10 +3132,154 @@ async function loadPresentationView(token) {
   document.documentElement.style.setProperty("--bg-brightness", state.bgOpacity||0.35);
   document.documentElement.style.setProperty("--bg-blur", (state.bgBlur||8)+"px");
   initCinematicBg();
-  switchBgImage("collection");
   showScreen("builder");
-  updatePreview();
+  showLandingScreen();
   g("loading-screen").classList.add("hidden");
+}
+
+// ── LANDING SCREEN (split: Outdoor | Active) ──
+function showLandingScreen() {
+  const preview=g('showcase-preview'); if(!preview) return;
+  const headline=state.landingHeadline||'Spring Summer 2026';
+  const outdoorName=state.outdoorCollectionName||'Outdoor';
+  const activeName=state.activeCollectionName||'Active';
+  const outdoorImg=state.outdoorLandingImg||'';
+  const activeImg=state.activeLandingImg||'';
+  const outdoorCount=state.products||[];
+  const activeCount=state.activeProducts||[];
+  const textGrad='linear-gradient(to top, rgba(0,0,0,0.75) 0%, rgba(0,0,0,0.2) 50%, transparent 100%)';
+
+  preview.className='showcase';
+  preview.innerHTML=
+    // Top headline bar
+    '<div style="position:relative;z-index:2;text-align:center;padding:52px 40px 36px;background:#1C1C1A">'
+      +'<div style="font-size:9px;letter-spacing:0.35em;text-transform:uppercase;color:rgba(196,168,130,0.6);margin-bottom:16px">Delta Galil</div>'
+      +'<div style="font-family:Cormorant Garamond,serif;font-size:clamp(36px,5vw,68px);font-weight:300;color:#fff;line-height:1.05;letter-spacing:0.02em">'+headline+'</div>'
+      +'<div style="width:48px;height:1px;background:#C4A882;margin:20px auto 0;opacity:0.5"></div>'
+    +'</div>'
+    // Split panels
+    +'<div style="display:grid;grid-template-columns:1fr 1fr;min-height:75vh">'
+      // Outdoor
+      +'<div onclick="enterCollection(\'outdoor\')" style="position:relative;overflow:hidden;cursor:pointer;background:#0D1018;border-right:1px solid rgba(255,255,255,0.08)">'
+        +(outdoorImg?'<img src="'+outdoorImg+'" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:center top;opacity:1;transition:transform 0.8s ease" class="landing-bg-img" />'
+          :'<div style="position:absolute;inset:0;background:linear-gradient(135deg,#0D1018 0%,#1A2030 100%)"></div>')
+        +'<div style="position:absolute;inset:0;background:'+textGrad+'"></div>'
+        +'<div style="position:absolute;inset:0;background:rgba(0,0,0,0);transition:background 0.4s" class="landing-hover-overlay"></div>'
+        +'<div style="position:absolute;bottom:0;left:0;right:0;padding:44px 44px 48px;z-index:2">'
+          +'<div style="width:20px;height:1px;background:#C4A882;margin-bottom:14px;opacity:0.7"></div>'
+          +'<div style="font-size:9px;letter-spacing:0.3em;text-transform:uppercase;color:rgba(255,255,255,0.5);margin-bottom:12px">Collection 01</div>'
+          +'<div style="font-family:Cormorant Garamond,serif;font-size:clamp(32px,3.5vw,52px);font-weight:300;color:#fff;line-height:1.05;margin-bottom:14px">'+outdoorName+'</div>'
+          +(outdoorCount.length?'<div style="font-size:10px;color:rgba(255,255,255,0.4);letter-spacing:0.12em;text-transform:uppercase;margin-bottom:18px">'+outdoorCount.length+' styles</div>':'')
+          +'<div style="font-size:10px;letter-spacing:0.2em;text-transform:uppercase;color:#C4A882;opacity:0;transition:opacity 0.3s" class="landing-cta">Explore →</div>'
+        +'</div>'
+      +'</div>'
+      // Active
+      +'<div onclick="enterCollection(\'active\')" style="position:relative;overflow:hidden;cursor:pointer;background:#180810">'
+        +(activeImg?'<img src="'+activeImg+'" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:center top;opacity:1;transition:transform 0.8s ease" class="landing-bg-img" />'
+          :'<div style="position:absolute;inset:0;background:linear-gradient(135deg,#180810 0%,#2A1020 100%)"></div>')
+        +'<div style="position:absolute;inset:0;background:'+textGrad+'"></div>'
+        +'<div style="position:absolute;inset:0;background:rgba(0,0,0,0);transition:background 0.4s" class="landing-hover-overlay"></div>'
+        +'<div style="position:absolute;bottom:0;left:0;right:0;padding:44px 44px 48px;z-index:2">'
+          +'<div style="width:20px;height:1px;background:#C4A882;margin-bottom:14px;opacity:0.7"></div>'
+          +'<div style="font-size:9px;letter-spacing:0.3em;text-transform:uppercase;color:rgba(255,255,255,0.5);margin-bottom:12px">Collection 02</div>'
+          +'<div style="font-family:Cormorant Garamond,serif;font-size:clamp(32px,3.5vw,52px);font-weight:300;color:#fff;line-height:1.05;margin-bottom:14px">'+activeName+'</div>'
+          +(activeCount.length?'<div style="font-size:10px;color:rgba(255,255,255,0.4);letter-spacing:0.12em;text-transform:uppercase;margin-bottom:18px">'+activeCount.length+' styles</div>':'')
+          +'<div style="font-size:10px;letter-spacing:0.2em;text-transform:uppercase;color:#C4A882;opacity:0;transition:opacity 0.3s" class="landing-cta">Explore →</div>'
+        +'</div>'
+      +'</div>'
+    +'</div>';
+
+  // Hover effects
+  setTimeout(()=>{
+    document.querySelectorAll('#showcase-preview > div:last-child > div').forEach(panel=>{
+      const overlay=panel.querySelector('.landing-hover-overlay');
+      const cta=panel.querySelector('.landing-cta');
+      const img=panel.querySelector('.landing-bg-img');
+      panel.addEventListener('mouseenter',()=>{
+        if(overlay) overlay.style.background='rgba(0,0,0,0.15)';
+        if(cta) cta.style.opacity='1';
+        if(img) img.style.transform='scale(1.04)';
+      });
+      panel.addEventListener('mouseleave',()=>{
+        if(overlay) overlay.style.background='rgba(0,0,0,0)';
+        if(cta) cta.style.opacity='0';
+        if(img) img.style.transform='scale(1)';
+      });
+    });
+  },100);
+  preview.style.display='block';
+}
+
+// ── ENTER COLLECTION ──
+let _activeMode=false; // true when viewer is in Active collection
+function enterCollection(which) {
+  _activeMode=(which==='active');
+  if(_activeMode) {
+    // Temporarily swap state to Active data for rendering
+    window._outdoorState={
+      products:state.products, catWarmName:state.catWarmName, catAirName:state.catAirName,
+      catWarmVideo:state.catWarmVideo, catAirVideo:state.catAirVideo,
+      opening:state.opening, openingImg:state.openingImg, openingVideo:state.openingVideo,
+      vision:state.vision, visionQuote:state.visionQuote, visionVideo:state.visionVideo,
+      techItems:state.techItems, techDefaultImg:state.techDefaultImg, techDefaultVideo:state.techDefaultVideo,
+      sellingPoints:state.sellingPoints, bgSectionImgs:state.bgSectionImgs,
+    };
+    state.products=state.activeProducts||[];
+    state.catWarmName=state.activeCatWarmName||'Apparel';
+    state.catAirName=state.activeCatAirName||'Accessories';
+    state.catWarmVideo=state.activeCatWarmVideo||'';
+    state.catAirVideo=state.activeCatAirVideo||'';
+    state.opening=state.activeOpening||'';
+    state.openingImg=state.activeOpeningImg||'';
+    state.openingVideo=state.activeOpeningVideo||'';
+    state.vision=state.activeVision||'';
+    state.visionQuote=state.activeVisionQuote||'';
+    state.visionVideo=state.activeVisionVideo||'';
+    state.techItems=state.activeTechItems||[];
+    state.techDefaultImg=state.activeTechDefaultImg||'';
+    state.techDefaultVideo=state.activeTechDefaultVideo||'';
+    state.sellingPoints=state.activeSellingPoints||[];
+    state.bgSectionImgs=state.activeBgSectionImgs||{};
+    // Update hidden fields
+    if(g('pitch-opening')) g('pitch-opening').value=state.opening;
+    if(g('opening-video')) g('opening-video').value=state.openingVideo;
+    if(g('pitch-vision')) g('pitch-vision').value=state.vision;
+    if(g('pitch-vision-quote')) g('pitch-vision-quote').value=state.visionQuote;
+    if(g('pitch-vision-video')) g('pitch-vision-video').value=state.visionVideo;
+    if(g('tech-default-video')) g('tech-default-video').value=state.techDefaultVideo;
+    switchBgImage('collection');
+  }
+  updatePreview();
+  window.scrollTo({top:0,behavior:'smooth'});
+  // Add a back-to-landing button
+  const preview=g('showcase-preview');
+  if(preview){
+    const backBar=document.createElement('div');
+    backBar.id='back-to-landing';
+    backBar.style.cssText='position:fixed;top:16px;left:50%;transform:translateX(-50%);z-index:999;background:rgba(28,28,26,0.85);border:1px solid rgba(255,255,255,0.12);border-radius:20px;padding:8px 20px;display:flex;align-items:center;gap:10px;cursor:pointer;backdrop-filter:blur(8px)';
+    backBar.innerHTML='<span style="font-size:9px;letter-spacing:0.2em;text-transform:uppercase;color:rgba(255,255,255,0.5)">'+state.landingHeadline+'</span>'
+      +'<span style="color:rgba(255,255,255,0.2);font-size:10px">|</span>'
+      +'<span style="font-size:9px;letter-spacing:0.2em;text-transform:uppercase;color:#C4A882">'+(which==='outdoor'?state.outdoorCollectionName:state.activeCollectionName)+'</span>';
+    backBar.onclick=()=>{ restoreFromCollection(); showLandingScreen(); backBar.remove(); };
+    document.body.appendChild(backBar);
+  }
+}
+
+function restoreFromCollection() {
+  if(_activeMode && window._outdoorState) {
+    const s=window._outdoorState;
+    state.products=s.products; state.catWarmName=s.catWarmName; state.catAirName=s.catAirName;
+    state.catWarmVideo=s.catWarmVideo; state.catAirVideo=s.catAirVideo;
+    state.opening=s.opening; state.openingImg=s.openingImg; state.openingVideo=s.openingVideo;
+    state.vision=s.vision; state.visionQuote=s.visionQuote; state.visionVideo=s.visionVideo;
+    state.techItems=s.techItems; state.techDefaultImg=s.techDefaultImg; state.techDefaultVideo=s.techDefaultVideo;
+    state.sellingPoints=s.sellingPoints; state.bgSectionImgs=s.bgSectionImgs;
+    window._outdoorState=null;
+  }
+  _activeMode=false;
+  // remove back button if visible
+  const bb=document.getElementById('back-to-landing'); if(bb) bb.remove();
+  switchBgImage('collection');
 }
 
 async function loadSharedView(token) {
