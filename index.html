@@ -3201,7 +3201,7 @@ function showLandingScreen() {
   const activeImg=state.activeLandingImg||'';
   const outdoorVid=g('outdoor-landing-video')?.value||state.outdoorLandingVideo||'';
   const activeVid=g('active-landing-video')?.value||state.activeLandingVideo||'';
-  const outdoorCount=(state.products||[]).filter(p=>p.category==='warm'||p.layer==='base'||p.layer==='Base Layer');
+  const outdoorCount=(state.products||[]);
   const activeCount=(state.activeProducts||[]);
   const textGrad='linear-gradient(to top, rgba(0,0,0,0.75) 0%, rgba(0,0,0,0.2) 50%, transparent 100%)';
 
