@@ -1407,16 +1407,63 @@ async function duplicatePitch(id, pitches) {
     client: src.client||'',
     tagline: src.tagline||'',
     description: src.description||'',
-    opening: src.opening||'',
-    why_tagline: src.why_tagline||'',
-    vision: src.vision||'',
     template: src.template||'editorial',
     palette: src.palette||0,
     products: src.products||[],
+    // Opening
+    opening: src.opening||'',
     opening_img: src.opening_img||'',
     opening_mobile_img: src.opening_mobile_img||'',
+    opening_video: src.opening_video||'',
+    opening_mobile_video: src.opening_mobile_video||'',
+    // Vision
+    vision: src.vision||'',
+    vision_quote: src.vision_quote||'',
+    vision_video: src.vision_video||'',
+    // Why
+    why_tagline: src.why_tagline||'',
+    why_stat1: src.why_stat1||'',
+    why_stat1_label: src.why_stat1_label||'',
+    why_stat2: src.why_stat2||'',
+    why_stat2_label: src.why_stat2_label||'',
+    why_video: src.why_video||'',
+    selling_points: src.selling_points||[],
+    // Tech
+    tech_default_img: src.tech_default_img||'',
+    tech_default_video: src.tech_default_video||'',
+    tech_items: src.tech_items||[],
+    // Categories
+    cat_warm_name: src.cat_warm_name||'Base Layer',
+    cat_air_name: src.cat_air_name||'Mid Layer',
     cat_warm_video: src.cat_warm_video||'',
     cat_air_video: src.cat_air_video||'',
+    // Background
+    bg_section_imgs: src.bg_section_imgs||{},
+    bg_opacity: src.bg_opacity||0.35,
+    bg_blur: src.bg_blur||8,
+    // Active collection
+    active_collection_name: src.active_collection_name||'Active',
+    active_opening: src.active_opening||'',
+    active_opening_img: src.active_opening_img||'',
+    active_opening_video: src.active_opening_video||'',
+    active_vision: src.active_vision||'',
+    active_vision_quote: src.active_vision_quote||'',
+    active_vision_video: src.active_vision_video||'',
+    active_tech_default_img: src.active_tech_default_img||'',
+    active_tech_default_video: src.active_tech_default_video||'',
+    active_tech_items: src.active_tech_items||[],
+    active_cat_warm_name: src.active_cat_warm_name||'Apparel',
+    active_cat_air_name: src.active_cat_air_name||'Accessories',
+    active_cat_warm_video: src.active_cat_warm_video||'',
+    active_cat_air_video: src.active_cat_air_video||'',
+    active_selling_points: src.active_selling_points||[],
+    active_products: src.active_products||[],
+    active_bg_section_imgs: src.active_bg_section_imgs||{},
+    // Landing
+    outdoor_landing_img: src.outdoor_landing_img||'',
+    active_landing_img: src.active_landing_img||'',
+    outdoor_collection_name: src.outdoor_collection_name||'Outdoor',
+    landing_headline: src.landing_headline||'Spring Summer 2026',
   };
   const {data,error}=await sb.from('pitches').insert(copy).select().single();
   if (error){showToast('Could not duplicate','error');return;}
@@ -1540,7 +1587,7 @@ function showCat(cat){
     return;
   }
   const prods=state.products||[];
-  const catProds=prods.filter(p=>p.category===cat);
+  const catProds=prods.filter(p=>p.category===cat||(cat==='warm'&&(p.layer==='base'||p.layer==='Base Layer'))||(cat==='air'&&(p.layer==='mid'||p.layer==='Mid Layer')));
   // Preload all extra/hover images in background so detail panel opens instantly
   setTimeout(()=>{
     catProds.forEach(p=>{
@@ -1630,7 +1677,7 @@ function filterCat(cat,layer,btn){
   btn.closest('div').querySelectorAll('button').forEach(b=>{b.style.background='transparent';b.style.color='#888';b.style.borderColor='#ccc';});
   btn.style.background='#1C1C1A';btn.style.color='#fff';btn.style.borderColor='#1C1C1A';
   const prods=state.products||[];
-  const filtered=prods.filter(p=>p.category===cat&&(layer==='all'||p.layer===layer));
+  const filtered=prods.filter(p=>(p.category===cat||(cat==='warm'&&(p.layer==='base'||p.layer==='Base Layer'))||(cat==='air'&&(p.layer==='mid'||p.layer==='Mid Layer')))&&(layer==='all'||p.layer===layer||p.layer===(layer==='base'?'Base Layer':layer==='mid'?'Mid Layer':layer)));
   const grid=document.getElementById(cat+'-grid');
   grid.innerHTML=buildCatGrid(filtered,acc);
   setTimeout(()=>{
@@ -2676,8 +2723,8 @@ function showSection(section) {
 
     if (section==='collection') {
       const prods=state.products||[];
-      const warmProds=prods.filter(p=>p.layer==='base');
-      const airProds=prods.filter(p=>p.layer==='mid');
+      const warmProds=prods.filter(p=>p.layer==='base'||p.layer==='Base Layer'||p.category==='warm');
+      const airProds=prods.filter(p=>p.layer==='mid'||p.layer==='Mid Layer'||p.category==='air');
       const hasCategories=warmProds.length>0||airProds.length>0;
 
       if(!hasCategories){
@@ -2876,8 +2923,8 @@ function updatePreview() {
     preview.className='showcase tpl-preview-'+state.template;
     const {bg,textColor,accentColor,borderColor,cardBg} = getSectionColors();
     const prods=state.products||[];
-    const warmProds=prods.filter(p=>p.layer==='base');
-    const airProds=prods.filter(p=>p.layer==='mid');
+    const warmProds=prods.filter(p=>p.layer==='base'||p.layer==='Base Layer'||p.category==='warm');
+    const airProds=prods.filter(p=>p.layer==='mid'||p.layer==='Mid Layer'||p.category==='air');
     const hasCategories=warmProds.length>0||airProds.length>0;
     if(hasCategories){
       const warmVid=g('cat-warm-video')?.value||state.catWarmVideo||'';
