@@ -2000,6 +2000,18 @@ function replaceExtraImg(el, idx) {
   input.click();
 }
 function openModal() {
+  // Update category labels based on which collection we're editing
+  const warmOpt=g('cat-warm-option');
+  const airOpt=g('cat-air-option');
+  if(warmOpt && airOpt){
+    if(window._savingForActive){
+      warmOpt.textContent=state.activeCatWarmName||'Apparel';
+      airOpt.textContent=state.activeCatAirName||'Accessories';
+    } else {
+      warmOpt.textContent=state.catWarmName||'Base Layer';
+      airOpt.textContent=state.catAirName||'Mid Layer';
+    }
+  }
   // Update category dropdown with current names
   const wo = document.getElementById('cat-warm-option');
   const ao = document.getElementById('cat-air-option');
