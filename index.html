@@ -1926,6 +1926,11 @@ async function uploadImageToStorage(file) {
 
 function handleFileUpload(inp) {
   if (!inp.files[0]) return;
+  window._savingForActive=false;
+  const warmOpt=g('cat-warm-option');
+  const airOpt=g('cat-air-option');
+  if(warmOpt) warmOpt.textContent=state.catWarmName||'Base Layer';
+  if(airOpt) airOpt.textContent=state.catAirName||'Mid Layer';
   const file = inp.files[0];
   const localUrl = URL.createObjectURL(file);
   pendingImg = localUrl;
@@ -2278,6 +2283,11 @@ function handleActiveFileUpload(inp) {
   const localUrl=URL.createObjectURL(file);
   pendingImg=localUrl; pendingFile=file;
   window._savingForActive=true;
+  // Update category dropdown labels for Active
+  const warmOpt=g('cat-warm-option');
+  const airOpt=g('cat-air-option');
+  if(warmOpt) warmOpt.textContent=state.activeCatWarmName||'Apparel';
+  if(airOpt) airOpt.textContent=state.activeCatAirName||'Accessories';
   openModal();
   g('modal-img-preview').innerHTML='<img src="'+localUrl+'" />';
   g('modal-extra-imgs').style.display='block';
@@ -2287,6 +2297,11 @@ function editActiveProduct(id) {
   const p=state.activeProducts.find(x=>x.id===id); if(!p) return;
   window._editingActiveProduct=id;
   window._savingForActive=true;
+  // Update category dropdown labels for Active
+  const warmOpt=g('cat-warm-option');
+  const airOpt=g('cat-air-option');
+  if(warmOpt) warmOpt.textContent=state.activeCatWarmName||'Apparel';
+  if(airOpt) airOpt.textContent=state.activeCatAirName||'Accessories';
   pendingImg=p.img||null; pendingExtraFiles=[];
   pendingHoverFile=null; pendingHoverImg=p.hoverImg||null;
   pendingWarmthRating=p.warmth||0; pendingDryRating=p.dry||0; pendingBreathRating=p.breath||0;
