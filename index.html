@@ -1517,8 +1517,17 @@ async function openPitch(id) {
   // Active collection
   state.activeCollectionName=data.active_collection_name||'Active';
   state.activeTitle=data.active_title||''; state.activeClient=data.active_client||'';
+  state.activeOpening=data.active_opening||''; state.activeOpeningImg=data.active_opening_img||''; state.activeOpeningVideo=data.active_opening_video||'';
+  state.activeVision=data.active_vision||''; state.activeVisionQuote=data.active_vision_quote||''; state.activeVisionVideo=data.active_vision_video||'';
+  state.activeTechDefaultImg=data.active_tech_default_img||''; state.activeTechDefaultVideo=data.active_tech_default_video||''; state.activeTechItems=data.active_tech_items||[];
+  state.activeCatWarmName=data.active_cat_warm_name||'Apparel'; state.activeCatAirName=data.active_cat_air_name||'Accessories';
+  state.activeCatWarmVideo=data.active_cat_warm_video||''; state.activeCatAirVideo=data.active_cat_air_video||'';
+  state.activeSellingPoints=data.active_selling_points||[]; state.activeProducts=data.active_products||[];
+  state._activeProductsLoaded=true;
+  state.activeBgSectionImgs=data.active_bg_section_imgs||{};
   if(g('active-title')) g('active-title').value=state.activeTitle;
   if(g('active-client')) g('active-client').value=state.activeClient;
+  if(g('active-opening')) g('active-opening').value=state.activeOpening;
   if(g('active-opening-video')) g('active-opening-video').value=state.activeOpeningVideo;
   if(g('active-vision')) g('active-vision').value=state.activeVision;
   if(g('active-vision-quote')) g('active-vision-quote').value=state.activeVisionQuote;
@@ -3195,6 +3204,7 @@ async function loadPresentationView(token) {
   // Active
   state.activeCollectionName=data.active_collection_name||'Active';
   state.activeTitle=data.active_title||''; state.activeClient=data.active_client||'';
+  state.activeOpening=data.active_opening||''; state.activeOpeningImg=data.active_opening_img||''; state.activeOpeningVideo=data.active_opening_video||'';
   state.activeVision=data.active_vision||''; state.activeVisionQuote=data.active_vision_quote||''; state.activeVisionVideo=data.active_vision_video||'';
   state.activeTechDefaultImg=data.active_tech_default_img||''; state.activeTechDefaultVideo=data.active_tech_default_video||''; state.activeTechItems=data.active_tech_items||[];
   state.activeCatWarmName=data.active_cat_warm_name||'Apparel'; state.activeCatAirName=data.active_cat_air_name||'Accessories';
