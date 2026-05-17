@@ -733,7 +733,7 @@ img { image-rendering: auto; }
         <p class="section-label" style="margin-top:8px">Active — Opening Screen</p>
         <div class="field-group"><label class="field-label">Collection Title</label><input class="field-input" id="active-title" type="text" placeholder="e.g. Active Collection" oninput="state.activeTitle=this.value;scheduleAutoSave()" /></div>
         <div class="field-group"><label class="field-label">Client</label><input class="field-input" id="active-client" type="text" placeholder="e.g. Lululemon" oninput="state.activeClient=this.value;scheduleAutoSave()" /></div>
-        <div class="field-group"><label class="field-label">Opening Sentence</label><textarea class="field-input" id="active-opening" placeholder="e.g. Move freely, always." oninput="scheduleAutoSave()" style="min-height:60px"></textarea></div>
+        <div class="field-group"><label class="field-label">Opening Sentence</label><textarea class="field-input" id="active-opening" placeholder="e.g. Move freely, always." oninput="state.activeOpening=this.value;scheduleAutoSave()" style="min-height:60px"></textarea></div>
         <div class="field-group">
           <label class="field-label">Opening Background Image</label>
           <div style="display:flex;gap:8px;align-items:center;margin-bottom:6px">
@@ -754,8 +754,8 @@ img { image-rendering: auto; }
         <div class="field-group"><label class="field-label">Accessories Category Name</label><input class="field-input" id="active-cat-air-name" type="text" placeholder="e.g. Accessories" oninput="state.activeCatAirName=this.value;scheduleAutoSave()" /></div>
         <div class="field-group"><label class="field-label">Accessories — Background Video URL</label><input class="field-input" id="active-cat-air-video" type="text" placeholder="Paste video URL (.mp4)" oninput="state.activeCatAirVideo=this.value;scheduleAutoSave()" /></div>
         <p class="section-label" style="margin-top:8px">Active — Vision</p>
-        <div class="field-group"><label class="field-label">Pull Quote</label><input class="field-input" id="active-vision-quote" type="text" placeholder="e.g. Engineered for life in motion." oninput="scheduleAutoSave()" /></div>
-        <div class="field-group"><label class="field-label">Vision Text</label><textarea class="field-input" id="active-vision" placeholder="What's the story behind Active?..." oninput="scheduleAutoSave()" style="min-height:100px"></textarea></div>
+        <div class="field-group"><label class="field-label">Pull Quote</label><input class="field-input" id="active-vision-quote" type="text" placeholder="e.g. Engineered for life in motion." oninput="state.activeVisionQuote=this.value;scheduleAutoSave()" /></div>
+        <div class="field-group"><label class="field-label">Vision Text</label><textarea class="field-input" id="active-vision" placeholder="What's the story behind Active?..." oninput="state.activeVision=this.value;scheduleAutoSave()" style="min-height:100px"></textarea></div>
         <div class="field-group"><label class="field-label">Vision Background Video URL</label><input class="field-input" id="active-vision-video" type="text" placeholder="Paste video URL (.mp4)" oninput="state.activeVisionVideo=this.value;scheduleAutoSave()" /></div>
         <p class="section-label" style="margin-top:8px">Active — Why This Collection</p>
         <div id="active-selling-points-list"></div>
@@ -1841,12 +1841,12 @@ async function savePitch() {
     active_collection_name:state.activeCollectionName||'Active',
     active_title:g('active-title')?.value||state.activeTitle||'',
     active_client:g('active-client')?.value||state.activeClient||'',
-    active_opening:g('active-opening')?.value||state.activeOpening||'',
+    active_opening:state.activeOpening||'',
     active_opening_img:state.activeOpeningImg||'',
-    active_opening_video:g('active-opening-video')?.value||state.activeOpeningVideo||'',
-    active_vision:g('active-vision')?.value||state.activeVision||'',
-    active_vision_quote:g('active-vision-quote')?.value||state.activeVisionQuote||'',
-    active_vision_video:g('active-vision-video')?.value||state.activeVisionVideo||'',
+    active_opening_video:state.activeOpeningVideo||'',
+    active_vision:state.activeVision||'',
+    active_vision_quote:state.activeVisionQuote||'',
+    active_vision_video:state.activeVisionVideo||'',
     active_tech_default_img:state.activeTechDefaultImg||'',
     active_tech_default_video:g('active-tech-default-video')?.value||state.activeTechDefaultVideo||'',
     active_tech_items:state.activeTechItems||[],
