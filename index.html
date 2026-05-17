@@ -3332,6 +3332,8 @@ function enterCollection(which) {
   if(g('pitch-opening')) g('pitch-opening').value=state.opening||'';
   if(g('opening-video')) g('opening-video').value=state.openingVideo||'';
   if(g('opening-mobile-video')) g('opening-mobile-video').value=state.openingMobileVideo||'';
+  if(g('pitch-title')) g('pitch-title').value=state.title||'';
+  if(g('pitch-client')) g('pitch-client').value=state.client||'';
   if(g('pitch-vision')) g('pitch-vision').value=state.vision||'';
   if(g('pitch-vision-quote')) g('pitch-vision-quote').value=state.visionQuote||'';
   if(g('pitch-vision-video')) g('pitch-vision-video').value=state.visionVideo||'';
@@ -3373,6 +3375,8 @@ function restoreFromCollection() {
     state.techItems=s.techItems; state.techDefaultImg=s.techDefaultImg; state.techDefaultVideo=s.techDefaultVideo;
     state.sellingPoints=s.sellingPoints; state.bgSectionImgs=s.bgSectionImgs;
     state.title=s.title; state.client=s.client;
+    if(g('pitch-title')) g('pitch-title').value=s.title||'';
+    if(g('pitch-client')) g('pitch-client').value=s.client||'';
     window._outdoorState=null;
   }
   _activeMode=false;
