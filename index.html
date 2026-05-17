@@ -729,6 +729,16 @@ img { image-rendering: auto; }
               <input type="file" id="bg-input-active-tech" accept="image/*" style="display:none" onchange="handleActiveBgSection('tech',this)" />
             </div>
           </div>
+          <div style="display:flex;align-items:center;gap:10px;margin-top:8px">
+            <label style="font-size:10px;letter-spacing:0.1em;text-transform:uppercase;color:var(--mid);white-space:nowrap">Opacity</label>
+            <input type="range" min="0.05" max="0.7" step="0.01" value="0.35" id="bg-opacity-slider-active" style="flex:1" oninput="setBgOpacity(this.value);document.getElementById('bg-opacity-slider').value=this.value;document.getElementById('bg-opacity-val').textContent=Math.round(this.value*100)+'%'" />
+            <span id="bg-opacity-val-active" style="font-size:11px;color:var(--mid);min-width:28px">35%</span>
+          </div>
+          <div style="display:flex;align-items:center;gap:10px;margin-top:6px">
+            <label style="font-size:10px;letter-spacing:0.1em;text-transform:uppercase;color:var(--mid);white-space:nowrap">Blur</label>
+            <input type="range" min="0" max="20" step="1" value="8" id="bg-blur-slider-active" style="flex:1" oninput="setBgBlur(this.value);document.getElementById('bg-blur-slider').value=this.value;document.getElementById('bg-blur-val').textContent=this.value+'px'" />
+            <span id="bg-blur-val-active" style="font-size:11px;color:var(--mid);min-width:28px">8px</span>
+          </div>
         </div>
         <p class="section-label" style="margin-top:8px">Active — Opening Screen</p>
         <div class="field-group"><label class="field-label">Collection Title</label><input class="field-input" id="active-title" type="text" placeholder="e.g. Active Collection" oninput="state.activeTitle=this.value;scheduleAutoSave()" /></div>
@@ -1301,6 +1311,14 @@ function initCinematicBg() {
   if (document.getElementById('bg-blur-slider')) {
     document.getElementById('bg-blur-slider').value = blur;
     document.getElementById('bg-blur-val').textContent = blur + 'px';
+  }
+  if (document.getElementById('bg-opacity-slider-active')) {
+    document.getElementById('bg-opacity-slider-active').value = brightness;
+    document.getElementById('bg-opacity-val-active').textContent = Math.round(brightness * 100) + '%';
+  }
+  if (document.getElementById('bg-blur-slider-active')) {
+    document.getElementById('bg-blur-slider-active').value = blur;
+    document.getElementById('bg-blur-val-active').textContent = blur + 'px';
   }
 
   const bg = document.createElement('div');
