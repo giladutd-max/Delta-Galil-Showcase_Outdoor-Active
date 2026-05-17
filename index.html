@@ -1872,6 +1872,8 @@ function switchTab(tab, el) {
   el.classList.add('active');
   document.querySelectorAll('.sidebar-content').forEach(c=>c.style.display='none');
   g('tab-'+tab).style.display='block';
+  window._currentTab=tab;
+  updatePreview();
 }
 function selectTemplate(tpl, el) {
   document.querySelectorAll('.template-card').forEach(c=>c.classList.remove('selected'));
@@ -2661,7 +2663,7 @@ function imgWrap(p,cls) {
   return `<div class="prod-img-wrap${cls?' '+cls:''}" onclick="openDetail(${p.id})">${inner}</div>`;
 }
 function getOpeningScreen() {
-  const isActiveSidebar = document.getElementById('tab-active')?.style.display !== 'none';
+  const isActiveSidebar = window._currentTab === 'active';
   const sentence = isActiveSidebar ? (state.activeOpening||g('active-opening')?.value||'') : (state.opening||g('pitch-opening')?.value||'');
   const img = isActiveSidebar ? (state.activeOpeningImg||'') : (state.openingImg||pendingOpeningImg||'');
   const mobileImg = isActiveSidebar ? '' : (state.openingMobileImg||'');
