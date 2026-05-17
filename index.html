@@ -1855,7 +1855,7 @@ async function savePitch() {
     active_cat_warm_video:g('active-cat-warm-video')?.value||state.activeCatWarmVideo||'',
     active_cat_air_video:g('active-cat-air-video')?.value||state.activeCatAirVideo||'',
     active_selling_points:state.activeSellingPoints||[],
-    active_products:state.activeProducts&&state.activeProducts.length>0?state.activeProducts:(state._activeProductsLoaded?[]:undefined),
+    active_products:state.activeProducts||[],
     active_bg_section_imgs:state.activeBgSectionImgs||{},
     outdoor_landing_img:state.outdoorLandingImg||'',
     active_landing_img:state.activeLandingImg||'',
