@@ -1846,7 +1846,7 @@ async function savePitch() {
     active_cat_warm_video:g('active-cat-warm-video')?.value||state.activeCatWarmVideo||'',
     active_cat_air_video:g('active-cat-air-video')?.value||state.activeCatAirVideo||'',
     active_selling_points:state.activeSellingPoints||[],
-    active_products:state.activeProducts||[],
+    active_products:state.activeProducts&&state.activeProducts.length>0?state.activeProducts:(state._activeProductsLoaded?[]:undefined),
     active_bg_section_imgs:state.activeBgSectionImgs||{},
     outdoor_landing_img:state.outdoorLandingImg||'',
     active_landing_img:state.activeLandingImg||'',
@@ -1856,7 +1856,7 @@ async function savePitch() {
     landing_headline:g('landing-headline')?.value||state.landingHeadline||'Spring Summer 2026',
     updated_at:new Date().toISOString()
   }).eq('id',state.pitchId);
-  if (error) { setSaveStatus(''); showToast('Save failed','error'); return; }
+  if (error) { console.error('Save error:', JSON.stringify(error)); setSaveStatus(''); showToast('Save failed: '+error.message,'error'); return; }
   setSaveStatus('saved');
   setTimeout(()=>setSaveStatus(''),2500);
 }
@@ -3198,6 +3198,7 @@ async function loadPresentationView(token) {
   state.activeCatWarmName=data.active_cat_warm_name||'Apparel'; state.activeCatAirName=data.active_cat_air_name||'Accessories';
   state.activeCatWarmVideo=data.active_cat_warm_video||''; state.activeCatAirVideo=data.active_cat_air_video||'';
   state.activeSellingPoints=data.active_selling_points||[]; state.activeProducts=data.active_products||[];
+  state._activeProductsLoaded=true;
   state.activeBgSectionImgs=data.active_bg_section_imgs||{};
   state.outdoorLandingImg=data.outdoor_landing_img||''; state.activeLandingImg=data.active_landing_img||''; state.outdoorLandingVideo=data.outdoor_landing_video||''; state.activeLandingVideo=data.active_landing_video||'';
   state.outdoorCollectionName=data.outdoor_collection_name||'Outdoor';
