@@ -2661,11 +2661,11 @@ function imgWrap(p,cls) {
   return `<div class="prod-img-wrap${cls?' '+cls:''}" onclick="openDetail(${p.id})">${inner}</div>`;
 }
 function getOpeningScreen() {
-  const sentence=g('pitch-opening')?.value||state.opening||'';
+  const sentence=state.opening||g('pitch-opening')?.value||'';
   const img=state.openingImg||pendingOpeningImg||'';
   const mobileImg=state.openingMobileImg||'';
-  const vid=g('opening-video')?.value||state.openingVideo||'';
-  const mobileVid=g('opening-mobile-video')?.value||state.openingMobileVideo||'';
+  const vid=state.openingVideo||g('opening-video')?.value||'';
+  const mobileVid=state.openingMobileVideo||g('opening-mobile-video')?.value||'';
   if(!sentence&&!img&&!vid&&!mobileImg&&!mobileVid) return '';
   const isMob=window.innerWidth<=768;
   const activeVid=(isMob&&mobileVid)?mobileVid:vid;
