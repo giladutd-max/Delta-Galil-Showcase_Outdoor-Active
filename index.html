@@ -1260,7 +1260,7 @@ function removeActiveBgSection(section) {
 
 function applyBgFilter() {
   const brightness = state.bgOpacity || 0.35;
-  const blur = state.bgBlur || 8;
+  const blur = (state.bgBlur !== undefined && state.bgBlur !== null) ? state.bgBlur : 8;
   document.querySelectorAll('.bg-cinematic-img').forEach(el => {
     el.style.filter = `blur(${blur}px) brightness(${brightness}) saturate(0.8)`;
   });
@@ -1275,7 +1275,8 @@ function setBgBlur(val) {
 }
 
 function switchBgImage(section) {
-  const imgs = state.bgSectionImgs || {};
+  const isActive = window._currentTab === 'active' || _activeMode;
+  const imgs = (isActive ? state.activeBgSectionImgs : state.bgSectionImgs) || {};
   const url = imgs[section] || imgs['collection'] || Object.values(imgs)[0];
   const el = document.getElementById('bg-cinematic-el');
   if (!el || !url) return;
@@ -1297,7 +1298,8 @@ function setBgOpacity(val) {
 }
 
 function initCinematicBg() {
-  const imgs = state.bgSectionImgs || {};
+  const isActive = window._currentTab === 'active' || _activeMode;
+  const imgs = (isActive ? state.activeBgSectionImgs : state.bgSectionImgs) || {};
   const firstUrl = imgs['collection'] || Object.values(imgs)[0];
   if (!firstUrl) return;
 
@@ -1562,7 +1564,7 @@ async function openPitch(id) {
   if(g('why-stat-2')) g('why-stat-2').value=data.why_stat2||'';
   if(g('why-stat-2-label')) g('why-stat-2-label').value=data.why_stat2_label||'';
   if(g('why-video')) g('why-video').value=data.why_video||'';
-  state.sellingPoints=data.selling_points||[]; state.techDefaultImg=data.tech_default_img||''; state.techDefaultVideo=data.tech_default_video||''; state.catWarmVideo=data.cat_warm_video||''; state.catAirVideo=data.cat_air_video||''; state.catWarmName=data.cat_warm_name||'Base Layer'; state.catAirName=data.cat_air_name||'Mid Layer'; state.bgSectionImgs=data.bg_section_imgs||{}; state.bgOpacity=data.bg_opacity||0.35; state.bgBlur=data.bg_blur||8; state.techItems=data.tech_items||[];
+  state.sellingPoints=data.selling_points||[]; state.techDefaultImg=data.tech_default_img||''; state.techDefaultVideo=data.tech_default_video||''; state.catWarmVideo=data.cat_warm_video||''; state.catAirVideo=data.cat_air_video||''; state.catWarmName=data.cat_warm_name||'Base Layer'; state.catAirName=data.cat_air_name||'Mid Layer'; state.bgSectionImgs=data.bg_section_imgs||{}; state.bgOpacity=data.bg_opacity||0.35; state.bgBlur=(data.bg_blur!==undefined&&data.bg_blur!==null)?data.bg_blur:8; state.techItems=data.tech_items||[];
   if(state.openingImg){const op=document.getElementById('opening-img-preview');if(op)op.innerHTML='<img src="'+state.openingImg+'" style="width:100%;height:100%;object-fit:cover" />';}
   if(state.openingMobileImg){const omp=document.getElementById('opening-mobile-img-preview');if(omp)omp.innerHTML='<img src="'+state.openingMobileImg+'" style="width:100%;height:100%;object-fit:cover" />';}
   if(state.techDefaultImg){const tdp=document.getElementById('tech-default-img-preview');if(tdp)tdp.innerHTML='<img src="'+state.techDefaultImg+'" style="width:100%;height:100%;object-fit:cover" />';}
@@ -1940,6 +1942,10 @@ function switchTab(tab, el) {
   document.querySelectorAll('.sidebar-content').forEach(c=>c.style.display='none');
   g('tab-'+tab).style.display='block';
   window._currentTab=tab;
+  // Re-init cinematic background for the right collection
+  document.getElementById('bg-cinematic-el')?.remove();
+  initCinematicBg();
+  switchBgImage('collection');
   updatePreview();
 }
 function selectTemplate(tpl, el) {
@@ -3258,7 +3264,7 @@ async function loadPresentationView(token) {
   state.whyStat1=data.why_stat1||""; state.whyStat1Label=data.why_stat1_label||"";
   state.whyStat2=data.why_stat2||""; state.whyStat2Label=data.why_stat2_label||"";
   state.whyVideo=data.why_video||"";
-  state.sellingPoints=data.selling_points||[]; state.techDefaultImg=data.tech_default_img||""; state.techDefaultVideo=data.tech_default_video||""; state.catWarmVideo=data.cat_warm_video||""; state.catAirVideo=data.cat_air_video||""; state.catWarmName=data.cat_warm_name||"Base Layer"; state.catAirName=data.cat_air_name||"Mid Layer"; state.bgSectionImgs=data.bg_section_imgs||{}; state.bgOpacity=data.bg_opacity||0.35; state.bgBlur=data.bg_blur||8; state.techItems=data.tech_items||[];
+  state.sellingPoints=data.selling_points||[]; state.techDefaultImg=data.tech_default_img||""; state.techDefaultVideo=data.tech_default_video||""; state.catWarmVideo=data.cat_warm_video||""; state.catAirVideo=data.cat_air_video||""; state.catWarmName=data.cat_warm_name||"Base Layer"; state.catAirName=data.cat_air_name||"Mid Layer"; state.bgSectionImgs=data.bg_section_imgs||{}; state.bgOpacity=data.bg_opacity||0.35; state.bgBlur=(data.bg_blur!==undefined&&data.bg_blur!==null)?data.bg_blur:8; state.techItems=data.tech_items||[];
   // Active
   state.activeCollectionName=data.active_collection_name||'Active';
   state.activeTitle=data.active_title||''; state.activeClient=data.active_client||'';
@@ -3281,7 +3287,7 @@ async function loadPresentationView(token) {
   document.querySelector(".canvas").style.background="transparent";
   document.body.style.background="#1C1C1A";
   document.documentElement.style.setProperty("--bg-brightness", state.bgOpacity||0.35);
-  document.documentElement.style.setProperty("--bg-blur", (state.bgBlur||8)+"px");
+  document.documentElement.style.setProperty("--bg-blur", ((state.bgBlur!==undefined&&state.bgBlur!==null)?state.bgBlur:8)+"px");
   initCinematicBg();
   showScreen("builder");
   showLandingScreen();
@@ -3495,7 +3501,7 @@ async function loadSharedView(token) {
   if(g('why-stat-2')) g('why-stat-2').value=data.why_stat2||'';
   if(g('why-stat-2-label')) g('why-stat-2-label').value=data.why_stat2_label||'';
   if(g('why-video')) g('why-video').value=data.why_video||'';
-  state.sellingPoints=data.selling_points||[]; state.techDefaultImg=data.tech_default_img||''; state.techDefaultVideo=data.tech_default_video||''; state.catWarmVideo=data.cat_warm_video||''; state.catAirVideo=data.cat_air_video||''; state.catWarmName=data.cat_warm_name||'Base Layer'; state.catAirName=data.cat_air_name||'Mid Layer'; state.bgSectionImgs=data.bg_section_imgs||{}; state.bgOpacity=data.bg_opacity||0.35; state.bgBlur=data.bg_blur||8; state.techItems=data.tech_items||[];
+  state.sellingPoints=data.selling_points||[]; state.techDefaultImg=data.tech_default_img||''; state.techDefaultVideo=data.tech_default_video||''; state.catWarmVideo=data.cat_warm_video||''; state.catAirVideo=data.cat_air_video||''; state.catWarmName=data.cat_warm_name||'Base Layer'; state.catAirName=data.cat_air_name||'Mid Layer'; state.bgSectionImgs=data.bg_section_imgs||{}; state.bgOpacity=data.bg_opacity||0.35; state.bgBlur=(data.bg_blur!==undefined&&data.bg_blur!==null)?data.bg_blur:8; state.techItems=data.tech_items||[];
   document.querySelector('.sidebar').style.display='none';
   document.querySelector('.header-actions').innerHTML='';
   document.querySelector('.header-left').innerHTML='';
