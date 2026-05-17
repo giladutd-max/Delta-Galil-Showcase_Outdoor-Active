@@ -1209,6 +1209,45 @@ function removeBgSection(section) {
   initCinematicBg();
 }
 
+function triggerActiveBgUpload(section) {
+  document.getElementById('bg-input-active-' + section)?.click();
+}
+
+async function handleActiveBgSection(section, input) {
+  const file = input.files[0]; if (!file) return;
+  showToast('Uploading...', 'success');
+  const url = await uploadImageToStorage(file);
+  if (!url) return;
+  state.activeBgSectionImgs = state.activeBgSectionImgs || {};
+  state.activeBgSectionImgs[section] = url;
+  renderActiveBgThumbs();
+  scheduleAutoSave();
+  input.value = '';
+}
+
+function renderActiveBgThumbs() {
+  const sections = ['collection', 'vision', 'tech'];
+  sections.forEach(sec => {
+    const thumb = document.getElementById('bg-thumb-active-' + sec);
+    if (!thumb) return;
+    const url = (state.activeBgSectionImgs || {})[sec];
+    if (url) {
+      thumb.innerHTML = `<img src="${url}" style="width:100%;height:100%;object-fit:cover" /><div onclick="event.stopPropagation();removeActiveBgSection('${sec}')" style="position:absolute;top:0;right:0;background:rgba(0,0,0,0.65);color:white;border:none;width:16px;height:16px;font-size:10px;cursor:pointer;display:flex;align-items:center;justify-content:center">×</div>`;
+      thumb.style.position = 'relative';
+    } else {
+      thumb.innerHTML = '+';
+      thumb.style.position = '';
+    }
+  });
+}
+
+function removeActiveBgSection(section) {
+  state.activeBgSectionImgs = state.activeBgSectionImgs || {};
+  delete state.activeBgSectionImgs[section];
+  renderActiveBgThumbs();
+  scheduleAutoSave();
+}
+
 function applyBgFilter() {
   const brightness = state.bgOpacity || 0.35;
   const blur = state.bgBlur || 8;
@@ -1553,6 +1592,7 @@ async function openPitch(id) {
   });
   renderProductsList(); renderSellingPoints(); renderTechItems(); renderPalettes(); updatePreview();
   renderBgThumbs();
+  renderActiveBgThumbs();
   showScreen('builder');
   setTimeout(()=>{ document.getElementById('bg-cinematic-el')?.remove(); initCinematicBg(); switchBgImage('collection'); }, 500);
   // show share banner
@@ -3356,7 +3396,10 @@ function enterCollection(which) {
   if(g('cat-air-video')) g('cat-air-video').value=state.catAirVideo||'';
   if(g('cat-warm-name')) g('cat-warm-name').value=state.catWarmName||'';
   if(g('cat-air-name')) g('cat-air-name').value=state.catAirName||'';
-  if(_activeMode) switchBgImage('collection');
+  // Re-init the cinematic background with the swapped bgSectionImgs
+  document.getElementById('bg-cinematic-el')?.remove();
+  initCinematicBg();
+  switchBgImage('collection');
   // Restore cinematic background
   const bgEl=document.querySelector('.bg-cinematic');
   if(bgEl) bgEl.style.opacity='1';
