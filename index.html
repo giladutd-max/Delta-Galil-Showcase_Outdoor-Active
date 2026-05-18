@@ -1571,6 +1571,9 @@ async function openPitch(id) {
   if(g('why-stat-2-label')) g('why-stat-2-label').value=data.why_stat2_label||'';
   if(g('why-video')) g('why-video').value=data.why_video||'';
   state.sellingPoints=data.selling_points||[]; state.techDefaultImg=data.tech_default_img||''; state.techDefaultVideo=data.tech_default_video||''; state.catWarmVideo=data.cat_warm_video||''; state.catAirVideo=data.cat_air_video||''; state.catWarmName=data.cat_warm_name||'Base Layer'; state.catAirName=data.cat_air_name||'Mid Layer'; state.bgSectionImgs=data.bg_section_imgs||{}; state.bgOpacity=data.bg_opacity||0.35; state.bgBlur=(data.bg_blur!==undefined&&data.bg_blur!==null)?data.bg_blur:8; state.techItems=data.tech_items||[];
+  state.outdoorLandingVideo=data.outdoor_landing_video||""; state.activeLandingVideo=data.active_landing_video||"";
+  state.outdoorLandingImg=data.outdoor_landing_img||""; state.activeLandingImg=data.active_landing_img||"";
+  state.outdoorCollectionName=data.outdoor_collection_name||"Outdoor"; state.landingHeadline=data.landing_headline||"Spring Summer 2026";
   if(state.openingImg){const op=document.getElementById('opening-img-preview');if(op)op.innerHTML='<img src="'+state.openingImg+'" style="width:100%;height:100%;object-fit:cover" />';}
   if(state.openingMobileImg){const omp=document.getElementById('opening-mobile-img-preview');if(omp)omp.innerHTML='<img src="'+state.openingMobileImg+'" style="width:100%;height:100%;object-fit:cover" />';}
   if(state.techDefaultImg){const tdp=document.getElementById('tech-default-img-preview');if(tdp)tdp.innerHTML='<img src="'+state.techDefaultImg+'" style="width:100%;height:100%;object-fit:cover" />';}
@@ -1925,8 +1928,8 @@ async function savePitch() {
     active_bg_section_imgs:state.activeBgSectionImgs||{},
     outdoor_landing_img:state.outdoorLandingImg||'',
     active_landing_img:state.activeLandingImg||'',
-    outdoor_landing_video:g('outdoor-landing-video')?.value||state.outdoorLandingVideo||'',
-    active_landing_video:g('active-landing-video')?.value||state.activeLandingVideo||'',
+    outdoor_landing_video:state.outdoorLandingVideo||'',
+    active_landing_video:state.activeLandingVideo||'',
     outdoor_collection_name:g('outdoor-collection-name')?.value||state.outdoorCollectionName||'Outdoor',
     landing_headline:g('landing-headline')?.value||state.landingHeadline||'Spring Summer 2026',
     updated_at:new Date().toISOString()
@@ -2789,25 +2792,6 @@ function getOpeningScreen() {
   const activeImg=(isMob&&mobileImg)?mobileImg:img;
   const bgStyle=activeImg?'background-image:url('+activeImg+')':'background:#1C1C1A';
   const showVideo=!!activeVid&&!(isMob&&mobileImg);
-
-  // Reuse existing video element if same src — prevents killing a playing video on every updatePreview
-  if (showVideo) {
-    const existing = document.getElementById('opening-video-el');
-    const existingSrc = existing ? (existing.querySelector('source')?.src || existing.src || '') : '';
-    const isSameSrc = existingSrc && (existingSrc === activeVid || existingSrc.endsWith(activeVid));
-    if (existing && isSameSrc) {
-      // Just update the sentence text if needed and return a placeholder — we'll preserve the DOM element
-      const screen = existing.closest('.opening-screen');
-      if (screen) {
-        const sentenceEl = screen.querySelector('.opening-sentence');
-        if (sentenceEl && sentence) sentenceEl.textContent = sentence;
-        const bgEl = screen.querySelector('.opening-screen-bg');
-        if (bgEl) bgEl.style.cssText = bgStyle;
-        return ''; // signal to caller to skip re-render
-      }
-    }
-  }
-
   const videoEl=showVideo?'<video id="opening-video-el" autoplay muted playsinline loop preload="auto" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;z-index:0;opacity:0;transition:opacity 0.4s ease" oncanplay="this.style.opacity=1">'+
     '<source src="'+activeVid+'" type="video/mp4"></video>':'';
   return '<div class="opening-screen" style="position:relative;overflow:hidden;height:clamp(320px,100vw,600px)">'
@@ -3088,6 +3072,10 @@ function updatePreview() {
     state.vision = g('pitch-vision')?.value || state.vision;
     const preview=g('showcase-preview');
     if (!preview) return;
+    // Snapshot any currently playing opening video so we can re-attach it after innerHTML wipe
+    const existingVid = document.getElementById('opening-video-el');
+    const existingScreen = existingVid ? existingVid.closest('.opening-screen') : null;
+    const existingVidSrc = existingVid ? (existingVid.querySelector('source')?.getAttribute('src')||'') : '';
     preview.className='showcase tpl-preview-'+state.template;
     const {bg,textColor,accentColor,borderColor,cardBg} = getSectionColors();
     const prods=state.products||[];
@@ -3108,13 +3096,11 @@ function updatePreview() {
       const subOnSplit='rgba(255,255,255,0.5)';
       const eyebrowColor='rgba(255,255,255,0.7)';
       const textGradient='linear-gradient(to top, rgba(0,0,0,0.65) 0%, transparent 55%)';
-      const openingHTML = getOpeningScreen();
-      const preservedOpening = openingHTML === '' && document.getElementById('opening-video-el');
-      const splitHTML=(preservedOpening ? '' : openingHTML)+getNavCards(null)+getHero()
+      const splitHTML=getOpeningScreen()+getNavCards(null)+getHero()
         +'<div id="section-anchor"></div>'
         +'<div id="cat-split" style="display:grid;grid-template-columns:1fr 1fr;min-height:95vh">'
           +'<div onclick="showCat(\'warm\')" class="cat-panel" style="background:'+warmBg+';display:flex;flex-direction:column;justify-content:flex-end;padding:48px;cursor:pointer;border-right:1px solid rgba(255,255,255,0.08);position:relative;overflow:hidden;transition:opacity 0.8s ease,transform 0.8s ease;opacity:0;transform:translateY(40px)">'
-            +(warmVid?'<video muted playsinline preload="none" class="cat-vid lazy-vid" data-src="'+warmVid+'" data-opacity="'+vidOpacity+'" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;opacity:0;transition:opacity 0.5s ease,transform 0.6s ease"><source data-src="'+warmVid+'" type="video/mp4"></video>':'')
+            +(warmVid?'<video autoplay muted playsinline preload="auto" class="cat-vid" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;opacity:0;transition:opacity 0.5s ease" oncanplay="this.style.opacity='+vidOpacity+'"><source src="'+warmVid+'" type="video/mp4"></video>':'')
             +'<div style="position:absolute;inset:0;background:'+textGradient+';pointer-events:none"></div>'
             +'<div style="position:absolute;top:0;left:0;right:0;height:3px;background:'+warmAcc+'"></div>'
             +'<div style="position:relative;z-index:1;transition:transform 0.4s ease" class="cat-text">'
@@ -3126,7 +3112,7 @@ function updatePreview() {
             +'</div>'
           +'</div>'
           +'<div onclick="showCat(\'air\')" class="cat-panel" style="background:'+airBg+';display:flex;flex-direction:column;justify-content:flex-end;padding:48px;cursor:pointer;position:relative;overflow:hidden;transition:opacity 0.8s ease 0.15s,transform 0.8s ease 0.15s;opacity:0;transform:translateY(40px)">'
-            +(airVid?'<video muted playsinline preload="none" class="cat-vid lazy-vid" data-src="'+airVid+'" data-opacity="'+vidOpacity+'" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;opacity:0;transition:opacity 0.5s ease,transform 0.6s ease"><source data-src="'+airVid+'" type="video/mp4"></source></video>':'')
+            +(airVid?'<video autoplay muted playsinline preload="auto" class="cat-vid" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;opacity:0;transition:opacity 0.5s ease" oncanplay="this.style.opacity='+vidOpacity+'"><source src="'+airVid+'" type="video/mp4"></video>':'')
             +'<div style="position:absolute;inset:0;background:'+textGradient+';pointer-events:none"></div>'
             +'<div style="position:absolute;top:0;left:0;right:0;height:3px;background:'+airAcc+'"></div>'
             +'<div style="position:relative;z-index:1;transition:transform 0.4s ease" class="cat-text">'
@@ -3140,14 +3126,19 @@ function updatePreview() {
         +'</div>'
         +'<div id="cat-warm" style="display:none;background:'+warmBg+'"></div>'
         +'<div id="cat-air" style="display:none;background:'+airBg+'"></div>';
-      // Save the live opening video element before wiping innerHTML, if it was preserved
-      const savedOpeningEl = preservedOpening ? document.querySelector('.opening-screen') : null;
       preview.innerHTML=splitHTML;
-      if (savedOpeningEl) preview.insertBefore(savedOpeningEl, preview.firstChild);
+      // If the opening video src hasn't changed, swap back the live element to avoid restart
+      if (existingScreen && existingVidSrc) {
+        const newVid = preview.querySelector('#opening-video-el');
+        const newSrc = newVid ? (newVid.querySelector('source')?.getAttribute('src')||'') : '';
+        if (newSrc === existingVidSrc && newVid) {
+          newVid.closest('.opening-screen')?.replaceWith(existingScreen);
+        }
+      }
       // Add compact class to hero
       const heroEl=preview.querySelector('.showcase-hero');
       if(heroEl) heroEl.classList.add('hero-compact');
-      // scroll observer — reveals panels AND starts lazy video loading when scrolled into view
+      // scroll observer — reveals panels on scroll
       setTimeout(()=>{
         const panels=document.querySelectorAll('.cat-panel');
         const obs=new IntersectionObserver((entries)=>{
@@ -3155,20 +3146,6 @@ function updatePreview() {
             if(e.isIntersecting){
               e.target.style.opacity='1';
               e.target.style.transform='translateY(0)';
-              // Lazy-load the video now that user has scrolled to it
-              const v=e.target.querySelector('.lazy-vid');
-              if(v && !v.getAttribute('data-loaded')) {
-                const src=v.getAttribute('data-src');
-                const targetOpacity=v.getAttribute('data-opacity')||'0.9';
-                if(src){
-                  v.setAttribute('data-loaded','1');
-                  v.loop=true; v.autoplay=true;
-                  // Set oncanplay before setting src so it fires reliably
-                  v.oncanplay=()=>{ v.style.opacity=targetOpacity; };
-                  v.src=src; v.preload='auto'; v.load();
-                  v.play().catch(()=>{});
-                }
-              }
               obs.unobserve(e.target);
             }
           });
@@ -3176,11 +3153,14 @@ function updatePreview() {
         panels.forEach(p=>obs.observe(p));
       },100);
     } else {
-      const openingHTML2 = getOpeningScreen();
-      const preservedOpening2 = openingHTML2 === '' && document.getElementById('opening-video-el');
-      const savedOpeningEl2 = preservedOpening2 ? document.querySelector('.opening-screen') : null;
-      preview.innerHTML=(preservedOpening2 ? '' : openingHTML2)+getNavCards(null)+getHero()+getProducts()+getClosingFooter();
-      if (savedOpeningEl2) preview.insertBefore(savedOpeningEl2, preview.firstChild);
+      preview.innerHTML=getOpeningScreen()+getNavCards(null)+getHero()+getProducts()+getClosingFooter();
+      if (existingScreen && existingVidSrc) {
+        const newVid = preview.querySelector('#opening-video-el');
+        const newSrc = newVid ? (newVid.querySelector('source')?.getAttribute('src')||'') : '';
+        if (newSrc === existingVidSrc && newVid) {
+          newVid.closest('.opening-screen')?.replaceWith(existingScreen);
+        }
+      }
     }
     preview.style.display='block';
     safeClassName('product-detail','product-detail');
