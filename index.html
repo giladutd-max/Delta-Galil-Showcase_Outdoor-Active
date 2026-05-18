@@ -3093,7 +3093,7 @@ function updatePreview() {
         +'<div id="section-anchor"></div>'
         +'<div id="cat-split" style="display:grid;grid-template-columns:1fr 1fr;min-height:95vh">'
           +'<div onclick="showCat(\'warm\')" class="cat-panel" style="background:'+warmBg+';display:flex;flex-direction:column;justify-content:flex-end;padding:48px;cursor:pointer;border-right:1px solid rgba(255,255,255,0.08);position:relative;overflow:hidden;transition:opacity 0.8s ease,transform 0.8s ease;opacity:0;transform:translateY(40px)">'
-            +(warmVid?'<video autoplay muted playsinline preload="auto" class="cat-vid" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;opacity:0;transition:opacity 0.5s ease,transform 0.6s ease" oncanplay="this.style.opacity='+vidOpacity+'"><source src="'+warmVid+'" type="video/mp4"></video>':'')
+            +(warmVid?'<video muted playsinline preload="none" class="cat-vid lazy-vid" data-src="'+warmVid+'" data-opacity="'+vidOpacity+'" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;opacity:0;transition:opacity 0.5s ease,transform 0.6s ease"><source data-src="'+warmVid+'" type="video/mp4"></video>':'')
             +'<div style="position:absolute;inset:0;background:'+textGradient+';pointer-events:none"></div>'
             +'<div style="position:absolute;top:0;left:0;right:0;height:3px;background:'+warmAcc+'"></div>'
             +'<div style="position:relative;z-index:1;transition:transform 0.4s ease" class="cat-text">'
@@ -3105,7 +3105,7 @@ function updatePreview() {
             +'</div>'
           +'</div>'
           +'<div onclick="showCat(\'air\')" class="cat-panel" style="background:'+airBg+';display:flex;flex-direction:column;justify-content:flex-end;padding:48px;cursor:pointer;position:relative;overflow:hidden;transition:opacity 0.8s ease 0.15s,transform 0.8s ease 0.15s;opacity:0;transform:translateY(40px)">'
-            +(airVid?'<video autoplay muted playsinline preload="auto" class="cat-vid" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;opacity:0;transition:opacity 0.5s ease,transform 0.6s ease" oncanplay="this.style.opacity='+vidOpacity+'"><source src="'+airVid+'" type="video/mp4"></video>':'')
+            +(airVid?'<video muted playsinline preload="none" class="cat-vid lazy-vid" data-src="'+airVid+'" data-opacity="'+vidOpacity+'" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;opacity:0;transition:opacity 0.5s ease,transform 0.6s ease"><source data-src="'+airVid+'" type="video/mp4"></source></video>':'')
             +'<div style="position:absolute;inset:0;background:'+textGradient+';pointer-events:none"></div>'
             +'<div style="position:absolute;top:0;left:0;right:0;height:3px;background:'+airAcc+'"></div>'
             +'<div style="position:relative;z-index:1;transition:transform 0.4s ease" class="cat-text">'
@@ -3123,11 +3123,23 @@ function updatePreview() {
       // Add compact class to hero
       const heroEl=preview.querySelector('.showcase-hero');
       if(heroEl) heroEl.classList.add('hero-compact');
-      // scroll observer
+      // scroll observer — reveals panels AND starts lazy video loading when scrolled into view
       setTimeout(()=>{
         const panels=document.querySelectorAll('.cat-panel');
         const obs=new IntersectionObserver((entries)=>{
-          entries.forEach(e=>{if(e.isIntersecting){e.target.style.opacity='1';e.target.style.transform='translateY(0)';obs.unobserve(e.target);}});
+          entries.forEach(e=>{
+            if(e.isIntersecting){
+              e.target.style.opacity='1';
+              e.target.style.transform='translateY(0)';
+              // Lazy-load the video now that user has scrolled to it
+              const v=e.target.querySelector('.lazy-vid');
+              if(v && !v.src) {
+                const src=v.getAttribute('data-src');
+                if(src){ v.src=src; v.preload='auto'; v.load(); v.play().catch(()=>{}); v.oncanplay=()=>{ v.style.opacity=v.getAttribute('data-opacity')||'0.9'; }; }
+              }
+              obs.unobserve(e.target);
+            }
+          });
         },{threshold:0.15});
         panels.forEach(p=>obs.observe(p));
       },100);
@@ -3334,32 +3346,6 @@ async function loadPresentationView(token) {
   showLandingScreen();
   g("loading-screen").classList.add("hidden");
 
-  // Preload all videos in the background so they're buffered before user navigates to each section
-  (function preloadAllVideos() {
-    const urls = [
-      state.openingVideo, state.openingMobileVideo,
-      state.visionVideo,
-      state.techDefaultVideo,
-      state.catWarmVideo, state.catAirVideo,
-      state.outdoorLandingVideo,
-      state.activeOpeningVideo, state.activeVisionVideo,
-      state.activeTechDefaultVideo,
-      state.activeCatWarmVideo, state.activeCatAirVideo,
-      state.activeLandingVideo,
-    ].filter(Boolean);
-    (state.techItems||[]).forEach(t=>{ if(t.video) urls.push(t.video); });
-    (state.activeTechItems||[]).forEach(t=>{ if(t.video) urls.push(t.video); });
-    const container = document.createElement('div');
-    container.style.cssText = 'position:fixed;width:1px;height:1px;opacity:0;pointer-events:none;overflow:hidden;z-index:-1';
-    document.body.appendChild(container);
-    urls.forEach(src => {
-      const v = document.createElement('video');
-      v.muted = true; v.preload = 'auto';
-      v.src = src;
-      v.load();
-      container.appendChild(v);
-    });
-  })();
 }
 
 // ── LANDING SCREEN (split: Outdoor | Active) ──
