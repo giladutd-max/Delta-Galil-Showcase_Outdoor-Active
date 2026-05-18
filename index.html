@@ -2789,7 +2789,7 @@ function getOpeningScreen() {
   const activeImg=(isMob&&mobileImg)?mobileImg:img;
   const bgStyle=activeImg?'background-image:url('+activeImg+')':'background:#1C1C1A';
   const showVideo=!!activeVid&&!(isMob&&mobileImg);
-  const videoEl=showVideo?'<video id="opening-video-el" autoplay muted playsinline loop preload="auto" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;z-index:0;opacity:0;transition:opacity 1s ease" oncanplay="this.style.opacity=1">'+
+  const videoEl=showVideo?'<video id="opening-video-el" autoplay muted playsinline loop preload="auto" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;z-index:0;opacity:0;transition:opacity 0.4s ease" oncanplay="this.style.opacity=1">'+
     '<source src="'+activeVid+'" type="video/mp4"></video>':'';
   return '<div class="opening-screen" style="position:relative;overflow:hidden;height:clamp(320px,100vw,600px)">'
     +'<div class="opening-screen-bg" style="'+bgStyle+'"></div>'
@@ -2912,7 +2912,7 @@ function showSection(section) {
       // Video or image background on right side
       const rightSide = visionVid
         ?'<div class="vision-video-fade" style="flex:1;position:relative;overflow:hidden;min-height:520px">'
-           +'<video autoplay muted loop playsinline style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;opacity:0;transition:opacity 1.2s ease" preload="auto" oncanplay="this.style.opacity=1">'
+           +'<video autoplay muted loop playsinline style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;opacity:0;transition:opacity 0.5s ease" preload="auto" oncanplay="this.style.opacity=1">'
            +'<source src="'+visionVid+'" type="video/mp4"></video>'
          +'</div>'
         : heroImg
@@ -3093,7 +3093,7 @@ function updatePreview() {
         +'<div id="section-anchor"></div>'
         +'<div id="cat-split" style="display:grid;grid-template-columns:1fr 1fr;min-height:95vh">'
           +'<div onclick="showCat(\'warm\')" class="cat-panel" style="background:'+warmBg+';display:flex;flex-direction:column;justify-content:flex-end;padding:48px;cursor:pointer;border-right:1px solid rgba(255,255,255,0.08);position:relative;overflow:hidden;transition:opacity 0.8s ease,transform 0.8s ease;opacity:0;transform:translateY(40px)">'
-            +(warmVid?'<video autoplay muted playsinline preload="auto" class="cat-vid" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;opacity:0;transition:opacity 1.2s ease,transform 0.6s ease" oncanplay="this.style.opacity='+vidOpacity+'"><source src="'+warmVid+'" type="video/mp4"></video>':'')
+            +(warmVid?'<video autoplay muted playsinline preload="auto" class="cat-vid" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;opacity:0;transition:opacity 0.5s ease,transform 0.6s ease" oncanplay="this.style.opacity='+vidOpacity+'"><source src="'+warmVid+'" type="video/mp4"></video>':'')
             +'<div style="position:absolute;inset:0;background:'+textGradient+';pointer-events:none"></div>'
             +'<div style="position:absolute;top:0;left:0;right:0;height:3px;background:'+warmAcc+'"></div>'
             +'<div style="position:relative;z-index:1;transition:transform 0.4s ease" class="cat-text">'
@@ -3105,7 +3105,7 @@ function updatePreview() {
             +'</div>'
           +'</div>'
           +'<div onclick="showCat(\'air\')" class="cat-panel" style="background:'+airBg+';display:flex;flex-direction:column;justify-content:flex-end;padding:48px;cursor:pointer;position:relative;overflow:hidden;transition:opacity 0.8s ease 0.15s,transform 0.8s ease 0.15s;opacity:0;transform:translateY(40px)">'
-            +(airVid?'<video autoplay muted playsinline preload="auto" class="cat-vid" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;opacity:0;transition:opacity 1.2s ease,transform 0.6s ease" oncanplay="this.style.opacity='+vidOpacity+'"><source src="'+airVid+'" type="video/mp4"></video>':'')
+            +(airVid?'<video autoplay muted playsinline preload="auto" class="cat-vid" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;opacity:0;transition:opacity 0.5s ease,transform 0.6s ease" oncanplay="this.style.opacity='+vidOpacity+'"><source src="'+airVid+'" type="video/mp4"></video>':'')
             +'<div style="position:absolute;inset:0;background:'+textGradient+';pointer-events:none"></div>'
             +'<div style="position:absolute;top:0;left:0;right:0;height:3px;background:'+airAcc+'"></div>'
             +'<div style="position:relative;z-index:1;transition:transform 0.4s ease" class="cat-text">'
@@ -3333,6 +3333,33 @@ async function loadPresentationView(token) {
   showScreen("builder");
   showLandingScreen();
   g("loading-screen").classList.add("hidden");
+
+  // Preload all videos in the background so they're buffered before user navigates to each section
+  (function preloadAllVideos() {
+    const urls = [
+      state.openingVideo, state.openingMobileVideo,
+      state.visionVideo,
+      state.techDefaultVideo,
+      state.catWarmVideo, state.catAirVideo,
+      state.outdoorLandingVideo,
+      state.activeOpeningVideo, state.activeVisionVideo,
+      state.activeTechDefaultVideo,
+      state.activeCatWarmVideo, state.activeCatAirVideo,
+      state.activeLandingVideo,
+    ].filter(Boolean);
+    (state.techItems||[]).forEach(t=>{ if(t.video) urls.push(t.video); });
+    (state.activeTechItems||[]).forEach(t=>{ if(t.video) urls.push(t.video); });
+    const container = document.createElement('div');
+    container.style.cssText = 'position:fixed;width:1px;height:1px;opacity:0;pointer-events:none;overflow:hidden;z-index:-1';
+    document.body.appendChild(container);
+    urls.forEach(src => {
+      const v = document.createElement('video');
+      v.muted = true; v.preload = 'auto';
+      v.src = src;
+      v.load();
+      container.appendChild(v);
+    });
+  })();
 }
 
 // ── LANDING SCREEN (split: Outdoor | Active) ──
@@ -3357,7 +3384,7 @@ function showLandingScreen() {
       // Outdoor half
       +'<div onclick="enterCollection(\'outdoor\')" style="position:relative;overflow:hidden;cursor:pointer;min-height:100vh;background:#0D1018;border-right:1px solid rgba(255,255,255,0.08)">'
         +'<div style="position:absolute;inset:0;z-index:0;'+(outdoorImg?'background:url(\''+outdoorImg+'\') center/cover no-repeat':'background:linear-gradient(160deg,#0D1018 0%,#1A2030 100%)')+'"></div>'
-        +(outdoorVid?'<video autoplay muted loop playsinline style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;opacity:0;transition:opacity 1.2s ease;z-index:1" oncanplay="this.style.opacity=0.75"><source src="'+outdoorVid+'" type="video/mp4"></video>':'')
+        +(outdoorVid?'<video autoplay muted loop playsinline style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;opacity:0;transition:opacity 0.5s ease;z-index:1" oncanplay="this.style.opacity=0.75"><source src="'+outdoorVid+'" type="video/mp4"></video>':'')
         
         +'<div style="position:absolute;inset:0;z-index:3;background:rgba(0,0,0,0);transition:background 0.4s" class="landing-hover-overlay"></div>'
         +'<div style="position:absolute;bottom:0;left:0;right:0;padding:40px 44px 48px;z-index:4">'
@@ -3371,7 +3398,7 @@ function showLandingScreen() {
       // Active half
       +'<div onclick="enterCollection(\'active\')" style="position:relative;overflow:hidden;cursor:pointer;min-height:100vh;background:#180810">'
         +'<div style="position:absolute;inset:0;z-index:0;'+(activeImg?'background:url(\''+activeImg+'\') center/cover no-repeat':'background:linear-gradient(160deg,#180810 0%,#2A1020 100%)')+'"></div>'
-        +(activeVid?'<video autoplay muted loop playsinline style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;opacity:0;transition:opacity 1.2s ease;z-index:1" oncanplay="this.style.opacity=0.75"><source src="'+activeVid+'" type="video/mp4"></video>':'')
+        +(activeVid?'<video autoplay muted loop playsinline style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;opacity:0;transition:opacity 0.5s ease;z-index:1" oncanplay="this.style.opacity=0.75"><source src="'+activeVid+'" type="video/mp4"></video>':'')
         
         +'<div style="position:absolute;inset:0;z-index:3;background:rgba(0,0,0,0);transition:background 0.4s" class="landing-hover-overlay"></div>'
         +'<div style="position:absolute;bottom:0;left:0;right:0;padding:40px 44px 48px;z-index:4">'
