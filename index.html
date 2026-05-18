@@ -2345,7 +2345,7 @@ function renderActiveProductsList() {
   g('active-product-count').textContent=(state.activeProducts||[]).length;
   const list=g('active-products-list'); if(!list) return;
   list.innerHTML=(state.activeProducts||[]).map((p,i)=>`
-    <div class="product-item" draggable="true" data-id="${p.id}">
+    <div class="product-item" draggable="true" data-id="${p.id}" style="cursor:grab">
       <div style="color:var(--light);font-size:13px;padding:0 6px 0 0;cursor:grab;flex-shrink:0">⠿</div>
       <div class="product-thumb">${p.img?'<img src="'+p.img+'" loading="lazy" />':p.emoji}</div>
       <div class="product-info"><div class="product-info-name">${p.name}</div><div class="product-info-fabric">${p.fabric||'No fabric info'}</div></div>
@@ -2354,6 +2354,41 @@ function renderActiveProductsList() {
         <button class="product-remove" onclick="removeActiveProduct(${p.id})" title="Remove">×</button>
       </div>
     </div>`).join('');
+
+  // drag-and-drop reordering
+  let dragId=null;
+  list.querySelectorAll('.product-item').forEach(item=>{
+    item.addEventListener('dragstart',e=>{
+      dragId=item.dataset.id;
+      item.style.opacity='0.4';
+      e.dataTransfer.effectAllowed='move';
+    });
+    item.addEventListener('dragend',e=>{
+      item.style.opacity='1';
+      list.querySelectorAll('.product-item').forEach(i=>i.style.borderTop='');
+    });
+    item.addEventListener('dragover',e=>{
+      e.preventDefault();
+      e.dataTransfer.dropEffect='move';
+      list.querySelectorAll('.product-item').forEach(i=>i.style.borderTop='');
+      item.style.borderTop='2px solid var(--accent)';
+    });
+    item.addEventListener('dragleave',()=>{
+      item.style.borderTop='';
+    });
+    item.addEventListener('drop',e=>{
+      e.preventDefault();
+      item.style.borderTop='';
+      if (!dragId||dragId===item.dataset.id) return;
+      const fromIdx=state.activeProducts.findIndex(p=>String(p.id)===dragId);
+      const toIdx=state.activeProducts.findIndex(p=>String(p.id)===item.dataset.id);
+      if (fromIdx===-1||toIdx===-1) return;
+      const moved=state.activeProducts.splice(fromIdx,1)[0];
+      state.activeProducts.splice(toIdx,0,moved);
+      renderActiveProductsList();
+      scheduleAutoSave();
+    });
+  });
 }
 function removeActiveProduct(id){state.activeProducts=state.activeProducts.filter(p=>p.id!==id);renderActiveProductsList();scheduleAutoSave();}
 function handleActiveFileUpload(inp) {
