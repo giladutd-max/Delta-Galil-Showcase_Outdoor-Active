@@ -511,33 +511,6 @@ header { z-index: 100; }
   .showcase, .product-detail { box-shadow: none; max-width: 100%; }
 }
 img { image-rendering: auto; }
-
-/* ── PDF EXPORT ── */
-.pdf-pool-label{font-size:10px;letter-spacing:0.08em;text-transform:uppercase;color:var(--mid);margin-bottom:6px}
-.pdf-pool{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:12px;min-height:40px;padding:8px;border:1px dashed var(--border);border-radius:4px}
-.pdf-product-chip{display:flex;align-items:center;gap:6px;padding:6px 8px;background:var(--cream);border:1px solid var(--border);border-radius:3px;cursor:grab;font-size:11px;color:var(--charcoal);user-select:none;max-width:100%}
-.pdf-product-chip.dragging{opacity:0.4}
-.pdf-pair{background:var(--warm-white);border:1px solid var(--border);border-radius:4px;padding:8px;margin-bottom:8px}
-.pdf-pair-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:6px}
-.pdf-pair-num{font-size:10px;letter-spacing:0.1em;text-transform:uppercase;color:var(--mid)}
-.pdf-pair-drop{display:flex;gap:6px;min-height:44px}
-.pdf-drop-slot{flex:1;border:1px dashed var(--border);border-radius:3px;display:flex;align-items:center;justify-content:center;padding:4px;min-height:44px;transition:background 0.15s}
-.pdf-drop-slot.drag-over{background:rgba(196,168,130,0.12);border-color:var(--accent)}
-.pdf-drop-slot.filled{border-style:solid}
-.pdf-add-pair{width:100%;padding:8px;border:1px dashed var(--border);border-radius:4px;background:transparent;font-size:11px;color:var(--mid);cursor:pointer;text-align:center;margin-bottom:8px}
-.pdf-add-pair:hover{border-color:var(--accent);color:var(--accent)}
-#pdf-print-root{display:none;position:fixed;inset:0;z-index:99999;background:#f0ede8;overflow:auto;padding:20px}
-#pdf-print-root.visible{display:block}
-.pdf-page{margin:0 auto 20px;box-shadow:0 2px 20px rgba(0,0,0,0.12)}
-@media print{
-  body>*:not(#pdf-print-root){display:none!important}
-  #pdf-print-root{display:block!important;position:static;overflow:visible;padding:0;background:#fff}
-  #pdf-controls{display:none!important}
-  .pdf-page{margin:0;box-shadow:none;page-break-after:always;break-after:page;page-break-inside:avoid;break-inside:avoid}
-  .pdf-page:last-child{page-break-after:auto;break-after:auto}
-  @page{size:A4 landscape;margin:0}
-}
-
 </style>
 </head>
 <body>
@@ -589,13 +562,41 @@ img { image-rendering: auto; }
   </header>
   <div class="app-body">
     <aside class="sidebar">
-      <div class="sidebar-tabs">
-        <button class="sidebar-tab active" onclick="switchTab('pitch',this)">Pitch</button>
-        <button class="sidebar-tab" onclick="switchTab('products',this)">Products</button>
-        <button class="sidebar-tab" onclick="switchTab('templates',this)">Templates</button>
+      <div class="sidebar-tabs" style="flex-wrap:wrap">
+        <button class="sidebar-tab active" onclick="switchTab('pitch',this)" style="font-size:10px">Outdoor</button>
+        <button class="sidebar-tab" onclick="switchTab('products',this)" style="font-size:10px">O · Products</button>
+        <button class="sidebar-tab" onclick="switchTab('active',this)" style="font-size:10px;border-top:2px solid rgba(196,168,130,0.2)">Active</button>
+        <button class="sidebar-tab" onclick="switchTab('active-products',this)" style="font-size:10px;border-top:2px solid rgba(196,168,130,0.2)">A · Products</button>
+        <button class="sidebar-tab" onclick="switchTab('templates',this)" style="font-size:10px;border-top:2px solid rgba(196,168,130,0.2);flex:2">Templates</button>
       </div>
       <div id="tab-pitch" class="sidebar-content">
-        <p class="section-label">Background Images</p>
+        <p class="section-label">Landing Screen</p>
+        <div class="field-group"><label class="field-label">Headline</label><input class="field-input" id="landing-headline" type="text" placeholder="e.g. Spring Summer 2026" oninput="state.landingHeadline=this.value;scheduleAutoSave()" /></div>
+        <div class="field-group"><label class="field-label">Outdoor — Collection Name</label><input class="field-input" id="outdoor-collection-name" type="text" placeholder="e.g. Outdoor" oninput="state.outdoorCollectionName=this.value;scheduleAutoSave()" /></div>
+        <div class="field-group">
+          <label class="field-label">Outdoor — Landing Image</label>
+          <div style="display:flex;gap:8px;align-items:center;margin-bottom:6px">
+            <div id="outdoor-landing-img-preview" style="flex:1;height:64px;border:1.5px dashed var(--light);border-radius:4px;display:flex;align-items:center;justify-content:center;cursor:pointer;overflow:hidden" onclick="document.getElementById('outdoor-landing-img-input').click()">
+              <span style="font-size:11px;color:var(--mid)">Click to upload</span>
+            </div>
+            <button onclick="state.outdoorLandingImg='';document.getElementById('outdoor-landing-img-preview').innerHTML='<span style=\'font-size:11px;color:var(--mid)\'>Click to upload</span>';scheduleAutoSave();" style="font-size:11px;color:#E24B4A;background:none;border:1px solid rgba(226,75,74,0.3);border-radius:2px;padding:6px 10px;cursor:pointer;font-family:DM Sans,sans-serif">✕</button>
+          </div>
+          <input type="file" id="outdoor-landing-img-input" accept="image/*" style="display:none" onchange="handleLandingImg('outdoor',this)" />
+        </div>
+        <div class="field-group"><label class="field-label">Outdoor — Landing Video URL</label><input class="field-input" id="outdoor-landing-video" type="text" placeholder="Paste video URL (.mp4)" oninput="state.outdoorLandingVideo=this.value;scheduleAutoSave()" /></div>
+        <div class="field-group"><label class="field-label">Active — Collection Name</label><input class="field-input" id="active-collection-name" type="text" placeholder="e.g. Active" oninput="state.activeCollectionName=this.value;scheduleAutoSave()" /></div>
+        <div class="field-group">
+          <label class="field-label">Active — Landing Image</label>
+          <div style="display:flex;gap:8px;align-items:center;margin-bottom:6px">
+            <div id="active-landing-img-preview" style="flex:1;height:64px;border:1.5px dashed var(--light);border-radius:4px;display:flex;align-items:center;justify-content:center;cursor:pointer;overflow:hidden" onclick="document.getElementById('active-landing-img-input').click()">
+              <span style="font-size:11px;color:var(--mid)">Click to upload</span>
+            </div>
+            <button onclick="state.activeLandingImg='';document.getElementById('active-landing-img-preview').innerHTML='<span style=\'font-size:11px;color:var(--mid)\'>Click to upload</span>';scheduleAutoSave();" style="font-size:11px;color:#E24B4A;background:none;border:1px solid rgba(226,75,74,0.3);border-radius:2px;padding:6px 10px;cursor:pointer;font-family:DM Sans,sans-serif">✕</button>
+          </div>
+          <input type="file" id="active-landing-img-input" accept="image/*" style="display:none" onchange="handleLandingImg('active',this)" />
+        </div>
+        <div class="field-group"><label class="field-label">Active — Landing Video URL</label><input class="field-input" id="active-landing-video" type="text" placeholder="Paste video URL (.mp4)" oninput="state.activeLandingVideo=this.value;scheduleAutoSave()" /></div>
+        <p class="section-label" style="margin-top:4px">Outdoor — Background Images</p>
         <div class="field-group">
           <label class="field-label" style="margin-bottom:10px">One image per section — appears behind the canvas</label>
           
@@ -628,7 +629,7 @@ img { image-rendering: auto; }
             <span id="bg-blur-val" style="font-size:11px;color:var(--mid);min-width:28px">8px</span>
           </div>
         </div>
-        <p class="section-label">Opening Screen</p>
+        <p class="section-label" style="margin-top:8px">Outdoor — Opening Screen</p>
         <div class="field-group"><label class="field-label">Opening Sentence</label><textarea class="field-input" id="pitch-opening" placeholder="e.g. Where performance meets identity." oninput="scheduleAutoSave()" style="min-height:60px"></textarea></div>
         <div class="field-group">
           <label class="field-label">Opening Background Image</label>
@@ -658,7 +659,7 @@ img { image-rendering: auto; }
           <label class="field-label">Mobile Background Video URL <span style="font-size:9px;color:var(--mid);font-weight:400;letter-spacing:0">— shown on phones instead</span></label>
           <input class="field-input" id="opening-mobile-video" type="text" placeholder="Paste mobile video URL (.mp4)" oninput="state.openingMobileVideo=this.value;scheduleAutoSave();updatePreview()" />
         </div>
-        <p class="section-label" style="margin-top:8px">Collection Details</p>
+        <p class="section-label" style="margin-top:8px">Outdoor — Collection Details</p>
         <div class="field-group"><label class="field-label">Collection Name</label><input class="field-input" id="pitch-title" type="text" placeholder="e.g. Spring Essentials 2026" oninput="scheduleAutoSave()" /></div>
         <div class="field-group"><label class="field-label">Client / Occasion</label><input class="field-input" id="pitch-client" type="text" placeholder="e.g. H&M — Q2 Review" oninput="scheduleAutoSave()" /></div>
         <div class="field-group"><label class="field-label">Tagline</label><input class="field-input" id="pitch-tagline" type="text" placeholder="e.g. Comfort Meets Craft" oninput="scheduleAutoSave()" /></div>
@@ -697,13 +698,106 @@ img { image-rendering: auto; }
         <button onclick="addTechItem()" style="font-size:11px;color:var(--accent-dark);background:none;border:1px dashed var(--light);padding:7px 14px;border-radius:2px;cursor:pointer;font-family:DM Sans,sans-serif;width:100%;margin-top:4px;transition:all 0.2s">+ Add technology</button>
       </div>
       <div id="tab-products" class="sidebar-content" style="display:none">
-        <p class="section-label">Products <span id="product-count" style="color:var(--accent-dark);font-weight:400">0</span></p>
+        <p class="section-label">Outdoor Products <span id="product-count" style="color:var(--accent-dark);font-weight:400">0</span></p>
         <div id="products-list"></div>
         <button class="upload-zone" onclick="document.getElementById('file-input').click()">
           <div class="upload-zone-icon">+</div>
           <div class="upload-zone-text"><strong>Add product</strong><br/>Upload image to get started</div>
         </button>
         <input type="file" id="file-input" accept="image/*" onchange="handleFileUpload(this)" />
+      </div>
+
+      <!-- ── ACTIVE TAB ── -->
+      <div id="tab-active" class="sidebar-content" style="display:none">
+        <p class="section-label">Active — Background Images</p>
+        <div class="field-group">
+          <label class="field-label" style="margin-bottom:10px">One image per section — appears behind the canvas</label>
+          <div style="display:flex;flex-direction:column;gap:10px;margin-bottom:12px">
+            <div style="display:flex;align-items:center;gap:8px">
+              <div style="font-size:10px;letter-spacing:0.1em;text-transform:uppercase;color:var(--mid);width:80px;flex-shrink:0">Collection</div>
+              <div id="bg-thumb-active-collection" onclick="triggerActiveBgUpload('collection')" style="width:48px;height:48px;border:1.5px dashed var(--border);border-radius:4px;cursor:pointer;overflow:hidden;display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:18px;color:var(--mid)">+</div>
+              <input type="file" id="bg-input-active-collection" accept="image/*" style="display:none" onchange="handleActiveBgSection('collection',this)" />
+            </div>
+            <div style="display:flex;align-items:center;gap:8px">
+              <div style="font-size:10px;letter-spacing:0.1em;text-transform:uppercase;color:var(--mid);width:80px;flex-shrink:0">Vision</div>
+              <div id="bg-thumb-active-vision" onclick="triggerActiveBgUpload('vision')" style="width:48px;height:48px;border:1.5px dashed var(--border);border-radius:4px;cursor:pointer;overflow:hidden;display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:18px;color:var(--mid)">+</div>
+              <input type="file" id="bg-input-active-vision" accept="image/*" style="display:none" onchange="handleActiveBgSection('vision',this)" />
+            </div>
+            <div style="display:flex;align-items:center;gap:8px">
+              <div style="font-size:10px;letter-spacing:0.1em;text-transform:uppercase;color:var(--mid);width:80px;flex-shrink:0">Technology</div>
+              <div id="bg-thumb-active-tech" onclick="triggerActiveBgUpload('tech')" style="width:48px;height:48px;border:1.5px dashed var(--border);border-radius:4px;cursor:pointer;overflow:hidden;display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:18px;color:var(--mid)">+</div>
+              <input type="file" id="bg-input-active-tech" accept="image/*" style="display:none" onchange="handleActiveBgSection('tech',this)" />
+            </div>
+          </div>
+          <div style="display:flex;align-items:center;gap:10px;margin-top:8px">
+            <label style="font-size:10px;letter-spacing:0.1em;text-transform:uppercase;color:var(--mid);white-space:nowrap">Opacity</label>
+            <input type="range" min="0.05" max="0.7" step="0.01" value="0.35" id="bg-opacity-slider-active" style="flex:1" oninput="setBgOpacity(this.value);document.getElementById('bg-opacity-slider').value=this.value;document.getElementById('bg-opacity-val').textContent=Math.round(this.value*100)+'%'" />
+            <span id="bg-opacity-val-active" style="font-size:11px;color:var(--mid);min-width:28px">35%</span>
+          </div>
+          <div style="display:flex;align-items:center;gap:10px;margin-top:6px">
+            <label style="font-size:10px;letter-spacing:0.1em;text-transform:uppercase;color:var(--mid);white-space:nowrap">Blur</label>
+            <input type="range" min="0" max="20" step="1" value="8" id="bg-blur-slider-active" style="flex:1" oninput="setBgBlur(this.value);document.getElementById('bg-blur-slider').value=this.value;document.getElementById('bg-blur-val').textContent=this.value+'px'" />
+            <span id="bg-blur-val-active" style="font-size:11px;color:var(--mid);min-width:28px">8px</span>
+          </div>
+        </div>
+        <p class="section-label" style="margin-top:8px">Active — Opening Screen</p>
+        <div class="field-group"><label class="field-label">Collection Title</label><input class="field-input" id="active-title" type="text" placeholder="e.g. Active Collection" oninput="state.activeTitle=this.value;scheduleAutoSave()" /></div>
+        <div class="field-group"><label class="field-label">Client</label><input class="field-input" id="active-client" type="text" placeholder="e.g. Lululemon" oninput="state.activeClient=this.value;scheduleAutoSave()" /></div>
+        <div class="field-group"><label class="field-label">Opening Sentence</label><textarea class="field-input" id="active-opening" placeholder="e.g. Move freely, always." oninput="state.activeOpening=this.value;scheduleAutoSave()" style="min-height:60px"></textarea></div>
+        <div class="field-group">
+          <label class="field-label">Opening Background Image</label>
+          <div style="display:flex;gap:8px;align-items:center;margin-bottom:6px">
+            <div id="active-opening-img-preview" style="flex:1;height:80px;border:1.5px dashed var(--light);border-radius:4px;display:flex;align-items:center;justify-content:center;cursor:pointer;overflow:hidden" onclick="document.getElementById('active-opening-img-input').click()">
+              <span style="font-size:11px;color:var(--mid)">Click to upload background</span>
+            </div>
+            <button onclick="state.activeOpeningImg='';document.getElementById('active-opening-img-preview').innerHTML='<span style=\'font-size:11px;color:var(--mid)\'>Click to upload background</span>';scheduleAutoSave();" style="font-size:11px;color:#E24B4A;background:none;border:1px solid rgba(226,75,74,0.3);border-radius:2px;padding:6px 10px;cursor:pointer;font-family:DM Sans,sans-serif;white-space:nowrap">✕ Remove</button>
+          </div>
+          <input type="file" id="active-opening-img-input" accept="image/*" style="display:none" onchange="handleActiveOpeningImage(this)" />
+        </div>
+        <div class="field-group">
+          <label class="field-label">Opening Background Video URL</label>
+          <input class="field-input" id="active-opening-video" type="text" placeholder="Paste video URL (.mp4)" oninput="state.activeOpeningVideo=this.value;scheduleAutoSave();updatePreview()" />
+        </div>
+        <p class="section-label" style="margin-top:8px">Active — Collection Details</p>
+        <div class="field-group"><label class="field-label">Apparel Category Name</label><input class="field-input" id="active-cat-warm-name" type="text" placeholder="e.g. Apparel" oninput="state.activeCatWarmName=this.value;scheduleAutoSave()" /></div>
+        <div class="field-group"><label class="field-label">Apparel — Background Video URL</label><input class="field-input" id="active-cat-warm-video" type="text" placeholder="Paste video URL (.mp4)" oninput="state.activeCatWarmVideo=this.value;scheduleAutoSave()" /></div>
+        <div class="field-group"><label class="field-label">Accessories Category Name</label><input class="field-input" id="active-cat-air-name" type="text" placeholder="e.g. Accessories" oninput="state.activeCatAirName=this.value;scheduleAutoSave()" /></div>
+        <div class="field-group"><label class="field-label">Accessories — Background Video URL</label><input class="field-input" id="active-cat-air-video" type="text" placeholder="Paste video URL (.mp4)" oninput="state.activeCatAirVideo=this.value;scheduleAutoSave()" /></div>
+        <p class="section-label" style="margin-top:8px">Active — Vision</p>
+        <div class="field-group"><label class="field-label">Pull Quote</label><input class="field-input" id="active-vision-quote" type="text" placeholder="e.g. Engineered for life in motion." oninput="state.activeVisionQuote=this.value;scheduleAutoSave()" /></div>
+        <div class="field-group"><label class="field-label">Vision Text</label><textarea class="field-input" id="active-vision" placeholder="What's the story behind Active?..." oninput="state.activeVision=this.value;scheduleAutoSave()" style="min-height:100px"></textarea></div>
+        <div class="field-group"><label class="field-label">Vision Background Video URL</label><input class="field-input" id="active-vision-video" type="text" placeholder="Paste video URL (.mp4)" oninput="state.activeVisionVideo=this.value;scheduleAutoSave()" /></div>
+        <p class="section-label" style="margin-top:8px">Active — Why This Collection</p>
+        <div id="active-selling-points-list"></div>
+        <button onclick="addActiveSellingPoint()" style="font-size:11px;color:var(--accent-dark);background:none;border:1px dashed var(--light);padding:7px 14px;border-radius:2px;cursor:pointer;font-family:DM Sans,sans-serif;width:100%;margin-top:4px;transition:all 0.2s">+ Add selling point</button>
+        <p class="section-label" style="margin-top:16px">Active — Technology</p>
+        <div class="field-group">
+          <label class="field-label">Default Image <span style="font-size:9px;color:var(--mid);font-weight:400;letter-spacing:0">— shown before hover</span></label>
+          <div style="display:flex;gap:8px;align-items:center;margin-bottom:6px">
+            <div id="active-tech-default-img-preview" style="flex:1;height:80px;border:1.5px dashed var(--light);border-radius:4px;display:flex;align-items:center;justify-content:center;cursor:pointer;overflow:hidden" onclick="document.getElementById('active-tech-default-img-input').click()">
+              <span style="font-size:11px;color:var(--mid)">Click to upload image</span>
+            </div>
+            <button onclick="state.activeTechDefaultImg='';document.getElementById('active-tech-default-img-preview').innerHTML='<span style=\'font-size:11px;color:var(--mid)\'>Click to upload image</span>';scheduleAutoSave();" style="font-size:11px;color:#E24B4A;background:none;border:1px solid rgba(226,75,74,0.3);border-radius:2px;padding:6px 10px;cursor:pointer;font-family:DM Sans,sans-serif;white-space:nowrap">✕</button>
+          </div>
+          <input type="file" id="active-tech-default-img-input" accept="image/*" style="display:none" onchange="handleActiveTechDefaultImg(this)" />
+        </div>
+        <div class="field-group">
+          <label class="field-label">Default Video URL</label>
+          <input class="field-input" id="active-tech-default-video" type="text" placeholder="Paste video URL (.mp4)" oninput="state.activeTechDefaultVideo=this.value;scheduleAutoSave()" />
+        </div>
+        <div id="active-tech-items-list"></div>
+        <button onclick="addActiveTechItem()" style="font-size:11px;color:var(--accent-dark);background:none;border:1px dashed var(--light);padding:7px 14px;border-radius:2px;cursor:pointer;font-family:DM Sans,sans-serif;width:100%;margin-top:4px;transition:all 0.2s">+ Add technology</button>
+      </div>
+
+      <!-- ── ACTIVE PRODUCTS TAB ── -->
+      <div id="tab-active-products" class="sidebar-content" style="display:none">
+        <p class="section-label">Active Products <span id="active-product-count" style="color:var(--accent-dark);font-weight:400">0</span></p>
+        <div id="active-products-list"></div>
+        <button class="upload-zone" onclick="document.getElementById('active-file-input').click()">
+          <div class="upload-zone-icon">+</div>
+          <div class="upload-zone-text"><strong>Add Active product</strong><br/>Upload image to get started</div>
+        </button>
+        <input type="file" id="active-file-input" accept="image/*" onchange="handleActiveFileUpload(this)" />
       </div>
       <div id="tab-templates" class="sidebar-content" style="display:none">
         <p class="section-label">Choose Template</p>
@@ -749,21 +843,6 @@ img { image-rendering: auto; }
         </div>
         <p class="section-label" style="margin-top:8px">Color Palette</p>
         <div id="palette-container"></div>
-      </div>
-
-      <div id="tab-pdf" class="sidebar-content" style="display:none">
-        <p class="section-label">PDF Export</p>
-        <div style="font-size:11px;color:var(--mid);margin-bottom:16px;line-height:1.6">Drag products into pairs or leave solo. Each page prints on its own A4 landscape sheet.</div>
-        <div style="margin-bottom:12px">
-          <label class="field-label">Collection</label>
-          <div style="display:flex;gap:8px">
-            <button id="pdf-outdoor-btn" onclick="setPdfCollection('outdoor')" style="flex:1;font-size:10px;padding:8px;background:var(--charcoal);color:var(--cream);border:none;border-radius:2px;cursor:pointer;font-family:DM Sans,sans-serif;letter-spacing:0.06em;text-transform:uppercase">Outdoor</button>
-            <button id="pdf-active-btn" onclick="setPdfCollection('active')" style="flex:1;font-size:10px;padding:8px;background:transparent;color:var(--mid);border:1px solid var(--border);border-radius:2px;cursor:pointer;font-family:DM Sans,sans-serif;letter-spacing:0.06em;text-transform:uppercase">Active</button>
-          </div>
-        </div>
-        <div id="pdf-pairs-area" style="margin-bottom:16px"></div>
-        <button class="btn btn-primary" onclick="exportToPDF()" style="width:100%;margin-bottom:8px">Export PDF</button>
-        <button class="btn btn-ghost-dark" onclick="previewPDF()" style="width:100%;font-size:11px">Preview</button>
       </div>
     </aside>
     <main class="canvas" id="canvas">
@@ -934,6 +1013,7 @@ const TECHNOLOGIES = [
   { id:'breathable',   label:'Breathable',          icon:'💨' },
   { id:'quick_dry',    label:'QuickDry',            icon:'⚡' },
   { id:'soft',         label:'Soft',                icon:'🤍' },
+  { id:'parametric',   label:'Parametric Design',   icon:'◈'  },
 ];
 
 let state = {
@@ -944,6 +1024,22 @@ let state = {
   techDefaultImg: '', techDefaultVideo: '', techItems: [], catWarmVideo: '', catAirVideo: '', catWarmName: 'Base Layer', catAirName: 'Mid Layer', bgImages: [], bgSectionImgs: {}, bgOpacity: 0.35, bgBlur: 8,
   sellingPoints: [],
   products: [],
+  // ── ACTIVE COLLECTION ──
+  activeCollectionName: 'Active',
+  activeTitle: '', activeClient: '',
+  activeOpening: '', activeOpeningImg: '', activeOpeningVideo: '',
+  activeVision: '', activeVisionQuote: '', activeVisionVideo: '',
+  activeTechDefaultImg: '', activeTechDefaultVideo: '', activeTechItems: [],
+  activeCatWarmName: 'Apparel', activeCatAirName: 'Accessories',
+  activeCatWarmVideo: '', activeCatAirVideo: '',
+  activeSellingPoints: [],
+  activeProducts: [],
+  activeBgSectionImgs: {},
+  // split screen landing images
+  outdoorLandingImg: '', activeLandingImg: '',
+  outdoorLandingVideo: '', activeLandingVideo: '',
+  outdoorCollectionName: 'Outdoor',
+  landingHeadline: 'Spring Summer 2026',
 };
 let currentUser = null;
 let autoSaveTimer = null;
@@ -998,7 +1094,7 @@ function renderWarmthPicker() {
 
 function warmthFlameCol(n, type='w') { return METER_FILTERS[type][n-1]; }
 
-const METER_ICONS = { w: '/Flame_two.png', d: '/drop.png', b: 'https://dkgzhmpuqzykzebzcqdr.supabase.co/storage/v1/object/public/product-images/breathable%20new5.png' };
+const METER_ICONS = { w: 'https://dkgzhmpuqzykzebzcqdr.supabase.co/storage/v1/object/public/product-images/Flame_two2.png', d: 'https://dkgzhmpuqzykzebzcqdr.supabase.co/storage/v1/object/public/product-images/drop.png', b: 'https://dkgzhmpuqzykzebzcqdr.supabase.co/storage/v1/object/public/product-images/breathable%20new5.png' };
 const METER_ASPECT = { w: 1.2, d: 1.0, b: 1.0 };
 const METER_SIZE_MULT = { w: 1, d: 1, b: 1 };
 
@@ -1006,7 +1102,7 @@ function warmthFlameSVG(size, active, fill, picker=false, isDark=false, type='w'
   const mult = METER_SIZE_MULT[type] || 1;
   const w = Math.round(size * mult);
   const h = Math.round(size * METER_ASPECT[type||'w'] * mult);
-  const src = METER_ICONS[type] || '/Flame_two.png';
+  const src = METER_ICONS[type] || METER_ICONS.w;
   if (active) {
     return `<img src="${src}" width="${w}" height="${h}" style="display:block;filter:${fill};vertical-align:bottom" />`;
   } else {
@@ -1123,9 +1219,48 @@ function removeBgSection(section) {
   initCinematicBg();
 }
 
+function triggerActiveBgUpload(section) {
+  document.getElementById('bg-input-active-' + section)?.click();
+}
+
+async function handleActiveBgSection(section, input) {
+  const file = input.files[0]; if (!file) return;
+  showToast('Uploading...', 'success');
+  const url = await uploadImageToStorage(file);
+  if (!url) return;
+  state.activeBgSectionImgs = state.activeBgSectionImgs || {};
+  state.activeBgSectionImgs[section] = url;
+  renderActiveBgThumbs();
+  scheduleAutoSave();
+  input.value = '';
+}
+
+function renderActiveBgThumbs() {
+  const sections = ['collection', 'vision', 'tech'];
+  sections.forEach(sec => {
+    const thumb = document.getElementById('bg-thumb-active-' + sec);
+    if (!thumb) return;
+    const url = (state.activeBgSectionImgs || {})[sec];
+    if (url) {
+      thumb.innerHTML = `<img src="${url}" style="width:100%;height:100%;object-fit:cover" /><div onclick="event.stopPropagation();removeActiveBgSection('${sec}')" style="position:absolute;top:0;right:0;background:rgba(0,0,0,0.65);color:white;border:none;width:16px;height:16px;font-size:10px;cursor:pointer;display:flex;align-items:center;justify-content:center">×</div>`;
+      thumb.style.position = 'relative';
+    } else {
+      thumb.innerHTML = '+';
+      thumb.style.position = '';
+    }
+  });
+}
+
+function removeActiveBgSection(section) {
+  state.activeBgSectionImgs = state.activeBgSectionImgs || {};
+  delete state.activeBgSectionImgs[section];
+  renderActiveBgThumbs();
+  scheduleAutoSave();
+}
+
 function applyBgFilter() {
   const brightness = state.bgOpacity || 0.35;
-  const blur = state.bgBlur || 8;
+  const blur = (state.bgBlur !== undefined && state.bgBlur !== null) ? state.bgBlur : 8;
   document.querySelectorAll('.bg-cinematic-img').forEach(el => {
     el.style.filter = `blur(${blur}px) brightness(${brightness}) saturate(0.8)`;
   });
@@ -1140,7 +1275,8 @@ function setBgBlur(val) {
 }
 
 function switchBgImage(section) {
-  const imgs = state.bgSectionImgs || {};
+  const isActive = window._currentTab === 'active' || _activeMode;
+  const imgs = (isActive ? state.activeBgSectionImgs : state.bgSectionImgs) || {};
   const url = imgs[section] || imgs['collection'] || Object.values(imgs)[0];
   const el = document.getElementById('bg-cinematic-el');
   if (!el || !url) return;
@@ -1162,12 +1298,13 @@ function setBgOpacity(val) {
 }
 
 function initCinematicBg() {
-  const imgs = state.bgSectionImgs || {};
+  const isActive = window._currentTab === 'active' || _activeMode;
+  const imgs = (isActive ? state.activeBgSectionImgs : state.bgSectionImgs) || {};
   const firstUrl = imgs['collection'] || Object.values(imgs)[0];
   if (!firstUrl) return;
 
   const brightness = state.bgOpacity || 0.35;
-  const blur = state.bgBlur || 8;
+  const blur = (state.bgBlur !== undefined && state.bgBlur !== null) ? state.bgBlur : 8;
 
   if (document.getElementById('bg-opacity-slider')) {
     document.getElementById('bg-opacity-slider').value = brightness;
@@ -1177,8 +1314,16 @@ function initCinematicBg() {
     document.getElementById('bg-blur-slider').value = blur;
     document.getElementById('bg-blur-val').textContent = blur + 'px';
   }
+  if (document.getElementById('bg-opacity-slider-active')) {
+    document.getElementById('bg-opacity-slider-active').value = brightness;
+    document.getElementById('bg-opacity-val-active').textContent = Math.round(brightness * 100) + '%';
+  }
+  if (document.getElementById('bg-blur-slider-active')) {
+    document.getElementById('bg-blur-slider-active').value = blur;
+    document.getElementById('bg-blur-val-active').textContent = blur + 'px';
+  }
 
-  // Remove existing bg element to prevent stacking multiple blur layers
+  // Remove any existing bg element to prevent stacking multiple blur layers
   const existing = document.getElementById('bg-cinematic-el');
   if (existing) existing.remove();
 
@@ -1192,16 +1337,18 @@ function initCinematicBg() {
   document.body.appendChild(bg);
   applyBgFilter();
 
-  function doParallax(scrollY) {
-    const layer = document.querySelector('.bg-cinematic-img');
-    if (!layer) return;
-    const pct = 50 + (scrollY * 0.02); // shift background position slightly
-    layer.style.backgroundPosition = `center ${pct}%`;
+  if (!window._parallaxListenerAttached) {
+    window._parallaxListenerAttached = true;
+    function doParallax(scrollY) {
+      const layer = document.querySelector('.bg-cinematic-img');
+      if (!layer) return;
+      const pct = 50 + (scrollY * 0.02);
+      layer.style.backgroundPosition = `center ${pct}%`;
+    }
+    const canvas = document.querySelector('.canvas');
+    if (canvas) canvas.addEventListener('scroll', () => doParallax(canvas.scrollTop), { passive: true });
+    window.addEventListener('scroll', () => doParallax(window.scrollY), { passive: true });
   }
-
-  const canvas = document.querySelector('.canvas');
-  if (canvas) canvas.addEventListener('scroll', () => doParallax(canvas.scrollTop), { passive: true });
-  window.addEventListener('scroll', () => doParallax(window.scrollY), { passive: true });
 }
 
 function showScreen(id) {
@@ -1332,16 +1479,63 @@ async function duplicatePitch(id, pitches) {
     client: src.client||'',
     tagline: src.tagline||'',
     description: src.description||'',
-    opening: src.opening||'',
-    why_tagline: src.why_tagline||'',
-    vision: src.vision||'',
     template: src.template||'editorial',
     palette: src.palette||0,
     products: src.products||[],
+    // Opening
+    opening: src.opening||'',
     opening_img: src.opening_img||'',
     opening_mobile_img: src.opening_mobile_img||'',
+    opening_video: src.opening_video||'',
+    opening_mobile_video: src.opening_mobile_video||'',
+    // Vision
+    vision: src.vision||'',
+    vision_quote: src.vision_quote||'',
+    vision_video: src.vision_video||'',
+    // Why
+    why_tagline: src.why_tagline||'',
+    why_stat1: src.why_stat1||'',
+    why_stat1_label: src.why_stat1_label||'',
+    why_stat2: src.why_stat2||'',
+    why_stat2_label: src.why_stat2_label||'',
+    why_video: src.why_video||'',
+    selling_points: src.selling_points||[],
+    // Tech
+    tech_default_img: src.tech_default_img||'',
+    tech_default_video: src.tech_default_video||'',
+    tech_items: src.tech_items||[],
+    // Categories
+    cat_warm_name: src.cat_warm_name||'Base Layer',
+    cat_air_name: src.cat_air_name||'Mid Layer',
     cat_warm_video: src.cat_warm_video||'',
     cat_air_video: src.cat_air_video||'',
+    // Background
+    bg_section_imgs: src.bg_section_imgs||{},
+    bg_opacity: src.bg_opacity||0.35,
+    bg_blur: (src.bg_blur!==undefined&&src.bg_blur!==null)?src.bg_blur:8,
+    // Active collection
+    active_collection_name: src.active_collection_name||'Active',
+    active_opening: src.active_opening||'',
+    active_opening_img: src.active_opening_img||'',
+    active_opening_video: src.active_opening_video||'',
+    active_vision: src.active_vision||'',
+    active_vision_quote: src.active_vision_quote||'',
+    active_vision_video: src.active_vision_video||'',
+    active_tech_default_img: src.active_tech_default_img||'',
+    active_tech_default_video: src.active_tech_default_video||'',
+    active_tech_items: src.active_tech_items||[],
+    active_cat_warm_name: src.active_cat_warm_name||'Apparel',
+    active_cat_air_name: src.active_cat_air_name||'Accessories',
+    active_cat_warm_video: src.active_cat_warm_video||'',
+    active_cat_air_video: src.active_cat_air_video||'',
+    active_selling_points: src.active_selling_points||[],
+    active_products: src.active_products||[],
+    active_bg_section_imgs: src.active_bg_section_imgs||{},
+    // Landing
+    outdoor_landing_img: src.outdoor_landing_img||'',
+    active_landing_img: src.active_landing_img||'',
+    outdoor_collection_name: src.outdoor_collection_name||'Outdoor',
+    landing_headline: src.landing_headline||'Spring Summer 2026',
   };
   const {data,error}=await sb.from('pitches').insert(copy).select().single();
   if (error){showToast('Could not duplicate','error');return;}
@@ -1376,10 +1570,10 @@ async function openPitch(id) {
   if(g('why-stat-2')) g('why-stat-2').value=data.why_stat2||'';
   if(g('why-stat-2-label')) g('why-stat-2-label').value=data.why_stat2_label||'';
   if(g('why-video')) g('why-video').value=data.why_video||'';
-  state.outdoorLandingVideo=data.outdoor_landing_video||''; state.activeLandingVideo=data.active_landing_video||'';
-  state.outdoorLandingImg=data.outdoor_landing_img||''; state.activeLandingImg=data.active_landing_img||'';
-  state.outdoorCollectionName=data.outdoor_collection_name||'Outdoor'; state.landingHeadline=data.landing_headline||'Spring Summer 2026';
-  state.sellingPoints=data.selling_points||[]; state.techDefaultImg=data.tech_default_img||''; state.techDefaultVideo=data.tech_default_video||''; state.catWarmVideo=data.cat_warm_video||''; state.catAirVideo=data.cat_air_video||''; state.catWarmName=data.cat_warm_name||'Base Layer'; state.catAirName=data.cat_air_name||'Mid Layer'; state.bgSectionImgs=data.bg_section_imgs||{}; state.bgOpacity=data.bg_opacity||0.35; state.bgBlur=data.bg_blur||8; state.techItems=data.tech_items||[];
+  state.sellingPoints=data.selling_points||[]; state.techDefaultImg=data.tech_default_img||''; state.techDefaultVideo=data.tech_default_video||''; state.catWarmVideo=data.cat_warm_video||''; state.catAirVideo=data.cat_air_video||''; state.catWarmName=data.cat_warm_name||'Base Layer'; state.catAirName=data.cat_air_name||'Mid Layer'; state.bgSectionImgs=data.bg_section_imgs||{}; state.bgOpacity=data.bg_opacity||0.35; state.bgBlur=(data.bg_blur!==undefined&&data.bg_blur!==null)?data.bg_blur:8; state.techItems=data.tech_items||[];
+  state.outdoorLandingVideo=data.outdoor_landing_video||""; state.activeLandingVideo=data.active_landing_video||"";
+  state.outdoorLandingImg=data.outdoor_landing_img||""; state.activeLandingImg=data.active_landing_img||"";
+  state.outdoorCollectionName=data.outdoor_collection_name||"Outdoor"; state.landingHeadline=data.landing_headline||"Spring Summer 2026";
   if(state.openingImg){const op=document.getElementById('opening-img-preview');if(op)op.innerHTML='<img src="'+state.openingImg+'" style="width:100%;height:100%;object-fit:cover" />';}
   if(state.openingMobileImg){const omp=document.getElementById('opening-mobile-img-preview');if(omp)omp.innerHTML='<img src="'+state.openingMobileImg+'" style="width:100%;height:100%;object-fit:cover" />';}
   if(state.techDefaultImg){const tdp=document.getElementById('tech-default-img-preview');if(tdp)tdp.innerHTML='<img src="'+state.techDefaultImg+'" style="width:100%;height:100%;object-fit:cover" />';}
@@ -1388,12 +1582,46 @@ async function openPitch(id) {
   if(g('cat-air-video')) g('cat-air-video').value=state.catAirVideo||'';
   if(g('cat-warm-name')) g('cat-warm-name').value=state.catWarmName||'Base Layer';
   if(g('cat-air-name')) g('cat-air-name').value=state.catAirName||'Mid Layer';
+  // Active collection
+  state.activeCollectionName=data.active_collection_name||'Active';
+  state.activeTitle=data.active_title||''; state.activeClient=data.active_client||'';
+  state.activeOpening=data.active_opening||''; state.activeOpeningImg=data.active_opening_img||''; state.activeOpeningVideo=data.active_opening_video||'';
+  state.activeVision=data.active_vision||''; state.activeVisionQuote=data.active_vision_quote||''; state.activeVisionVideo=data.active_vision_video||'';
+  state.activeTechDefaultImg=data.active_tech_default_img||''; state.activeTechDefaultVideo=data.active_tech_default_video||''; state.activeTechItems=data.active_tech_items||[];
+  state.activeCatWarmName=data.active_cat_warm_name||'Apparel'; state.activeCatAirName=data.active_cat_air_name||'Accessories';
+  state.activeCatWarmVideo=data.active_cat_warm_video||''; state.activeCatAirVideo=data.active_cat_air_video||'';
+  state.activeSellingPoints=data.active_selling_points||[]; state.activeProducts=data.active_products||[];
+  state._activeProductsLoaded=true;
+  state.activeBgSectionImgs=data.active_bg_section_imgs||{};
+  if(g('active-title')) g('active-title').value=state.activeTitle;
+  if(g('active-client')) g('active-client').value=state.activeClient;
+  if(g('active-opening')) g('active-opening').value=state.activeOpening;
+  if(g('active-opening-video')) g('active-opening-video').value=state.activeOpeningVideo;
+  if(g('active-vision')) g('active-vision').value=state.activeVision;
+  if(g('active-vision-quote')) g('active-vision-quote').value=state.activeVisionQuote;
+  if(g('active-vision-video')) g('active-vision-video').value=state.activeVisionVideo;
+  if(g('active-tech-default-video')) g('active-tech-default-video').value=state.activeTechDefaultVideo;
+  if(g('active-cat-warm-name')) g('active-cat-warm-name').value=state.activeCatWarmName;
+  if(g('active-cat-air-name')) g('active-cat-air-name').value=state.activeCatAirName;
+  if(g('active-cat-warm-video')) g('active-cat-warm-video').value=state.activeCatWarmVideo;
+  if(g('active-cat-air-video')) g('active-cat-air-video').value=state.activeCatAirVideo;
+  if(g('active-collection-name')) g('active-collection-name').value=state.activeCollectionName;
+  if(g('outdoor-collection-name')) g('outdoor-collection-name').value=state.outdoorCollectionName;
+  if(g('landing-headline')) g('landing-headline').value=state.landingHeadline;
+  if(g('outdoor-landing-video')) g('outdoor-landing-video').value=state.outdoorLandingVideo||'';
+  if(g('active-landing-video')) g('active-landing-video').value=state.activeLandingVideo||'';
+  if(state.activeOpeningImg){const ap=g('active-opening-img-preview');if(ap)ap.innerHTML='<img src="'+state.activeOpeningImg+'" style="width:100%;height:100%;object-fit:cover" />';}
+  if(state.activeTechDefaultImg){const atp=g('active-tech-default-img-preview');if(atp)atp.innerHTML='<img src="'+state.activeTechDefaultImg+'" style="width:100%;height:100%;object-fit:cover" />';}
+  if(state.outdoorLandingImg){const olp=g('outdoor-landing-img-preview');if(olp)olp.innerHTML='<img src="'+state.outdoorLandingImg+'" style="width:100%;height:100%;object-fit:cover" />';}
+  if(state.activeLandingImg){const alp=g('active-landing-img-preview');if(alp)alp.innerHTML='<img src="'+state.activeLandingImg+'" style="width:100%;height:100%;object-fit:cover" />';}
+  renderActiveTechItems(); renderActiveSellingPoints(); renderActiveProductsList();
   // restore template selection
   document.querySelectorAll('.template-card').forEach(c=>{
     c.classList.toggle('selected', c.getAttribute('onclick').includes("'"+state.template+"'"));
   });
   renderProductsList(); renderSellingPoints(); renderTechItems(); renderPalettes(); updatePreview();
   renderBgThumbs();
+  renderActiveBgThumbs();
   showScreen('builder');
   setTimeout(()=>{ document.getElementById('bg-cinematic-el')?.remove(); initCinematicBg(); switchBgImage('collection'); }, 500);
   // show share banner
@@ -1438,7 +1666,7 @@ function showCat(cat){
     return;
   }
   const prods=state.products||[];
-  const catProds=prods.filter(p=>p.category===cat);
+  const catProds=prods.filter(p=>p.category===cat||(cat==='warm'&&(p.layer==='base'||p.layer==='Base Layer'))||(cat==='air'&&(p.layer==='mid'||p.layer==='Mid Layer')));
   // Preload all extra/hover images in background so detail panel opens instantly
   setTimeout(()=>{
     catProds.forEach(p=>{
@@ -1528,7 +1756,7 @@ function filterCat(cat,layer,btn){
   btn.closest('div').querySelectorAll('button').forEach(b=>{b.style.background='transparent';b.style.color='#888';b.style.borderColor='#ccc';});
   btn.style.background='#1C1C1A';btn.style.color='#fff';btn.style.borderColor='#1C1C1A';
   const prods=state.products||[];
-  const filtered=prods.filter(p=>p.category===cat&&(layer==='all'||p.layer===layer));
+  const filtered=prods.filter(p=>(p.category===cat||(cat==='warm'&&(p.layer==='base'||p.layer==='Base Layer'))||(cat==='air'&&(p.layer==='mid'||p.layer==='Mid Layer')))&&(layer==='all'||p.layer===layer||p.layer===(layer==='base'?'Base Layer':layer==='mid'?'Mid Layer':layer)));
   const grid=document.getElementById(cat+'-grid');
   grid.innerHTML=buildCatGrid(filtered,acc);
   setTimeout(()=>{
@@ -1677,10 +1905,36 @@ async function savePitch() {
     cat_air_name:g('cat-air-name')?.value||state.catAirName||'Mid Layer',
     bg_section_imgs:state.bgSectionImgs||{},
     bg_opacity:state.bgOpacity||0.35,
-    bg_blur:state.bgBlur||8,
+    bg_blur:(state.bgBlur!==undefined&&state.bgBlur!==null)?state.bgBlur:8,
+    // Active collection
+    active_collection_name:state.activeCollectionName||'Active',
+    active_title:g('active-title')?.value||state.activeTitle||'',
+    active_client:g('active-client')?.value||state.activeClient||'',
+    active_opening:state.activeOpening||'',
+    active_opening_img:state.activeOpeningImg||'',
+    active_opening_video:state.activeOpeningVideo||'',
+    active_vision:state.activeVision||'',
+    active_vision_quote:state.activeVisionQuote||'',
+    active_vision_video:state.activeVisionVideo||'',
+    active_tech_default_img:state.activeTechDefaultImg||'',
+    active_tech_default_video:state.activeTechDefaultVideo||'',
+    active_tech_items:state.activeTechItems||[],
+    active_cat_warm_name:g('active-cat-warm-name')?.value||state.activeCatWarmName||'Apparel',
+    active_cat_air_name:g('active-cat-air-name')?.value||state.activeCatAirName||'Accessories',
+    active_cat_warm_video:state.activeCatWarmVideo||'',
+    active_cat_air_video:state.activeCatAirVideo||'',
+    active_selling_points:state.activeSellingPoints||[],
+    active_products:state.activeProducts||[],
+    active_bg_section_imgs:state.activeBgSectionImgs||{},
+    outdoor_landing_img:state.outdoorLandingImg||'',
+    active_landing_img:state.activeLandingImg||'',
+    outdoor_landing_video:state.outdoorLandingVideo||'',
+    active_landing_video:state.activeLandingVideo||'',
+    outdoor_collection_name:g('outdoor-collection-name')?.value||state.outdoorCollectionName||'Outdoor',
+    landing_headline:g('landing-headline')?.value||state.landingHeadline||'Spring Summer 2026',
     updated_at:new Date().toISOString()
   }).eq('id',state.pitchId);
-  if (error) { setSaveStatus(''); showToast('Save failed','error'); return; }
+  if (error) { console.error('Save error:', JSON.stringify(error)); setSaveStatus(''); showToast('Save failed: '+error.message,'error'); return; }
   setSaveStatus('saved');
   setTimeout(()=>setSaveStatus(''),2500);
 }
@@ -1696,6 +1950,12 @@ function switchTab(tab, el) {
   el.classList.add('active');
   document.querySelectorAll('.sidebar-content').forEach(c=>c.style.display='none');
   g('tab-'+tab).style.display='block';
+  window._currentTab=tab;
+  // Re-init cinematic background for the right collection
+  document.getElementById('bg-cinematic-el')?.remove();
+  initCinematicBg();
+  switchBgImage('collection');
+  updatePreview();
 }
 function selectTemplate(tpl, el) {
   document.querySelectorAll('.template-card').forEach(c=>c.classList.remove('selected'));
@@ -1748,6 +2008,11 @@ async function uploadImageToStorage(file) {
 
 function handleFileUpload(inp) {
   if (!inp.files[0]) return;
+  window._savingForActive=false;
+  const warmOpt=g('cat-warm-option');
+  const airOpt=g('cat-air-option');
+  if(warmOpt) warmOpt.textContent=state.catWarmName||'Base Layer';
+  if(airOpt) airOpt.textContent=state.catAirName||'Mid Layer';
   const file = inp.files[0];
   const localUrl = URL.createObjectURL(file);
   pendingImg = localUrl;
@@ -1822,6 +2087,18 @@ function replaceExtraImg(el, idx) {
   input.click();
 }
 function openModal() {
+  // Update category labels based on which collection we're editing
+  const warmOpt=g('cat-warm-option');
+  const airOpt=g('cat-air-option');
+  if(warmOpt && airOpt){
+    if(window._savingForActive){
+      warmOpt.textContent=state.activeCatWarmName||'Apparel';
+      airOpt.textContent=state.activeCatAirName||'Accessories';
+    } else {
+      warmOpt.textContent=state.catWarmName||'Base Layer';
+      airOpt.textContent=state.catAirName||'Mid Layer';
+    }
+  }
   // Update category dropdown with current names
   const wo = document.getElementById('cat-warm-option');
   const ao = document.getElementById('cat-air-option');
@@ -1872,9 +2149,18 @@ async function saveProduct() {
   } else if (pendingHoverFile) {
     hoverImgUrl = await uploadImageToStorage(pendingHoverFile) || '';
   }
-  state.products.push({id:Date.now(),name,fabric:g('modal-fabric').value.trim(),desc:g('modal-desc').value.trim(),special:g('modal-special')?.value.trim()||'',video:g('modal-video')?.value.trim()||'',img:imgUrl,extraImgs,hoverImg:hoverImgUrl,warmth:pendingWarmthRating,dry:pendingDryRating,breath:pendingBreathRating,techs:[...pendingTechs],emoji:'📦',category:g('modal-category')?.value||'',layer:g('modal-layer')?.value||''});
-  g('modal-save-btn').textContent='Add Product'; g('modal-save-btn').disabled=false;
-  closeModal(); renderProductsList(); updatePreview(); scheduleAutoSave();
+  const _newProd={id:Date.now(),name,fabric:g('modal-fabric').value.trim(),desc:g('modal-desc').value.trim(),special:g('modal-special')?.value.trim()||'',video:g('modal-video')?.value.trim()||'',img:imgUrl,extraImgs,hoverImg:hoverImgUrl,warmth:pendingWarmthRating,dry:pendingDryRating,breath:pendingBreathRating,techs:[...pendingTechs],emoji:'📦',category:g('modal-category')?.value||'',layer:g('modal-layer')?.value||''};
+  if(window._savingForActive){
+    state.activeProducts=state.activeProducts||[];
+    state.activeProducts.push(_newProd);
+    window._savingForActive=false;
+    g('modal-save-btn').textContent='Add Product'; g('modal-save-btn').disabled=false;
+    closeModal(); renderActiveProductsList(); scheduleAutoSave();
+  } else {
+    state.products.push(_newProd);
+    g('modal-save-btn').textContent='Add Product'; g('modal-save-btn').disabled=false;
+    closeModal(); renderProductsList(); updatePreview(); scheduleAutoSave();
+  }
 }
 function removeProduct(id){state.products=state.products.filter(p=>p.id!==id);renderProductsList();updatePreview();scheduleAutoSave();}
 
@@ -1929,6 +2215,250 @@ function handleTechDefaultImg(inp) {
   uploadImageToStorage(file).then(publicUrl=>{
     if(publicUrl){state.techDefaultImg=publicUrl;scheduleAutoSave();}
   });
+}
+
+// ── ACTIVE COLLECTION HANDLERS ──
+function handleLandingImg(side, inp) {
+  if (!inp.files[0]) return;
+  const file=inp.files[0];
+  const url=URL.createObjectURL(file);
+  const preview=g(side+'-landing-img-preview');
+  if(preview) preview.innerHTML='<img src="'+url+'" style="width:100%;height:100%;object-fit:cover" />';
+  uploadImageToStorage(file).then(publicUrl=>{
+    if(publicUrl){
+      if(side==='outdoor') state.outdoorLandingImg=publicUrl;
+      else state.activeLandingImg=publicUrl;
+      scheduleAutoSave();
+    }
+  });
+}
+function handleActiveOpeningImage(inp) {
+  if (!inp.files[0]) return;
+  const file=inp.files[0];
+  const url=URL.createObjectURL(file);
+  const preview=g('active-opening-img-preview');
+  if(preview) preview.innerHTML='<img src="'+url+'" style="width:100%;height:100%;object-fit:cover" />';
+  uploadImageToStorage(file).then(publicUrl=>{
+    if(publicUrl){state.activeOpeningImg=publicUrl;scheduleAutoSave();}
+  });
+}
+function handleActiveTechDefaultImg(inp) {
+  if (!inp.files[0]) return;
+  const file=inp.files[0];
+  const url=URL.createObjectURL(file);
+  const preview=g('active-tech-default-img-preview');
+  if(preview) preview.innerHTML='<img src="'+url+'" style="width:100%;height:100%;object-fit:cover" />';
+  uploadImageToStorage(file).then(publicUrl=>{
+    if(publicUrl){state.activeTechDefaultImg=publicUrl;scheduleAutoSave();}
+  });
+}
+function triggerActiveBgUpload(section) {
+  const inp=g('bg-input-active-'+section);
+  if(inp) inp.click();
+}
+function handleActiveBgSection(section, inp) {
+  if(!inp.files[0]) return;
+  const file=inp.files[0];
+  const url=URL.createObjectURL(file);
+  const thumb=g('bg-thumb-active-'+section);
+  if(thumb) thumb.innerHTML='<img src="'+url+'" style="width:100%;height:100%;object-fit:cover" />';
+  uploadImageToStorage(file).then(publicUrl=>{
+    if(publicUrl){
+      state.activeBgSectionImgs=state.activeBgSectionImgs||{};
+      state.activeBgSectionImgs[section]=publicUrl;
+      scheduleAutoSave();
+    }
+  });
+}
+function addActiveTechItem() {
+  const id=Date.now();
+  state.activeTechItems=state.activeTechItems||[];
+  state.activeTechItems.push({id,label:'',name:'',desc:'',video:'',color:'#C4A882'});
+  renderActiveTechItems();
+  scheduleAutoSave();
+}
+function removeActiveTechItem(id) {
+  state.activeTechItems=state.activeTechItems.filter(t=>t.id!==id);
+  renderActiveTechItems();
+  scheduleAutoSave();
+}
+function updateActiveTechItem(id,field,val) {
+  const item=state.activeTechItems.find(t=>t.id===id);
+  if(!item) return;
+  if(field==='desc') val=val.slice(0,180);
+  item[field]=val;
+  scheduleAutoSave();
+}
+function renderActiveTechItems() {
+  const list=g('active-tech-items-list'); if(!list) return;
+  state.activeTechItems=state.activeTechItems||[];
+  list.innerHTML=state.activeTechItems.map((t,i)=>
+    '<div style="border:1px solid var(--border);border-radius:4px;padding:12px;margin-bottom:8px;background:var(--cream)">'
+      +'<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">'
+        +'<span style="font-size:10px;letter-spacing:0.1em;text-transform:uppercase;color:var(--mid)">Tech '+(i+1)+'</span>'
+        +'<button onclick="removeActiveTechItem('+t.id+')" style="font-size:14px;color:var(--light);background:none;border:none;cursor:pointer;padding:0">×</button>'
+      +'</div>'
+      +'<input class="field-input" style="margin-bottom:6px" placeholder="Label (e.g. DryTech)" value="'+(t.label||'').replace(/"/g,'&quot;')+'" oninput="updateActiveTechItem('+t.id+',\'label\',this.value)" />'
+      +'<input class="field-input" style="margin-bottom:6px" placeholder="Name" value="'+(t.name||'').replace(/"/g,'&quot;')+'" oninput="updateActiveTechItem('+t.id+',\'name\',this.value)" />'
+      +'<textarea class="field-input" style="margin-bottom:6px;min-height:56px" placeholder="Description (max 120 chars)" oninput="updateActiveTechItem('+t.id+',\'desc\',this.value);this.value=this.value.slice(0,120)" maxlength="180">'+(t.desc||'')+'</textarea>'
+      +'<input class="field-input" style="margin-bottom:8px" placeholder="Video URL (.mp4)" value="'+(t.video||'').replace(/"/g,'&quot;')+'" oninput="updateActiveTechItem('+t.id+',\'video\',this.value)" />'
+      +'<div style="display:flex;align-items:center;gap:10px">'
+        +'<span style="font-size:10px;letter-spacing:0.08em;text-transform:uppercase;color:var(--mid);flex-shrink:0">Hover colour</span>'
+        +'<input type="color" value="'+(t.color||'#C4A882')+'" '
+          +'oninput="updateActiveTechItem('+t.id+',\'color\',this.value);this.nextElementSibling.textContent=this.value;" '
+          +'style="width:32px;height:26px;border:1px solid var(--border);border-radius:3px;cursor:pointer;padding:1px 2px;background:var(--warm-white)" />'
+        +'<span style="font-size:11px;color:var(--mid);font-family:monospace">'+(t.color||'#C4A882')+'</span>'
+      +'</div>'
+    +'</div>'
+  ).join('');
+}
+function addActiveSellingPoint() {
+  const id=Date.now();
+  state.activeSellingPoints=state.activeSellingPoints||[];
+  state.activeSellingPoints.push({id,icon:'⭐',text:'',front:''});
+  renderActiveSellingPoints();
+  scheduleAutoSave();
+}
+function removeActiveSellingPoint(id) {
+  state.activeSellingPoints=state.activeSellingPoints.filter(s=>s.id!==id);
+  renderActiveSellingPoints();
+  scheduleAutoSave();
+}
+function renderActiveSellingPoints() {
+  const list=g('active-selling-points-list'); if(!list) return;
+  state.activeSellingPoints=state.activeSellingPoints||[];
+  list.innerHTML=state.activeSellingPoints.map((sp,i)=>
+    '<div class="sp-item" style="flex-direction:column;gap:6px;padding:10px">'
+      +'<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px">'
+        +'<span style="font-size:10px;letter-spacing:0.1em;text-transform:uppercase;color:var(--mid)">Card '+String(i+1).padStart(2,'0')+'</span>'
+        +'<button class="sp-remove" onclick="removeActiveSellingPoint('+sp.id+')">×</button>'
+      +'</div>'
+      +'<label style="font-size:10px;letter-spacing:0.08em;text-transform:uppercase;color:var(--mid)">Front (word/phrase)</label>'
+      +'<input class="field-input" style="margin-bottom:6px" placeholder="e.g. Performance" oninput="updateActiveSPFront('+sp.id+',this.value);scheduleAutoSave()" value="'+(sp.front||'').replace(/"/g,'&quot;')+'" />'
+      +'<label style="font-size:10px;letter-spacing:0.08em;text-transform:uppercase;color:var(--mid)">Back (data/insight)</label>'
+      +'<textarea class="field-input" placeholder="e.g. 82% demand activewear that moves with them" oninput="updateActiveSP('+sp.id+',this.value);scheduleAutoSave()">'+sp.text+'</textarea>'
+    +'</div>'
+  ).join('');
+}
+function updateActiveSP(id,val){const sp=state.activeSellingPoints.find(s=>s.id===id);if(sp)sp.text=val;}
+function updateActiveSPFront(id,val){const sp=state.activeSellingPoints.find(s=>s.id===id);if(sp)sp.front=val;}
+
+// Active products list
+function renderActiveProductsList() {
+  g('active-product-count').textContent=(state.activeProducts||[]).length;
+  const list=g('active-products-list'); if(!list) return;
+  list.innerHTML=(state.activeProducts||[]).map((p,i)=>`
+    <div class="product-item" draggable="true" data-id="${p.id}" style="cursor:grab">
+      <div style="color:var(--light);font-size:13px;padding:0 6px 0 0;cursor:grab;flex-shrink:0">⠿</div>
+      <div class="product-thumb">${p.img?'<img src="'+p.img+'" loading="lazy" />':p.emoji}</div>
+      <div class="product-info"><div class="product-info-name">${p.name}</div><div class="product-info-fabric">${p.fabric||'No fabric info'}</div></div>
+      <div style="display:flex;gap:4px;flex-shrink:0">
+        <button class="product-remove" style="color:var(--mid);font-size:13px;padding:4px 6px" onclick="editActiveProduct(${p.id})" title="Edit">✎</button>
+        <button class="product-remove" onclick="removeActiveProduct(${p.id})" title="Remove">×</button>
+      </div>
+    </div>`).join('');
+
+  // drag-and-drop reordering
+  let dragId=null;
+  list.querySelectorAll('.product-item').forEach(item=>{
+    item.addEventListener('dragstart',e=>{
+      dragId=item.dataset.id;
+      item.style.opacity='0.4';
+      e.dataTransfer.effectAllowed='move';
+    });
+    item.addEventListener('dragend',e=>{
+      item.style.opacity='1';
+      list.querySelectorAll('.product-item').forEach(i=>i.style.borderTop='');
+    });
+    item.addEventListener('dragover',e=>{
+      e.preventDefault();
+      e.dataTransfer.dropEffect='move';
+      list.querySelectorAll('.product-item').forEach(i=>i.style.borderTop='');
+      item.style.borderTop='2px solid var(--accent)';
+    });
+    item.addEventListener('dragleave',()=>{
+      item.style.borderTop='';
+    });
+    item.addEventListener('drop',e=>{
+      e.preventDefault();
+      item.style.borderTop='';
+      if (!dragId||dragId===item.dataset.id) return;
+      const fromIdx=state.activeProducts.findIndex(p=>String(p.id)===dragId);
+      const toIdx=state.activeProducts.findIndex(p=>String(p.id)===item.dataset.id);
+      if (fromIdx===-1||toIdx===-1) return;
+      const moved=state.activeProducts.splice(fromIdx,1)[0];
+      state.activeProducts.splice(toIdx,0,moved);
+      renderActiveProductsList();
+      scheduleAutoSave();
+    });
+  });
+}
+function removeActiveProduct(id){state.activeProducts=state.activeProducts.filter(p=>p.id!==id);renderActiveProductsList();scheduleAutoSave();}
+function handleActiveFileUpload(inp) {
+  if (!inp.files[0]) return;
+  const file=inp.files[0];
+  const localUrl=URL.createObjectURL(file);
+  pendingImg=localUrl; pendingFile=file;
+  window._savingForActive=true;
+  // Update category dropdown labels for Active
+  const warmOpt=g('cat-warm-option');
+  const airOpt=g('cat-air-option');
+  if(warmOpt) warmOpt.textContent=state.activeCatWarmName||'Apparel';
+  if(airOpt) airOpt.textContent=state.activeCatAirName||'Accessories';
+  openModal();
+  g('modal-img-preview').innerHTML='<img src="'+localUrl+'" />';
+  g('modal-extra-imgs').style.display='block';
+  inp.value='';
+}
+function editActiveProduct(id) {
+  const p=state.activeProducts.find(x=>x.id===id); if(!p) return;
+  window._editingActiveProduct=id;
+  window._savingForActive=true;
+  // Update category dropdown labels for Active
+  const warmOpt=g('cat-warm-option');
+  const airOpt=g('cat-air-option');
+  if(warmOpt) warmOpt.textContent=state.activeCatWarmName||'Apparel';
+  if(airOpt) airOpt.textContent=state.activeCatAirName||'Accessories';
+  pendingImg=p.img||null; pendingExtraFiles=[];
+  pendingHoverFile=null; pendingHoverImg=p.hoverImg||null;
+  pendingWarmthRating=p.warmth||0; pendingDryRating=p.dry||0; pendingBreathRating=p.breath||0;
+  g('modal-name').value=p.name||'';
+  if(g('modal-category')) g('modal-category').value=p.category||'';
+  if(g('modal-layer')) g('modal-layer').value=p.layer||'';
+  g('modal-fabric').value=p.fabric||'';
+  g('modal-desc').value=p.desc||'';
+  if(g('modal-special')) g('modal-special').value=p.special||'';
+  if(g('modal-video')) g('modal-video').value=p.video||'';
+  pendingTechs=[...(p.techs||[])];
+  g('modal-img-preview').innerHTML=p.img?'<img src="'+p.img+'" /><div style="position:absolute;inset:0;background:rgba(0,0,0,0.3);display:flex;align-items:center;justify-content:center;color:white;font-size:12px;letter-spacing:0.06em;text-transform:uppercase">Click to change</div>':'<div class="img-preview-placeholder"><span>'+p.emoji+'</span>Click to upload image</div>';
+  g('modal-img-preview').style.position='relative';
+  g('modal-extra-thumbs').innerHTML=''; removedExtraUrls=[];
+  if(p.extraImgs&&p.extraImgs.length){g('modal-extra-imgs').style.display='block';p.extraImgs.forEach((src,i)=>{const thumb=document.createElement('div');thumb.style.cssText='position:relative;width:48px;height:48px;border-radius:2px;overflow:hidden;flex-shrink:0';thumb.dataset.src=src;thumb.innerHTML=`<img src="${src}" style="width:100%;height:100%;object-fit:cover" /><button onclick="removeExistingExtra(this)" style="position:absolute;top:0;right:0;background:rgba(0,0,0,0.65);color:white;border:none;width:16px;height:16px;font-size:10px;cursor:pointer">×</button>`;g('modal-extra-thumbs').appendChild(thumb);});}
+  else{g('modal-extra-imgs').style.display='block';}
+  g('modal-save-btn').textContent='Update Product';
+  g('modal-save-btn').onclick=()=>updateActiveProduct(id);
+  g('modal-overlay').classList.add('open');
+  const hp=g('modal-hover-preview');
+  if(hp) hp.innerHTML=p.hoverImg?'<img src="'+p.hoverImg+'" style="width:100%;height:100%;object-fit:cover" />'+'<div id="modal-hover-replace" style="display:flex;position:absolute;inset:0;background:rgba(0,0,0,0.3);align-items:center;justify-content:center;color:white;font-size:11px;text-transform:uppercase">Click to replace</div>':'<span style="font-size:11px;color:var(--mid)">Click to upload hover image</span>';
+  renderWarmthPicker(); renderMeterPicker('dry',pendingDryRating,'d'); renderMeterPicker('breath',pendingBreathRating,'b'); renderTechList();
+}
+async function updateActiveProduct(id) {
+  const name=g('modal-name').value.trim(); if(!name){g('modal-name').focus();return;}
+  const idx=state.activeProducts.findIndex(x=>x.id===id); if(idx===-1) return;
+  g('modal-save-btn').textContent='Saving...'; g('modal-save-btn').disabled=true;
+  let imgUrl=state.activeProducts[idx].img;
+  if(pendingFile){imgUrl=await uploadImageToStorage(pendingFile);if(!imgUrl){g('modal-save-btn').textContent='Update Product';g('modal-save-btn').disabled=false;return;}}
+  const newExtras=[];
+  for(const ef of pendingExtraFiles.filter(Boolean)){const url=await uploadImageToStorage(ef.file);if(url)newExtras.push(url);}
+  const existingExtras=(state.activeProducts[idx].extraImgs||[]).filter(url=>!removedExtraUrls.includes(url));
+  let hoverImgUrl=state.activeProducts[idx].hoverImg||'';
+  if(pendingHoverImg)hoverImgUrl=pendingHoverImg;
+  else if(pendingHoverFile)hoverImgUrl=await uploadImageToStorage(pendingHoverFile)||hoverImgUrl;
+  state.activeProducts[idx]={...state.activeProducts[idx],name,fabric:g('modal-fabric').value.trim(),desc:g('modal-desc').value.trim(),special:g('modal-special')?.value.trim()||'',video:g('modal-video')?.value.trim()||'',img:imgUrl,extraImgs:[...existingExtras,...newExtras],hoverImg:hoverImgUrl,warmth:pendingWarmthRating,dry:pendingDryRating,breath:pendingBreathRating,techs:[...pendingTechs],category:g('modal-category')?.value||'',layer:g('modal-layer')?.value||''};
+  g('modal-save-btn').textContent='Add Product'; g('modal-save-btn').disabled=false;
+  g('modal-save-btn').onclick=saveProduct;
+  window._savingForActive=false; window._editingActiveProduct=null;
+  closeModal(); renderActiveProductsList(); scheduleAutoSave();
 }
 function addTechItem() {
   const id=Date.now();
@@ -2250,18 +2780,19 @@ function imgWrap(p,cls) {
   return `<div class="prod-img-wrap${cls?' '+cls:''}" onclick="openDetail(${p.id})">${inner}</div>`;
 }
 function getOpeningScreen() {
-  const sentence=g('pitch-opening')?.value||state.opening||'';
-  const img=state.openingImg||pendingOpeningImg||'';
-  const mobileImg=state.openingMobileImg||'';
-  const vid=g('opening-video')?.value||state.openingVideo||'';
-  const mobileVid=g('opening-mobile-video')?.value||state.openingMobileVideo||'';
+  const isActiveSidebar = window._currentTab === 'active';
+  const sentence = isActiveSidebar ? (state.activeOpening||g('active-opening')?.value||'') : (state.opening||g('pitch-opening')?.value||'');
+  const img = isActiveSidebar ? (state.activeOpeningImg||'') : (state.openingImg||pendingOpeningImg||'');
+  const mobileImg = isActiveSidebar ? '' : (state.openingMobileImg||'');
+  const vid = isActiveSidebar ? (state.activeOpeningVideo||g('active-opening-video')?.value||'') : (state.openingVideo||g('opening-video')?.value||'');
+  const mobileVid = isActiveSidebar ? '' : (state.openingMobileVideo||g('opening-mobile-video')?.value||'');
   if(!sentence&&!img&&!vid&&!mobileImg&&!mobileVid) return '';
   const isMob=window.innerWidth<=768;
   const activeVid=(isMob&&mobileVid)?mobileVid:vid;
   const activeImg=(isMob&&mobileImg)?mobileImg:img;
   const bgStyle=activeImg?'background-image:url('+activeImg+')':'background:#1C1C1A';
   const showVideo=!!activeVid&&!(isMob&&mobileImg);
-  const videoEl=showVideo?'<video id="opening-video-el" autoplay muted playsinline loop preload="auto" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;z-index:0;opacity:0;transition:opacity 1s ease" oncanplay="this.style.opacity=1">'+
+  const videoEl=showVideo?'<video id="opening-video-el" autoplay muted playsinline loop preload="auto" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;z-index:0;opacity:0;transition:opacity 0.4s ease" oncanplay="this.style.opacity=1">'+
     '<source src="'+activeVid+'" type="video/mp4"></video>':'';
   return '<div class="opening-screen" style="position:relative;overflow:hidden;height:clamp(320px,100vw,600px)">'
     +'<div class="opening-screen-bg" style="'+bgStyle+'"></div>'
@@ -2344,8 +2875,8 @@ function showSection(section) {
 
     if (section==='collection') {
       const prods=state.products||[];
-      const warmProds=prods.filter(p=>p.layer==='base');
-      const airProds=prods.filter(p=>p.layer==='mid');
+      const warmProds=prods.filter(p=>p.layer==='base'||p.layer==='Base Layer'||p.category==='warm');
+      const airProds=prods.filter(p=>p.layer==='mid'||p.layer==='Mid Layer'||p.category==='air');
       const hasCategories=warmProds.length>0||airProds.length>0;
 
       if(!hasCategories){
@@ -2384,7 +2915,7 @@ function showSection(section) {
       // Video or image background on right side
       const rightSide = visionVid
         ?'<div class="vision-video-fade" style="flex:1;position:relative;overflow:hidden;min-height:520px">'
-           +'<video autoplay muted loop playsinline style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;opacity:0;transition:opacity 1.2s ease" preload="auto" oncanplay="this.style.opacity=1">'
+           +'<video autoplay muted loop playsinline style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;opacity:0;transition:opacity 0.5s ease" preload="auto" oncanplay="this.style.opacity=1">'
            +'<source src="'+visionVid+'" type="video/mp4"></video>'
          +'</div>'
         : heroImg
@@ -2541,15 +3072,19 @@ function updatePreview() {
     state.vision = g('pitch-vision')?.value || state.vision;
     const preview=g('showcase-preview');
     if (!preview) return;
+    // Snapshot any currently playing opening video so we can re-attach it after innerHTML wipe
+    const existingVid = document.getElementById('opening-video-el');
+    const existingScreen = existingVid ? existingVid.closest('.opening-screen') : null;
+    const existingVidSrc = existingVid ? (existingVid.querySelector('source')?.getAttribute('src')||'') : '';
     preview.className='showcase tpl-preview-'+state.template;
     const {bg,textColor,accentColor,borderColor,cardBg} = getSectionColors();
     const prods=state.products||[];
-    const warmProds=prods.filter(p=>p.layer==='base');
-    const airProds=prods.filter(p=>p.layer==='mid');
+    const warmProds=prods.filter(p=>p.layer==='base'||p.layer==='Base Layer'||p.category==='warm');
+    const airProds=prods.filter(p=>p.layer==='mid'||p.layer==='Mid Layer'||p.category==='air');
     const hasCategories=warmProds.length>0||airProds.length>0;
     if(hasCategories){
-      const warmVid=g('cat-warm-video')?.value||state.catWarmVideo||'';
-      const airVid=g('cat-air-video')?.value||state.catAirVideo||'';
+      const warmVid=state.catWarmVideo||'';
+      const airVid=state.catAirVideo||'';
       const pal2=PALETTES[state.template][state.palette];
       const warmBg=pal2.warmBg||'#1A0A08';
       const warmAcc=pal2.warmAcc||'#C4722A';
@@ -2565,7 +3100,7 @@ function updatePreview() {
         +'<div id="section-anchor"></div>'
         +'<div id="cat-split" style="display:grid;grid-template-columns:1fr 1fr;min-height:95vh">'
           +'<div onclick="showCat(\'warm\')" class="cat-panel" style="background:'+warmBg+';display:flex;flex-direction:column;justify-content:flex-end;padding:48px;cursor:pointer;border-right:1px solid rgba(255,255,255,0.08);position:relative;overflow:hidden;transition:opacity 0.8s ease,transform 0.8s ease;opacity:0;transform:translateY(40px)">'
-            +(warmVid?'<video autoplay muted playsinline preload="auto" class="cat-vid" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;opacity:0;transition:opacity 1.2s ease,transform 0.6s ease" oncanplay="this.style.opacity='+vidOpacity+'"><source src="'+warmVid+'" type="video/mp4"></video>':'')
+            +(warmVid?'<video autoplay muted playsinline preload="auto" class="cat-vid" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;opacity:0;transition:opacity 0.5s ease" oncanplay="this.style.opacity='+vidOpacity+'"><source src="'+warmVid+'" type="video/mp4"></video>':'')
             +'<div style="position:absolute;inset:0;background:'+textGradient+';pointer-events:none"></div>'
             +'<div style="position:absolute;top:0;left:0;right:0;height:3px;background:'+warmAcc+'"></div>'
             +'<div style="position:relative;z-index:1;transition:transform 0.4s ease" class="cat-text">'
@@ -2577,7 +3112,7 @@ function updatePreview() {
             +'</div>'
           +'</div>'
           +'<div onclick="showCat(\'air\')" class="cat-panel" style="background:'+airBg+';display:flex;flex-direction:column;justify-content:flex-end;padding:48px;cursor:pointer;position:relative;overflow:hidden;transition:opacity 0.8s ease 0.15s,transform 0.8s ease 0.15s;opacity:0;transform:translateY(40px)">'
-            +(airVid?'<video autoplay muted playsinline preload="auto" class="cat-vid" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;opacity:0;transition:opacity 1.2s ease,transform 0.6s ease" oncanplay="this.style.opacity='+vidOpacity+'"><source src="'+airVid+'" type="video/mp4"></video>':'')
+            +(airVid?'<video autoplay muted playsinline preload="auto" class="cat-vid" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;opacity:0;transition:opacity 0.5s ease" oncanplay="this.style.opacity='+vidOpacity+'"><source src="'+airVid+'" type="video/mp4"></video>':'')
             +'<div style="position:absolute;inset:0;background:'+textGradient+';pointer-events:none"></div>'
             +'<div style="position:absolute;top:0;left:0;right:0;height:3px;background:'+airAcc+'"></div>'
             +'<div style="position:relative;z-index:1;transition:transform 0.4s ease" class="cat-text">'
@@ -2592,19 +3127,40 @@ function updatePreview() {
         +'<div id="cat-warm" style="display:none;background:'+warmBg+'"></div>'
         +'<div id="cat-air" style="display:none;background:'+airBg+'"></div>';
       preview.innerHTML=splitHTML;
+      // If the opening video src hasn't changed, swap back the live element to avoid restart
+      if (existingScreen && existingVidSrc) {
+        const newVid = preview.querySelector('#opening-video-el');
+        const newSrc = newVid ? (newVid.querySelector('source')?.getAttribute('src')||'') : '';
+        if (newSrc === existingVidSrc && newVid) {
+          newVid.closest('.opening-screen')?.replaceWith(existingScreen);
+        }
+      }
       // Add compact class to hero
       const heroEl=preview.querySelector('.showcase-hero');
       if(heroEl) heroEl.classList.add('hero-compact');
-      // scroll observer
+      // scroll observer — reveals panels on scroll
       setTimeout(()=>{
         const panels=document.querySelectorAll('.cat-panel');
         const obs=new IntersectionObserver((entries)=>{
-          entries.forEach(e=>{if(e.isIntersecting){e.target.style.opacity='1';e.target.style.transform='translateY(0)';obs.unobserve(e.target);}});
-        },{threshold:0.15});
+          entries.forEach(e=>{
+            if(e.isIntersecting){
+              e.target.style.opacity='1';
+              e.target.style.transform='translateY(0)';
+              obs.unobserve(e.target);
+            }
+          });
+        },{threshold:0.05});
         panels.forEach(p=>obs.observe(p));
       },100);
     } else {
       preview.innerHTML=getOpeningScreen()+getNavCards(null)+getHero()+getProducts()+getClosingFooter();
+      if (existingScreen && existingVidSrc) {
+        const newVid = preview.querySelector('#opening-video-el');
+        const newSrc = newVid ? (newVid.querySelector('source')?.getAttribute('src')||'') : '';
+        if (newSrc === existingVidSrc && newVid) {
+          newVid.closest('.opening-screen')?.replaceWith(existingScreen);
+        }
+      }
     }
     preview.style.display='block';
     safeClassName('product-detail','product-detail');
@@ -2758,7 +3314,7 @@ document.addEventListener('keydown',e=>{if(e.key==='Escape'){closeLightbox();clo
 
 // ── PRESENTATION VIEW (clean, no UI) ──
 async function loadPresentationView(token) {
-  const {data,error}=await sbAnon.from("pitches").select("*").eq("share_token",token).single();
+  const {data,error}=await sb.from("pitches").select("*").eq("share_token",token).single();
   if (error||!data){showToast("Pitch not found","error");await loadDashboard();return;}
   state.pitchId=data.id; state.shareToken=data.share_token;
   state.template=data.template; state.palette=data.palette||0;
@@ -2777,7 +3333,21 @@ async function loadPresentationView(token) {
   state.whyStat1=data.why_stat1||""; state.whyStat1Label=data.why_stat1_label||"";
   state.whyStat2=data.why_stat2||""; state.whyStat2Label=data.why_stat2_label||"";
   state.whyVideo=data.why_video||"";
-  state.sellingPoints=data.selling_points||[]; state.techDefaultImg=data.tech_default_img||""; state.techDefaultVideo=data.tech_default_video||""; state.catWarmVideo=data.cat_warm_video||""; state.catAirVideo=data.cat_air_video||""; state.catWarmName=data.cat_warm_name||"Base Layer"; state.catAirName=data.cat_air_name||"Mid Layer"; state.bgSectionImgs=data.bg_section_imgs||{}; state.bgOpacity=data.bg_opacity||0.35; state.bgBlur=data.bg_blur||8; state.techItems=data.tech_items||[];
+  state.sellingPoints=data.selling_points||[]; state.techDefaultImg=data.tech_default_img||""; state.techDefaultVideo=data.tech_default_video||""; state.catWarmVideo=data.cat_warm_video||""; state.catAirVideo=data.cat_air_video||""; state.catWarmName=data.cat_warm_name||"Base Layer"; state.catAirName=data.cat_air_name||"Mid Layer"; state.bgSectionImgs=data.bg_section_imgs||{}; state.bgOpacity=data.bg_opacity||0.35; state.bgBlur=(data.bg_blur!==undefined&&data.bg_blur!==null)?data.bg_blur:8; state.techItems=data.tech_items||[];
+  // Active
+  state.activeCollectionName=data.active_collection_name||'Active';
+  state.activeTitle=data.active_title||''; state.activeClient=data.active_client||'';
+  state.activeOpening=data.active_opening||''; state.activeOpeningImg=data.active_opening_img||''; state.activeOpeningVideo=data.active_opening_video||'';
+  state.activeVision=data.active_vision||''; state.activeVisionQuote=data.active_vision_quote||''; state.activeVisionVideo=data.active_vision_video||'';
+  state.activeTechDefaultImg=data.active_tech_default_img||''; state.activeTechDefaultVideo=data.active_tech_default_video||''; state.activeTechItems=data.active_tech_items||[];
+  state.activeCatWarmName=data.active_cat_warm_name||'Apparel'; state.activeCatAirName=data.active_cat_air_name||'Accessories';
+  state.activeCatWarmVideo=data.active_cat_warm_video||''; state.activeCatAirVideo=data.active_cat_air_video||'';
+  state.activeSellingPoints=data.active_selling_points||[]; state.activeProducts=data.active_products||[];
+  state._activeProductsLoaded=true;
+  state.activeBgSectionImgs=data.active_bg_section_imgs||{};
+  state.outdoorLandingImg=data.outdoor_landing_img||''; state.activeLandingImg=data.active_landing_img||''; state.outdoorLandingVideo=data.outdoor_landing_video||''; state.activeLandingVideo=data.active_landing_video||'';
+  state.outdoorCollectionName=data.outdoor_collection_name||'Outdoor';
+  state.landingHeadline=data.landing_headline||'Spring Summer 2026';
   document.querySelector("header").style.display="none";
   document.querySelector(".sidebar").style.display="none";
   document.querySelector(".canvas-label").style.display="none";
@@ -2786,12 +3356,180 @@ async function loadPresentationView(token) {
   document.querySelector(".canvas").style.background="transparent";
   document.body.style.background="#1C1C1A";
   document.documentElement.style.setProperty("--bg-brightness", state.bgOpacity||0.35);
-  document.documentElement.style.setProperty("--bg-blur", (state.bgBlur||8)+"px");
+  document.documentElement.style.setProperty("--bg-blur", ((state.bgBlur!==undefined&&state.bgBlur!==null)?state.bgBlur:8)+"px");
   initCinematicBg();
-  switchBgImage("collection");
   showScreen("builder");
-  updatePreview();
+  showLandingScreen();
   g("loading-screen").classList.add("hidden");
+
+}
+
+// ── LANDING SCREEN (split: Outdoor | Active) ──
+function showLandingScreen() {
+  const preview=g('showcase-preview'); if(!preview) return;
+  const headline=state.landingHeadline||'Spring Summer 2026';
+  const outdoorName=state.outdoorCollectionName||'Outdoor';
+  const activeName=state.activeCollectionName||'Active';
+  const outdoorImg=state.outdoorLandingImg||'';
+  const activeImg=state.activeLandingImg||'';
+  const outdoorVid=state.outdoorLandingVideo||'';
+  const activeVid=state.activeLandingVideo||'';
+  const outdoorCount=(state.products||[]);
+  const activeCount=(state.activeProducts||[]);
+  const textGrad='linear-gradient(to top, rgba(0,0,0,0.75) 0%, rgba(0,0,0,0.2) 50%, transparent 100%)';
+
+  preview.className='showcase';
+  const isPresent=document.querySelector('header')&&document.querySelector('header').style.display==='none';
+  if(isPresent){preview.style.maxWidth='100%';preview.style.width='100%';}
+  preview.innerHTML=
+    '<div style="position:relative;min-height:100vh;display:grid;grid-template-columns:1fr 1fr;isolation:isolate">'
+      // Outdoor half
+      +'<div onclick="enterCollection(\'outdoor\')" style="position:relative;overflow:hidden;cursor:pointer;min-height:100vh;background:#0D1018;border-right:1px solid rgba(255,255,255,0.08)">'
+        +'<div style="position:absolute;inset:0;z-index:0;'+(outdoorImg?'background:url(\''+outdoorImg+'\') center/cover no-repeat':'background:linear-gradient(160deg,#0D1018 0%,#1A2030 100%)')+'"></div>'
+        +(outdoorVid?'<video autoplay muted loop playsinline style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;opacity:0;transition:opacity 0.5s ease;z-index:1" oncanplay="this.style.opacity=0.75"><source src="'+outdoorVid+'" type="video/mp4"></video>':'')
+        
+        +'<div style="position:absolute;inset:0;z-index:3;background:rgba(0,0,0,0);transition:background 0.4s" class="landing-hover-overlay"></div>'
+        +'<div style="position:absolute;bottom:0;left:0;right:0;padding:40px 44px 48px;z-index:4">'
+          +'<div style="width:20px;height:1px;background:#C4A882;margin-bottom:14px;opacity:0.7"></div>'
+          +'<div style="font-family:Cormorant Garamond,serif;font-size:clamp(32px,3.5vw,52px);font-weight:300;color:#fff;line-height:1.05;margin-bottom:14px">'+outdoorName+'</div>'
+          +'<div style="font-size:10px;letter-spacing:0.2em;text-transform:uppercase;color:#C4A882;opacity:0;transition:opacity 0.3s" class="landing-cta">Explore →</div>'
+        +'</div>'
+      +'</div>'
+      // Active half
+      +'<div onclick="enterCollection(\'active\')" style="position:relative;overflow:hidden;cursor:pointer;min-height:100vh;background:#180810">'
+        +'<div style="position:absolute;inset:0;z-index:0;'+(activeImg?'background:url(\''+activeImg+'\') center/cover no-repeat':'background:linear-gradient(160deg,#180810 0%,#2A1020 100%)')+'"></div>'
+        +(activeVid?'<video autoplay muted loop playsinline style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;opacity:0;transition:opacity 0.5s ease;z-index:1" oncanplay="this.style.opacity=0.75"><source src="'+activeVid+'" type="video/mp4"></video>':'')
+        
+        +'<div style="position:absolute;inset:0;z-index:3;background:rgba(0,0,0,0);transition:background 0.4s" class="landing-hover-overlay"></div>'
+        +'<div style="position:absolute;bottom:0;left:0;right:0;padding:40px 44px 48px;z-index:4">'
+          +'<div style="width:20px;height:1px;background:#C4A882;margin-bottom:14px;opacity:0.7"></div>'
+          +'<div style="font-family:Cormorant Garamond,serif;font-size:clamp(32px,3.5vw,52px);font-weight:300;color:#fff;line-height:1.05;margin-bottom:14px">'+activeName+'</div>'
+          +'<div style="font-size:10px;letter-spacing:0.2em;text-transform:uppercase;color:#C4A882;opacity:0;transition:opacity 0.3s" class="landing-cta">Explore →</div>'
+        +'</div>'
+      +'</div>'
+      // Headline overlay
+      +'<div style="position:absolute;top:0;left:0;right:0;text-align:center;padding:52px 40px 0;pointer-events:none;z-index:10">'
+        +'<div style="font-size:9px;letter-spacing:0.35em;text-transform:uppercase;color:rgba(255,255,255,0.55);margin-bottom:16px">Delta Galil</div>'
+        +'<div style="font-family:Cormorant Garamond,serif;font-size:clamp(36px,5vw,68px);font-weight:300;color:#fff;line-height:1.05;letter-spacing:0.02em;text-shadow:0 2px 20px rgba(0,0,0,0.5)">'+headline+'</div>'
+        +'<div style="width:48px;height:1px;background:#C4A882;margin:20px auto 0;opacity:0.5"></div>'
+      +'</div>'
+    +'</div>';
+
+  // Hover effects
+  setTimeout(()=>{
+    document.querySelectorAll('#showcase-preview > div:last-child > div').forEach(panel=>{
+      const overlay=panel.querySelector('.landing-hover-overlay');
+      const cta=panel.querySelector('.landing-cta');
+      const img=panel.querySelector('.landing-bg-img');
+      panel.addEventListener('mouseenter',()=>{
+        if(overlay) overlay.style.background='rgba(0,0,0,0.15)';
+        if(cta) cta.style.opacity='1';
+        if(img) img.style.transform='scale(1.04)';
+      });
+      panel.addEventListener('mouseleave',()=>{
+        if(overlay) overlay.style.background='rgba(0,0,0,0)';
+        if(cta) cta.style.opacity='0';
+        if(img) img.style.transform='scale(1)';
+      });
+    });
+  },100);
+  preview.style.display='block';
+  const bgEl=document.querySelector('.bg-cinematic');
+  if(bgEl) bgEl.style.opacity='0';
+}
+
+// ── ENTER COLLECTION ──
+let _activeMode=false; // true when viewer is in Active collection
+function enterCollection(which) {
+  _activeMode=(which==='active');
+  if(_activeMode) {
+    // Temporarily swap state to Active data for rendering
+    window._outdoorState={
+      products:state.products, catWarmName:state.catWarmName, catAirName:state.catAirName,
+      catWarmVideo:state.catWarmVideo, catAirVideo:state.catAirVideo,
+      opening:state.opening, openingImg:state.openingImg, openingVideo:state.openingVideo,
+      vision:state.vision, visionQuote:state.visionQuote, visionVideo:state.visionVideo,
+      techItems:state.techItems, techDefaultImg:state.techDefaultImg, techDefaultVideo:state.techDefaultVideo,
+      sellingPoints:state.sellingPoints, bgSectionImgs:state.bgSectionImgs,
+      title:state.title, client:state.client,
+    };
+    state.products=state.activeProducts||[];
+    state.catWarmName=state.activeCatWarmName||'Apparel';
+    state.catAirName=state.activeCatAirName||'Accessories';
+    state.catWarmVideo=state.activeCatWarmVideo||'';
+    state.catAirVideo=state.activeCatAirVideo||'';
+    state.opening=state.activeOpening||'';
+    state.openingImg=state.activeOpeningImg||'';
+    state.openingVideo=state.activeOpeningVideo||'';
+    state.vision=state.activeVision||'';
+    state.visionQuote=state.activeVisionQuote||'';
+    state.visionVideo=state.activeVisionVideo||'';
+    state.techItems=state.activeTechItems||[];
+    state.techDefaultImg=state.activeTechDefaultImg||'';
+    state.techDefaultVideo=state.activeTechDefaultVideo||'';
+    state.sellingPoints=state.activeSellingPoints||[];
+    state.bgSectionImgs=state.activeBgSectionImgs||{};
+    state.title=state.activeTitle||'Active Collection';
+    state.client=state.activeClient||'';
+  }
+  // Always sync all state values to input fields so updatePreview reads them correctly
+  if(g('pitch-opening')) g('pitch-opening').value=state.opening||'';
+  if(g('opening-video')) g('opening-video').value=state.openingVideo||'';
+  if(g('opening-mobile-video')) g('opening-mobile-video').value=state.openingMobileVideo||'';
+  if(g('pitch-title')) g('pitch-title').value=state.title||'';
+  if(g('pitch-client')) g('pitch-client').value=state.client||'';
+  if(g('pitch-vision')) g('pitch-vision').value=state.vision||'';
+  if(g('pitch-vision-quote')) g('pitch-vision-quote').value=state.visionQuote||'';
+  if(g('pitch-vision-video')) g('pitch-vision-video').value=state.visionVideo||'';
+  if(g('tech-default-video')) g('tech-default-video').value=state.techDefaultVideo||'';
+  if(g('cat-warm-video')) g('cat-warm-video').value=state.catWarmVideo||'';
+  if(g('cat-air-video')) g('cat-air-video').value=state.catAirVideo||'';
+  if(g('cat-warm-name')) g('cat-warm-name').value=state.catWarmName||'';
+  if(g('cat-air-name')) g('cat-air-name').value=state.catAirName||'';
+  // Re-init the cinematic background with the swapped bgSectionImgs
+  document.getElementById('bg-cinematic-el')?.remove();
+  initCinematicBg();
+  switchBgImage('collection');
+  // Restore cinematic background
+  const bgEl=document.querySelector('.bg-cinematic');
+  if(bgEl) bgEl.style.opacity='1';
+  // Reset showcase width
+  const prev=g('showcase-preview');
+  if(prev){prev.style.maxWidth='';prev.style.width='';}
+  updatePreview();
+  window.scrollTo({top:0,behavior:'smooth'});
+  // Add a back-to-landing button
+  const preview=g('showcase-preview');
+  if(preview){
+    const backBar=document.createElement('div');
+    backBar.id='back-to-landing';
+    backBar.style.cssText='position:fixed;top:16px;left:50%;transform:translateX(-50%);z-index:999;background:rgba(28,28,26,0.85);border:1px solid rgba(255,255,255,0.12);border-radius:20px;padding:8px 20px;display:flex;align-items:center;gap:10px;cursor:pointer;backdrop-filter:blur(8px)';
+    backBar.innerHTML='<span style="font-size:9px;letter-spacing:0.2em;text-transform:uppercase;color:rgba(255,255,255,0.5)">'+state.landingHeadline+'</span>'
+      +'<span style="color:rgba(255,255,255,0.2);font-size:10px">|</span>'
+      +'<span style="font-size:9px;letter-spacing:0.2em;text-transform:uppercase;color:#C4A882">'+(which==='outdoor'?state.outdoorCollectionName:state.activeCollectionName)+'</span>';
+    backBar.onclick=()=>{ restoreFromCollection(); showLandingScreen(); backBar.remove(); };
+    document.body.appendChild(backBar);
+  }
+}
+
+function restoreFromCollection() {
+  if(_activeMode && window._outdoorState) {
+    const s=window._outdoorState;
+    state.products=s.products; state.catWarmName=s.catWarmName; state.catAirName=s.catAirName;
+    state.catWarmVideo=s.catWarmVideo; state.catAirVideo=s.catAirVideo;
+    state.opening=s.opening; state.openingImg=s.openingImg; state.openingVideo=s.openingVideo;
+    state.vision=s.vision; state.visionQuote=s.visionQuote; state.visionVideo=s.visionVideo;
+    state.techItems=s.techItems; state.techDefaultImg=s.techDefaultImg; state.techDefaultVideo=s.techDefaultVideo;
+    state.sellingPoints=s.sellingPoints; state.bgSectionImgs=s.bgSectionImgs;
+    state.title=s.title; state.client=s.client;
+    if(g('pitch-title')) g('pitch-title').value=s.title||'';
+    if(g('pitch-client')) g('pitch-client').value=s.client||'';
+    window._outdoorState=null;
+  }
+  _activeMode=false;
+  // remove back button if visible
+  const bb=document.getElementById('back-to-landing'); if(bb) bb.remove();
+  switchBgImage('collection');
 }
 
 async function loadSharedView(token) {
@@ -2829,7 +3567,7 @@ async function loadSharedView(token) {
   if(g('why-stat-2')) g('why-stat-2').value=data.why_stat2||'';
   if(g('why-stat-2-label')) g('why-stat-2-label').value=data.why_stat2_label||'';
   if(g('why-video')) g('why-video').value=data.why_video||'';
-  state.sellingPoints=data.selling_points||[]; state.techDefaultImg=data.tech_default_img||''; state.techDefaultVideo=data.tech_default_video||''; state.catWarmVideo=data.cat_warm_video||''; state.catAirVideo=data.cat_air_video||''; state.catWarmName=data.cat_warm_name||'Base Layer'; state.catAirName=data.cat_air_name||'Mid Layer'; state.bgSectionImgs=data.bg_section_imgs||{}; state.bgOpacity=data.bg_opacity||0.35; state.bgBlur=data.bg_blur||8; state.techItems=data.tech_items||[];
+  state.sellingPoints=data.selling_points||[]; state.techDefaultImg=data.tech_default_img||''; state.techDefaultVideo=data.tech_default_video||''; state.catWarmVideo=data.cat_warm_video||''; state.catAirVideo=data.cat_air_video||''; state.catWarmName=data.cat_warm_name||'Base Layer'; state.catAirName=data.cat_air_name||'Mid Layer'; state.bgSectionImgs=data.bg_section_imgs||{}; state.bgOpacity=data.bg_opacity||0.35; state.bgBlur=(data.bg_blur!==undefined&&data.bg_blur!==null)?data.bg_blur:8; state.techItems=data.tech_items||[];
   document.querySelector('.sidebar').style.display='none';
   document.querySelector('.header-actions').innerHTML='';
   document.querySelector('.header-left').innerHTML='';
@@ -2898,186 +3636,6 @@ document.addEventListener('click', function(e){
     showSection(section);
   }
 });
-
-
-// ── PDF EXPORT SYSTEM ──
-let _pdfCollection = 'outdoor';
-let _pdfPairs = [];
-
-function setPdfCollection(which) {
-  _pdfCollection = which;
-  const ob = document.getElementById('pdf-outdoor-btn');
-  const ab = document.getElementById('pdf-active-btn');
-  if (ob) { ob.style.background = which==='outdoor'?'var(--charcoal)':'transparent'; ob.style.color = which==='outdoor'?'var(--cream)':'var(--mid)'; ob.style.border = which==='outdoor'?'none':'1px solid var(--border)'; }
-  if (ab) { ab.style.background = which==='active'?'var(--charcoal)':'transparent'; ab.style.color = which==='active'?'var(--cream)':'var(--mid)'; ab.style.border = which==='active'?'none':'1px solid var(--border)'; }
-  initPdfPairs();
-}
-
-function initPdfPairs() {
-  const prods = (_pdfCollection==='outdoor' ? state.products : state.activeProducts) || [];
-  _pdfPairs = [];
-  for (let i=0; i<prods.length; i+=2) {
-    _pdfPairs.push([prods[i]?.id ?? null, prods[i+1]?.id ?? null]);
-  }
-  renderPdfPairs();
-}
-
-function renderPdfPairs() {
-  const prods = (_pdfCollection==='outdoor' ? state.products : state.activeProducts) || [];
-  const area = document.getElementById('pdf-pairs-area');
-  if (!area) return;
-  const pairedIds = new Set(_pdfPairs.flat().filter(Boolean));
-  const unpairedProds = prods.filter(p => !pairedIds.has(p.id));
-
-  let html = '';
-  if (unpairedProds.length) {
-    html += '<div class="pdf-pool-label">Unplaced Products</div><div class="pdf-pool" id="pdf-pool">' + unpairedProds.map(p => chipHTML(p)).join('') + '</div>';
-  }
-  html += '<div class="pdf-pool-label">Pages</div>';
-  _pdfPairs.forEach((pair, pi) => {
-    const p1 = prods.find(p=>p.id===pair[0]);
-    const p2 = prods.find(p=>p.id===pair[1]);
-    html += '<div class="pdf-pair">' +
-      '<div class="pdf-pair-header">' +
-        '<span class="pdf-pair-num">Page ' + (pi+1) + (pair[1]===null?' · Solo':' · Pair') + '</span>' +
-        '<button onclick="removePdfPair(' + pi + ')" style="background:none;border:none;cursor:pointer;color:var(--mid);font-size:16px;line-height:1">\u00d7</button>' +
-      '</div>' +
-      '<div class="pdf-pair-drop">' +
-        '<div class="pdf-drop-slot ' + (p1?'filled':'') + '" ondragover="pdfDragOver(event,' + pi + ',0)" ondragleave="this.classList.remove(\'drag-over\')" ondrop="pdfDrop(event,' + pi + ',0)">' +
-          (p1 ? chipHTML(p1) : '<span style="font-size:10px;color:var(--mid)">Drop here</span>') +
-        '</div>' +
-        '<div class="pdf-drop-slot ' + (p2?'filled':'') + '" ondragover="pdfDragOver(event,' + pi + ',1)" ondragleave="this.classList.remove(\'drag-over\')" ondrop="pdfDrop(event,' + pi + ',1)">' +
-          (p2 ? chipHTML(p2) : '<span style="font-size:10px;color:var(--mid)">Drop 2nd (optional)</span>') +
-        '</div>' +
-      '</div></div>';
-  });
-  html += '<button class="pdf-add-pair" onclick="addPdfPair()">+ Add Page</button>';
-  area.innerHTML = html;
-
-  area.querySelectorAll('.pdf-product-chip').forEach(chip => {
-    chip.addEventListener('dragstart', e => { e.dataTransfer.setData('text/plain', chip.dataset.id); chip.classList.add('dragging'); });
-    chip.addEventListener('dragend', () => chip.classList.remove('dragging'));
-  });
-  const pool = document.getElementById('pdf-pool');
-  if (pool) {
-    pool.addEventListener('dragover', e => { e.preventDefault(); e.dataTransfer.dropEffect='move'; });
-    pool.addEventListener('drop', e => { e.preventDefault(); pdfDrop(e, null, null); });
-  }
-}
-
-function chipHTML(p) {
-  const thumb = p.img ? '<img src="' + p.img + '" style="width:28px;height:28px;object-fit:cover;border-radius:2px;flex-shrink:0" />' : '<div style="width:28px;height:28px;background:var(--border);border-radius:2px;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:14px">\ud83d\udc55</div>';
-  return '<div class="pdf-product-chip" draggable="true" data-id="' + p.id + '">' + thumb + '<span style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:140px">' + (p.name||'Product') + '</span></div>';
-}
-
-function pdfDragOver(e, pairIdx, slot) {
-  e.preventDefault();
-  e.dataTransfer.dropEffect = 'move';
-  document.querySelectorAll('.pdf-drop-slot').forEach(s => s.classList.remove('drag-over'));
-  e.currentTarget.classList.add('drag-over');
-}
-
-function pdfDrop(e, pairIdx, slot) {
-  e.preventDefault();
-  document.querySelectorAll('.pdf-drop-slot').forEach(s => s.classList.remove('drag-over'));
-  const id = parseInt(e.dataTransfer.getData('text/plain'));
-  if (!id) return;
-  _pdfPairs = _pdfPairs.map(pair => [pair[0]===id?null:pair[0], pair[1]===id?null:pair[1]]);
-  if (pairIdx !== null) {
-    _pdfPairs[pairIdx][slot] = id;
-  }
-  _pdfPairs = _pdfPairs.filter(pair => pair[0]!==null || pair[1]!==null);
-  renderPdfPairs();
-}
-
-function addPdfPair() { _pdfPairs.push([null, null]); renderPdfPairs(); }
-function removePdfPair(pi) { _pdfPairs.splice(pi, 1); renderPdfPairs(); }
-
-function buildPdfPageHTML(pair) {
-  const prods = (_pdfCollection==='outdoor' ? state.products : state.activeProducts) || [];
-  const p1 = pair[0] ? prods.find(p=>p.id===pair[0]) : null;
-  const p2 = pair[1] ? prods.find(p=>p.id===pair[1]) : null;
-  const isSolo = !p2;
-
-  function ratingRow(label, val, icon) {
-    if (!val) return '';
-    const icons = Array(5).fill(0).map((_,i) => '<span style="font-size:12px;opacity:' + (i<val?'1':'0.2') + '">' + icon + '</span>').join('');
-    return '<div style="display:flex;align-items:center;gap:8px;margin-bottom:3px"><span style="font-size:7.5px;letter-spacing:0.1em;text-transform:uppercase;color:#999;width:52px;flex-shrink:0">' + label + '</span>' + icons + '</div>';
-  }
-
-  function techBadgesHtml(p) {
-    if (!(p.techs||[]).length) return '';
-    var badges = (p.techs||[]).map(function(tid) {
-      var t = TECHNOLOGIES.find(function(x){ return x.id===tid; });
-      return t ? '<span style="font-size:7px;letter-spacing:0.1em;text-transform:uppercase;border:1px solid #C4A882;border-radius:20px;padding:2px 8px;color:#8C7355;white-space:nowrap">' + t.label + '</span>' : '';
-    }).join('');
-    return '<div style="display:flex;flex-wrap:wrap;gap:4px;margin-top:6px">' + badges + '</div>';
-  }
-
-  function productBlock(p, titleSize) {
-    return '<div style="font-family:\'Cormorant Garamond\',serif;font-size:' + titleSize + ';font-weight:300;color:#1C1C1A;margin-bottom:3px;line-height:1.15">' + (p.name||'') + '</div>' +
-      '<div style="font-size:7.5px;letter-spacing:0.14em;text-transform:uppercase;color:#bbb;margin-bottom:8px">' + (p.fabric||'') + '</div>' +
-      ratingRow('Warmth', p.warmth, '\uD83D\uDD25') +
-      ratingRow('Dry Rate', p.dry, '\uD83D\uDCA7') +
-      ratingRow('Airflow', p.breath, '\u2744\uFE0F') +
-      ((p.special||p.desc) ? '<div style="font-size:9px;color:#555;line-height:1.65;margin:8px 0">' + (p.special||p.desc||'') + '</div>' : '') +
-      techBadgesHtml(p);
-  }
-
-  var collectionLabel = _pdfCollection==='outdoor' ? 'Outdoor Collection' : 'Active Collection';
-  var header = '<div style="display:flex;align-items:center;justify-content:space-between;padding:11px 26px;border-bottom:1px solid #eee;flex-shrink:0">' +
-    '<div style="font-size:9px;letter-spacing:0.2em;text-transform:uppercase;color:#1C1C1A;font-weight:500">Delta Galil</div>' +
-    '<div style="font-size:7.5px;letter-spacing:0.1em;text-transform:uppercase;color:#ccc">' + collectionLabel + ' \u00b7 Spring Summer 2026</div>' +
-    '</div>';
-
-  if (isSolo && p1) {
-    return '<div class="pdf-page" style="width:297mm;height:210mm;display:flex;flex-direction:column;background:#fff;font-family:\'DM Sans\',sans-serif;box-sizing:border-box;overflow:hidden">' +
-      header +
-      '<div style="flex:1;display:flex;flex-direction:row;overflow:hidden">' +
-        '<div style="flex:1.4;background:#f5f3f0;overflow:hidden">' +
-          '<img src="' + (p1.img||'') + '" style="width:100%;height:100%;object-fit:contain;object-position:center top;display:block" />' +
-        '</div>' +
-        '<div style="flex:1;padding:28px 28px;display:flex;flex-direction:column;justify-content:center;overflow:hidden">' +
-          '<div style="width:18px;height:1px;background:#C4A882;margin-bottom:16px"></div>' +
-          productBlock(p1, '24px') +
-        '</div>' +
-      '</div>' +
-    '</div>';
-  }
-
-  var cols = [p1, p2].filter(Boolean).map(function(p, i) {
-    return '<div style="flex:1;display:flex;flex-direction:column;' + (i===0?'border-right:1px solid #eee':'') + ';overflow:hidden">' +
-      '<div style="flex:1;background:#f5f3f0;overflow:hidden">' +
-        '<img src="' + (p.img||'') + '" style="width:100%;height:100%;object-fit:contain;object-position:center top;display:block" />' +
-      '</div>' +
-      '<div style="padding:12px 18px 14px;flex-shrink:0;border-top:1px solid #eee">' +
-        productBlock(p, '15px') +
-      '</div>' +
-    '</div>';
-  }).join('');
-
-  return '<div class="pdf-page" style="width:297mm;height:210mm;display:flex;flex-direction:column;background:#fff;font-family:\'DM Sans\',sans-serif;box-sizing:border-box;overflow:hidden">' +
-    header +
-    '<div style="flex:1;display:flex;flex-direction:row;overflow:hidden">' + cols + '</div>' +
-  '</div>';
-}
-
-function previewPDF() {
-  var root = document.getElementById('pdf-print-root');
-  if (!root) { root = document.createElement('div'); root.id='pdf-print-root'; document.body.appendChild(root); }
-  var validPairs = _pdfPairs.filter(function(pair){ return pair[0]||pair[1]; });
-  if (!validPairs.length) { alert('No products assigned to pages yet.'); return; }
-  root.innerHTML =
-    '<div id="pdf-controls" style="position:fixed;top:16px;right:16px;z-index:10;display:flex;gap:8px">' +
-      '<button onclick="window.print()" style="padding:10px 20px;background:#C4A882;border:none;cursor:pointer;font-family:DM Sans,sans-serif;font-size:12px;letter-spacing:0.06em;text-transform:uppercase;border-radius:2px;font-weight:500">Print / Save PDF</button>' +
-      '<button onclick="closePdfPreview()" style="padding:10px 20px;background:#1C1C1A;color:#fff;border:none;cursor:pointer;font-family:DM Sans,sans-serif;font-size:12px;letter-spacing:0.06em;text-transform:uppercase;border-radius:2px">Close</button>' +
-    '</div>' +
-    validPairs.map(function(pair){ return buildPdfPageHTML(pair); }).join('');
-  root.classList.add('visible');
-}
-
-function exportToPDF() { previewPDF(); setTimeout(function(){ window.print(); }, 600); }
-function closePdfPreview() { var root = document.getElementById('pdf-print-root'); if (root) { root.classList.remove('visible'); root.innerHTML=''; } }
 
 </script>
 </body>
