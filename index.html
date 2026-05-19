@@ -532,9 +532,11 @@ img { image-rendering: auto; }
 #pdf-print-root.visible { display:block; }
 @media print {
   body > *:not(#pdf-print-root) { display:none !important; }
-  #pdf-print-root { display:block !important; position:static; }
+  #pdf-print-root { display:block !important; position:static; overflow:visible; }
+  #pdf-print-root > div:first-child { display:none; } /* hide buttons */
   @page { size:A4 landscape; margin:0; }
-  .pdf-page { page-break-after:always; break-after:page; }
+  .pdf-page { page-break-after:always; break-after:page; page-break-inside:avoid; break-inside:avoid; width:297mm !important; height:210mm !important; overflow:hidden; }
+  .pdf-page:last-child { page-break-after:auto; break-after:auto; }
 }
 </style>
 </head>
@@ -3804,58 +3806,72 @@ function buildPdfPageHTML(pair) {
   const p2 = pair[1] ? prods.find(p=>p.id===pair[1]) : null;
   const isSolo = !p2;
 
-  const renderProduct = (p, side) => {
-    if (!p) return '';
-    const techs = (p.techs||[]).map(tid=>{
-      const t=TECHNOLOGIES.find(x=>x.id===tid);
-      return t ? `<span style="font-size:9px;letter-spacing:0.08em;text-transform:uppercase;border:1px solid #C4A882;border-radius:20px;padding:3px 10px;color:#C4A882;white-space:nowrap">${t.label}</span>` : '';
-    }).join('');
-    return `
-      <div style="flex:1;display:flex;flex-direction:column;align-items:center;padding:${isSolo?'40px 80px':'24px 32px'}">
-        <div style="width:100%;flex:1;max-height:${isSolo?'460px':'400px'};overflow:hidden;border-radius:4px;margin-bottom:24px;background:#f5f3f0">
-          <img src="${p.img||''}" style="width:100%;height:100%;object-fit:cover;object-position:top center" />
-        </div>
-        ${!isSolo?`<div style="width:100%;text-align:left">
-          <div style="font-family:Cormorant Garamond,serif;font-size:22px;font-weight:300;color:#1C1C1A;margin-bottom:6px">${p.name||''}</div>
-          <div style="font-size:9px;letter-spacing:0.12em;text-transform:uppercase;color:#888;margin-bottom:10px">${p.fabric||''}</div>
-          ${techs?`<div style="display:flex;flex-wrap:wrap;gap:5px">${techs}</div>`:''}
-        </div>`:''}
-      </div>`;
+  const techBadges = (p) => (p.techs||[]).map(tid=>{
+    const t=TECHNOLOGIES.find(x=>x.id===tid);
+    return t ? `<span style="font-size:8px;letter-spacing:0.1em;text-transform:uppercase;border:1px solid #C4A882;border-radius:20px;padding:3px 10px;color:#8C7355;white-space:nowrap">${t.label}</span>` : '';
+  }).join('');
+
+  const warmthIcons = (p) => {
+    const w = p.warmth||0; const a = p.airflow||0;
+    if (!w && !a) return '';
+    const filled = (n,icon,color) => Array(5).fill(0).map((_,i)=>`<span style="opacity:${i<n?1:0.2};font-size:12px">${icon}</span>`).join('');
+    return `<div style="margin-bottom:10px">
+      ${w?`<div style="display:flex;align-items:center;gap:6px;margin-bottom:4px"><span style="font-size:8px;letter-spacing:0.1em;text-transform:uppercase;color:#888;width:48px">Warmth</span>${filled(w,'🔥','#E85C1A')}</div>`:''}
+      ${a?`<div style="display:flex;align-items:center;gap:6px"><span style="font-size:8px;letter-spacing:0.1em;text-transform:uppercase;color:#888;width:48px">Airflow</span>${filled(a,'❄️','#4AAFEF')}</div>`:''}
+    </div>`;
   };
 
-  const sharedInfo = isSolo && p1 ? `
-    <div style="padding:40px;display:flex;flex-direction:column;justify-content:center;max-width:340px">
-      <div style="width:24px;height:1px;background:#C4A882;margin-bottom:20px"></div>
-      <div style="font-family:Cormorant Garamond,serif;font-size:32px;font-weight:300;color:#1C1C1A;margin-bottom:10px;line-height:1.15">${p1.name||''}</div>
-      <div style="font-size:10px;letter-spacing:0.14em;text-transform:uppercase;color:#888;margin-bottom:18px">${p1.fabric||''}</div>
-      ${p1.description?`<div style="font-size:12px;color:#555;line-height:1.7;margin-bottom:20px">${p1.description}</div>`:''}
-      ${(p1.techs||[]).length?`<div style="display:flex;flex-wrap:wrap;gap:6px">${(p1.techs||[]).map(tid=>{const t=TECHNOLOGIES.find(x=>x.id===tid);return t?`<span style="font-size:9px;letter-spacing:0.08em;text-transform:uppercase;border:1px solid #C4A882;border-radius:20px;padding:4px 12px;color:#C4A882">${t.label}</span>`:''}).join('')}</div>`:''}
-    </div>` : '';
+  const productInfo = (p) => `
+    <div style="margin-top:16px">
+      <div style="font-family:'Cormorant Garamond',serif;font-size:${isSolo?'28px':'20px'};font-weight:300;color:#1C1C1A;margin-bottom:4px;line-height:1.2">${p.name||''}</div>
+      <div style="font-size:8px;letter-spacing:0.14em;text-transform:uppercase;color:#999;margin-bottom:12px">${p.fabric||''}</div>
+      ${warmthIcons(p)}
+      ${p.description?`<div style="font-size:10px;color:#555;line-height:1.7;margin-bottom:12px;max-width:${isSolo?'360px':'100%'}">${p.description}</div>`:''}
+      ${(p.techs||[]).length?`<div style="display:flex;flex-wrap:wrap;gap:5px">${techBadges(p)}</div>`:''}
+    </div>`;
 
-  // For pairs, show shared info between or below
-  const pairSharedInfo = !isSolo ? `
-    <div style="padding:16px 24px 24px;border-top:1px solid #eee;display:flex;flex-direction:column;align-items:center;gap:8px">
-      <div style="font-family:Cormorant Garamond,serif;font-size:20px;font-weight:300;color:#1C1C1A;text-align:center">${p1?.name||''}</div>
-      <div style="font-size:9px;letter-spacing:0.12em;text-transform:uppercase;color:#888">${p1?.fabric||''}</div>
-      ${(p1?.techs||[]).length?`<div style="display:flex;flex-wrap:wrap;gap:5px;justify-content:center;margin-top:4px">${(p1.techs||[]).map(tid=>{const t=TECHNOLOGIES.find(x=>x.id===tid);return t?`<span style="font-size:9px;letter-spacing:0.08em;text-transform:uppercase;border:1px solid #C4A882;border-radius:20px;padding:3px 10px;color:#C4A882">${t.label}</span>`:''}).join('')}</div>`:''}
-      ${p1?.description?`<div style="font-size:11px;color:#666;line-height:1.65;text-align:center;max-width:520px;margin-top:6px">${p1.description}</div>`:''}
-    </div>` : '';
+  const header = `
+    <div style="display:flex;align-items:center;justify-content:space-between;padding:14px 32px;border-bottom:1px solid #eee;flex-shrink:0">
+      <div style="font-size:9px;letter-spacing:0.2em;text-transform:uppercase;color:#1C1C1A;font-weight:500">Delta Galil</div>
+      <div style="font-size:8px;letter-spacing:0.12em;text-transform:uppercase;color:#bbb">${_pdfCollection==='outdoor'?'Outdoor Collection':'Active Collection'} · Spring Summer 2026</div>
+    </div>`;
 
-  return `
-    <div class="pdf-page" style="width:297mm;height:210mm;display:flex;flex-direction:column;background:#fff;font-family:'DM Sans',sans-serif;overflow:hidden;position:relative">
-      <div style="display:flex;align-items:center;justify-content:space-between;padding:16px 32px;border-bottom:1px solid #eee;flex-shrink:0">
-        <div style="font-size:10px;letter-spacing:0.18em;text-transform:uppercase;color:#1C1C1A;font-weight:500">Delta Galil</div>
-        <div style="font-size:9px;letter-spacing:0.12em;text-transform:uppercase;color:#aaa">${_pdfCollection==='outdoor'?'Outdoor Collection':'Active Collection'} · Spring Summer 2026</div>
-      </div>
-      <div style="flex:1;display:flex;overflow:hidden;${isSolo?'flex-direction:row':'flex-direction:column'}">
-        <div style="flex:1;display:flex;${isSolo?'flex-direction:row':'flex-direction:column'}">
-          <div style="flex:1;display:flex;overflow:hidden">
-            ${isSolo ? renderProduct(p1,'left') + sharedInfo : `<div style="flex:1;display:flex;overflow:hidden">${renderProduct(p1,'left')}${renderProduct(p2,'right')}</div>`}
-          </div>
-          ${!isSolo ? pairSharedInfo : ''}
+  if (isSolo && p1) {
+    return `<div class="pdf-page" style="width:297mm;min-height:210mm;height:210mm;display:flex;flex-direction:column;background:#fff;font-family:'DM Sans',sans-serif;overflow:hidden;box-sizing:border-box">
+      ${header}
+      <div style="flex:1;display:flex;flex-direction:row;overflow:hidden;padding:24px 32px;gap:40px">
+        <div style="flex:1.2;overflow:hidden;border-radius:3px;background:#f5f3f0">
+          <img src="${p1.img||''}" style="width:100%;height:100%;object-fit:contain;object-position:center top;display:block" />
+        </div>
+        <div style="flex:1;display:flex;flex-direction:column;justify-content:center;padding:8px 0">
+          <div style="width:20px;height:1px;background:#C4A882;margin-bottom:20px"></div>
+          ${productInfo(p1)}
         </div>
       </div>
     </div>`;
+  }
+
+  // Pair page
+  return `<div class="pdf-page" style="width:297mm;min-height:210mm;height:210mm;display:flex;flex-direction:column;background:#fff;font-family:'DM Sans',sans-serif;overflow:hidden;box-sizing:border-box">
+    ${header}
+    <div style="flex:1;display:flex;flex-direction:column;overflow:hidden;padding:20px 32px 16px">
+      <div style="flex:1;display:flex;gap:24px;overflow:hidden;margin-bottom:14px">
+        ${[p1,p2].filter(Boolean).map(p=>`
+          <div style="flex:1;display:flex;flex-direction:column;overflow:hidden">
+            <div style="flex:1;overflow:hidden;border-radius:3px;background:#f5f3f0">
+              <img src="${p.img||''}" style="width:100%;height:100%;object-fit:contain;object-position:center top;display:block" />
+            </div>
+          </div>`).join('')}
+      </div>
+      <div style="display:flex;gap:24px;border-top:1px solid #eee;padding-top:12px">
+        ${[p1,p2].filter(Boolean).map(p=>`
+          <div style="flex:1">
+            ${productInfo(p)}
+          </div>`).join('')}
+      </div>
+    </div>
+  </div>`;}
+
 }
 
 function previewPDF() {
