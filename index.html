@@ -511,6 +511,31 @@ header { z-index: 100; }
   .showcase, .product-detail { box-shadow: none; max-width: 100%; }
 }
 img { image-rendering: auto; }
+
+/* ── PDF EXPORT ── */
+.pdf-pool { display:flex; flex-wrap:wrap; gap:8px; margin-bottom:12px; min-height:40px; padding:8px; border:1px dashed var(--border); border-radius:4px; }
+.pdf-pool-label { font-size:10px; letter-spacing:0.08em; text-transform:uppercase; color:var(--mid); margin-bottom:6px; }
+.pdf-product-chip { display:flex; align-items:center; gap:6px; padding:6px 8px; background:var(--cream); border:1px solid var(--border); border-radius:3px; cursor:grab; font-size:11px; color:var(--charcoal); user-select:none; }
+.pdf-product-chip img { width:28px; height:28px; object-fit:cover; border-radius:2px; flex-shrink:0; }
+.pdf-product-chip .chip-no-img { width:28px; height:28px; background:var(--border); border-radius:2px; flex-shrink:0; display:flex; align-items:center; justify-content:center; font-size:14px; }
+.pdf-product-chip.dragging { opacity:0.4; }
+.pdf-pair { background:var(--warm-white); border:1px solid var(--border); border-radius:4px; padding:8px; margin-bottom:8px; }
+.pdf-pair-header { display:flex; align-items:center; justify-content:space-between; margin-bottom:6px; }
+.pdf-pair-num { font-size:10px; letter-spacing:0.1em; text-transform:uppercase; color:var(--mid); }
+.pdf-pair-drop { display:flex; gap:6px; min-height:44px; }
+.pdf-drop-slot { flex:1; border:1px dashed var(--border); border-radius:3px; display:flex; align-items:center; justify-content:center; padding:4px; min-height:44px; transition:background 0.15s; }
+.pdf-drop-slot.drag-over { background:rgba(196,168,130,0.1); border-color:var(--accent); }
+.pdf-drop-slot.filled { border-style:solid; border-color:var(--border); justify-content:flex-start; }
+.pdf-add-pair { width:100%; padding:8px; border:1px dashed var(--border); border-radius:4px; background:transparent; font-size:11px; color:var(--mid); cursor:pointer; text-align:center; margin-bottom:8px; }
+.pdf-add-pair:hover { border-color:var(--accent); color:var(--accent); }
+#pdf-print-root { display:none; position:fixed; inset:0; z-index:99999; background:#fff; overflow:auto; }
+#pdf-print-root.visible { display:block; }
+@media print {
+  body > *:not(#pdf-print-root) { display:none !important; }
+  #pdf-print-root { display:block !important; position:static; }
+  @page { size:A4 landscape; margin:0; }
+  .pdf-page { page-break-after:always; break-after:page; }
+}
 </style>
 </head>
 <body>
@@ -568,6 +593,7 @@ img { image-rendering: auto; }
         <button class="sidebar-tab" onclick="switchTab('active',this)" style="font-size:10px;border-top:2px solid rgba(196,168,130,0.2)">Active</button>
         <button class="sidebar-tab" onclick="switchTab('active-products',this)" style="font-size:10px;border-top:2px solid rgba(196,168,130,0.2)">A · Products</button>
         <button class="sidebar-tab" onclick="switchTab('templates',this)" style="font-size:10px;border-top:2px solid rgba(196,168,130,0.2);flex:2">Templates</button>
+        <button class="sidebar-tab" onclick="switchTab('pdf',this)" style="font-size:10px;border-top:2px solid rgba(196,168,130,0.2);flex:2">PDF</button>
       </div>
       <div id="tab-pitch" class="sidebar-content">
         <p class="section-label">Landing Screen</p>
@@ -843,6 +869,21 @@ img { image-rendering: auto; }
         </div>
         <p class="section-label" style="margin-top:8px">Color Palette</p>
         <div id="palette-container"></div>
+      </div>
+
+      <div id="tab-pdf" class="sidebar-content" style="display:none">
+        <p class="section-label">PDF Export</p>
+        <div style="font-size:11px;color:var(--mid);margin-bottom:16px;line-height:1.6">Drag products into pairs or leave solo. Each pair prints on one page side by side, solo products get a full centered page.</div>
+        <div style="margin-bottom:12px">
+          <label class="field-label">Collection</label>
+          <div style="display:flex;gap:8px">
+            <button class="btn btn-dark" id="pdf-outdoor-btn" onclick="setPdfCollection('outdoor')" style="flex:1;font-size:10px;background:var(--charcoal);color:var(--cream)">Outdoor</button>
+            <button class="btn btn-ghost-dark" id="pdf-active-btn" onclick="setPdfCollection('active')" style="flex:1;font-size:10px">Active</button>
+          </div>
+        </div>
+        <div id="pdf-pairs-area" style="margin-bottom:16px"></div>
+        <button class="btn btn-primary" onclick="exportToPDF()" style="width:100%;margin-bottom:8px">Export PDF</button>
+        <button class="btn btn-ghost-dark" onclick="previewPDF()" style="width:100%;font-size:11px">Preview</button>
       </div>
     </aside>
     <main class="canvas" id="canvas">
@@ -1951,6 +1992,7 @@ function switchTab(tab, el) {
   document.querySelectorAll('.sidebar-content').forEach(c=>c.style.display='none');
   g('tab-'+tab).style.display='block';
   window._currentTab=tab;
+  if (tab==='pdf') { initPdfPairs(); return; }
   // Re-init cinematic background for the right collection
   document.getElementById('bg-cinematic-el')?.remove();
   initCinematicBg();
@@ -3636,6 +3678,210 @@ document.addEventListener('click', function(e){
     showSection(section);
   }
 });
+
+// ── PDF EXPORT SYSTEM ──
+let _pdfCollection = 'outdoor';
+let _pdfPairs = []; // array of [prodId, prodId|null]
+
+function setPdfCollection(which) {
+  _pdfCollection = which;
+  g('pdf-outdoor-btn').className = which==='outdoor' ? 'btn btn-dark' : 'btn btn-ghost-dark';
+  g('pdf-active-btn').className = which==='active' ? 'btn btn-dark' : 'btn btn-ghost-dark';
+  g('pdf-outdoor-btn').style.cssText = which==='outdoor' ? 'flex:1;font-size:10px;background:var(--charcoal);color:var(--cream)' : 'flex:1;font-size:10px';
+  g('pdf-active-btn').style.cssText = which==='active' ? 'flex:1;font-size:10px;background:var(--charcoal);color:var(--cream)' : 'flex:1;font-size:10px';
+  initPdfPairs();
+}
+
+function initPdfPairs() {
+  const prods = (_pdfCollection==='outdoor' ? state.products : state.activeProducts) || [];
+  // Auto-pair consecutively as default
+  _pdfPairs = [];
+  for (let i=0; i<prods.length; i+=2) {
+    _pdfPairs.push([prods[i]?.id ?? null, prods[i+1]?.id ?? null]);
+  }
+  renderPdfPairs();
+}
+
+function renderPdfPairs() {
+  const prods = (_pdfCollection==='outdoor' ? state.products : state.activeProducts) || [];
+  const area = g('pdf-pairs-area');
+  if (!area) return;
+  const pairedIds = new Set(_pdfPairs.flat().filter(Boolean));
+  const unpairedProds = prods.filter(p => !pairedIds.has(p.id));
+
+  let html = '';
+
+  // Unplaced pool
+  if (unpairedProds.length) {
+    html += `<div class="pdf-pool-label">Unplaced Products</div>
+    <div class="pdf-pool" id="pdf-pool" ondragover="pdfDragOver(event,null,null)" ondrop="pdfDrop(event,null,null)">
+      ${unpairedProds.map(p => chipHTML(p)).join('')}
+    </div>`;
+  }
+
+  // Pairs
+  html += `<div class="pdf-pool-label">Pages</div>`;
+  _pdfPairs.forEach((pair, pi) => {
+    const p1 = prods.find(p=>p.id===pair[0]);
+    const p2 = prods.find(p=>p.id===pair[1]);
+    html += `<div class="pdf-pair">
+      <div class="pdf-pair-header">
+        <span class="pdf-pair-num">Page ${pi+1} ${pair[1]===null?'· Solo':'· Pair'}</span>
+        <button onclick="removePdfPair(${pi})" style="background:none;border:none;cursor:pointer;color:var(--mid);font-size:16px;line-height:1">×</button>
+      </div>
+      <div class="pdf-pair-drop">
+        <div class="pdf-drop-slot ${p1?'filled':''}" ondragover="pdfDragOver(event,${pi},0)" ondragleave="this.classList.remove('drag-over')" ondrop="pdfDrop(event,${pi},0)">
+          ${p1 ? chipHTML(p1) : '<span style="font-size:10px;color:var(--mid)">Drop here</span>'}
+        </div>
+        <div class="pdf-drop-slot ${p2?'filled':''}" ondragover="pdfDragOver(event,${pi},1)" ondragleave="this.classList.remove('drag-over')" ondrop="pdfDrop(event,${pi},1)">
+          ${p2 ? chipHTML(p2) : '<span style="font-size:10px;color:var(--mid)">Drop here (optional)</span>'}
+        </div>
+      </div>
+    </div>`;
+  });
+
+  html += `<button class="pdf-add-pair" onclick="addPdfPair()">+ Add Page</button>`;
+  area.innerHTML = html;
+
+  // Attach drag listeners
+  area.querySelectorAll('.pdf-product-chip').forEach(chip => {
+    chip.addEventListener('dragstart', e => {
+      e.dataTransfer.setData('text/plain', chip.dataset.id);
+      chip.classList.add('dragging');
+    });
+    chip.addEventListener('dragend', () => chip.classList.remove('dragging'));
+  });
+}
+
+function chipHTML(p) {
+  const thumb = p.img ? `<img src="${p.img}" />` : `<div class="chip-no-img">👕</div>`;
+  const name = (p.name||'Product').substring(0,22);
+  return `<div class="pdf-product-chip" draggable="true" data-id="${p.id}">${thumb}<span>${name}</span></div>`;
+}
+
+let _dragOverSlot = null;
+function pdfDragOver(e, pairIdx, slot) {
+  e.preventDefault();
+  e.dataTransfer.dropEffect = 'move';
+  if (_dragOverSlot) _dragOverSlot.classList.remove('drag-over');
+  _dragOverSlot = e.currentTarget;
+  _dragOverSlot.classList.add('drag-over');
+}
+
+function pdfDrop(e, pairIdx, slot) {
+  e.preventDefault();
+  if (_dragOverSlot) _dragOverSlot.classList.remove('drag-over');
+  const id = parseInt(e.dataTransfer.getData('text/plain'));
+  if (!id) return;
+  // Remove from wherever it currently is
+  _pdfPairs = _pdfPairs.map(pair => pair.map(pid => pid===id ? null : pid));
+  if (pairIdx === null) {
+    // Dropped back to pool — already removed above
+  } else {
+    // Place into slot
+    const displaced = _pdfPairs[pairIdx][slot];
+    _pdfPairs[pairIdx][slot] = id;
+    // If something was displaced, it goes to pool (already null in pairs)
+  }
+  // Clean up empty pairs
+  _pdfPairs = _pdfPairs.filter(pair => pair[0]!==null || pair[1]!==null);
+  renderPdfPairs();
+}
+
+function addPdfPair() {
+  _pdfPairs.push([null, null]);
+  renderPdfPairs();
+}
+
+function removePdfPair(pi) {
+  _pdfPairs.splice(pi, 1);
+  renderPdfPairs();
+}
+
+function buildPdfPageHTML(pair) {
+  const prods = (_pdfCollection==='outdoor' ? state.products : state.activeProducts) || [];
+  const p1 = pair[0] ? prods.find(p=>p.id===pair[0]) : null;
+  const p2 = pair[1] ? prods.find(p=>p.id===pair[1]) : null;
+  const isSolo = !p2;
+
+  const renderProduct = (p, side) => {
+    if (!p) return '';
+    const techs = (p.techs||[]).map(tid=>{
+      const t=TECHNOLOGIES.find(x=>x.id===tid);
+      return t ? `<span style="font-size:9px;letter-spacing:0.08em;text-transform:uppercase;border:1px solid #C4A882;border-radius:20px;padding:3px 10px;color:#C4A882;white-space:nowrap">${t.label}</span>` : '';
+    }).join('');
+    return `
+      <div style="flex:1;display:flex;flex-direction:column;align-items:center;padding:${isSolo?'40px 80px':'24px 32px'}">
+        <div style="width:100%;flex:1;max-height:${isSolo?'460px':'400px'};overflow:hidden;border-radius:4px;margin-bottom:24px;background:#f5f3f0">
+          <img src="${p.img||''}" style="width:100%;height:100%;object-fit:cover;object-position:top center" />
+        </div>
+        ${!isSolo?`<div style="width:100%;text-align:left">
+          <div style="font-family:Cormorant Garamond,serif;font-size:22px;font-weight:300;color:#1C1C1A;margin-bottom:6px">${p.name||''}</div>
+          <div style="font-size:9px;letter-spacing:0.12em;text-transform:uppercase;color:#888;margin-bottom:10px">${p.fabric||''}</div>
+          ${techs?`<div style="display:flex;flex-wrap:wrap;gap:5px">${techs}</div>`:''}
+        </div>`:''}
+      </div>`;
+  };
+
+  const sharedInfo = isSolo && p1 ? `
+    <div style="padding:40px;display:flex;flex-direction:column;justify-content:center;max-width:340px">
+      <div style="width:24px;height:1px;background:#C4A882;margin-bottom:20px"></div>
+      <div style="font-family:Cormorant Garamond,serif;font-size:32px;font-weight:300;color:#1C1C1A;margin-bottom:10px;line-height:1.15">${p1.name||''}</div>
+      <div style="font-size:10px;letter-spacing:0.14em;text-transform:uppercase;color:#888;margin-bottom:18px">${p1.fabric||''}</div>
+      ${p1.description?`<div style="font-size:12px;color:#555;line-height:1.7;margin-bottom:20px">${p1.description}</div>`:''}
+      ${(p1.techs||[]).length?`<div style="display:flex;flex-wrap:wrap;gap:6px">${(p1.techs||[]).map(tid=>{const t=TECHNOLOGIES.find(x=>x.id===tid);return t?`<span style="font-size:9px;letter-spacing:0.08em;text-transform:uppercase;border:1px solid #C4A882;border-radius:20px;padding:4px 12px;color:#C4A882">${t.label}</span>`:''}).join('')}</div>`:''}
+    </div>` : '';
+
+  // For pairs, show shared info between or below
+  const pairSharedInfo = !isSolo ? `
+    <div style="padding:16px 24px 24px;border-top:1px solid #eee;display:flex;flex-direction:column;align-items:center;gap:8px">
+      <div style="font-family:Cormorant Garamond,serif;font-size:20px;font-weight:300;color:#1C1C1A;text-align:center">${p1?.name||''}</div>
+      <div style="font-size:9px;letter-spacing:0.12em;text-transform:uppercase;color:#888">${p1?.fabric||''}</div>
+      ${(p1?.techs||[]).length?`<div style="display:flex;flex-wrap:wrap;gap:5px;justify-content:center;margin-top:4px">${(p1.techs||[]).map(tid=>{const t=TECHNOLOGIES.find(x=>x.id===tid);return t?`<span style="font-size:9px;letter-spacing:0.08em;text-transform:uppercase;border:1px solid #C4A882;border-radius:20px;padding:3px 10px;color:#C4A882">${t.label}</span>`:''}).join('')}</div>`:''}
+      ${p1?.description?`<div style="font-size:11px;color:#666;line-height:1.65;text-align:center;max-width:520px;margin-top:6px">${p1.description}</div>`:''}
+    </div>` : '';
+
+  return `
+    <div class="pdf-page" style="width:297mm;height:210mm;display:flex;flex-direction:column;background:#fff;font-family:'DM Sans',sans-serif;overflow:hidden;position:relative">
+      <div style="display:flex;align-items:center;justify-content:space-between;padding:16px 32px;border-bottom:1px solid #eee;flex-shrink:0">
+        <div style="font-size:10px;letter-spacing:0.18em;text-transform:uppercase;color:#1C1C1A;font-weight:500">Delta Galil</div>
+        <div style="font-size:9px;letter-spacing:0.12em;text-transform:uppercase;color:#aaa">${_pdfCollection==='outdoor'?'Outdoor Collection':'Active Collection'} · Spring Summer 2026</div>
+      </div>
+      <div style="flex:1;display:flex;overflow:hidden;${isSolo?'flex-direction:row':'flex-direction:column'}">
+        <div style="flex:1;display:flex;${isSolo?'flex-direction:row':'flex-direction:column'}">
+          <div style="flex:1;display:flex;overflow:hidden">
+            ${isSolo ? renderProduct(p1,'left') + sharedInfo : `<div style="flex:1;display:flex;overflow:hidden">${renderProduct(p1,'left')}${renderProduct(p2,'right')}</div>`}
+          </div>
+          ${!isSolo ? pairSharedInfo : ''}
+        </div>
+      </div>
+    </div>`;
+}
+
+function previewPDF() {
+  let root = document.getElementById('pdf-print-root');
+  if (!root) { root = document.createElement('div'); root.id='pdf-print-root'; document.body.appendChild(root); }
+  const validPairs = _pdfPairs.filter(pair=>pair[0]||pair[1]);
+  if (!validPairs.length) { alert('No products assigned to pages yet.'); return; }
+  root.innerHTML = `
+    <div style="position:fixed;top:16px;right:16px;z-index:10;display:flex;gap:8px">
+      <button onclick="window.print()" style="padding:10px 20px;background:#C4A882;border:none;cursor:pointer;font-family:DM Sans,sans-serif;font-size:12px;letter-spacing:0.06em;text-transform:uppercase;border-radius:2px">Print / Save PDF</button>
+      <button onclick="closePdfPreview()" style="padding:10px 20px;background:#1C1C1A;color:#fff;border:none;cursor:pointer;font-family:DM Sans,sans-serif;font-size:12px;letter-spacing:0.06em;text-transform:uppercase;border-radius:2px">Close</button>
+    </div>
+    ${validPairs.map(pair=>buildPdfPageHTML(pair)).join('')}
+  `;
+  root.classList.add('visible');
+}
+
+function exportToPDF() {
+  previewPDF();
+  setTimeout(()=>window.print(), 800);
+}
+
+function closePdfPreview() {
+  const root = document.getElementById('pdf-print-root');
+  if (root) { root.classList.remove('visible'); root.innerHTML=''; }
+}
 
 </script>
 </body>
