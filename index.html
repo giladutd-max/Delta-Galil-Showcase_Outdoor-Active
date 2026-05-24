@@ -85,9 +85,11 @@ header { height: 56px; background: var(--charcoal); display: flex; align-items: 
 .header-back-dash { font-size: 12px; color: rgba(255,255,255,0.45); cursor: pointer; background: none; border: none; font-family: 'DM Sans', sans-serif; letter-spacing: 0.06em; text-transform: uppercase; padding: 0; transition: color 0.2s; }
 .header-back-dash:hover { color: white; }
 .header-actions { display: flex; gap: 8px; align-items: center; }
-.header-back { font-size:11px; color:rgba(255,255,255,0.7); cursor:pointer; background:rgba(255,255,255,0.08); border:1px solid rgba(255,255,255,0.15); border-radius:20px; font-family:'DM Sans',sans-serif; letter-spacing:0.08em; text-transform:uppercase; padding:9px 18px; transition:all 0.2s; display:none; }
-.header-back:hover { color:white; background:rgba(255,255,255,0.15); border-color:rgba(255,255,255,0.3); }
-.header-back.visible { display:block; }
+/* Unified back button — fixed top-left, always same size and position */
+#global-back-btn { position:fixed; top:20px; left:24px; z-index:900; display:none; align-items:center; gap:8px; padding:12px 22px; background:rgba(28,28,26,0.85); border:1px solid rgba(255,255,255,0.18); border-radius:24px; cursor:pointer; font-family:'DM Sans',sans-serif; font-size:12px; letter-spacing:0.1em; text-transform:uppercase; color:rgba(255,255,255,0.85); backdrop-filter:blur(10px); transition:all 0.2s; }
+#global-back-btn:hover { background:rgba(28,28,26,0.98); border-color:rgba(255,255,255,0.35); color:#fff; }
+#global-back-btn.visible { display:flex; }
+.header-back { display:none!important; }
 .save-status { font-size: 11px; color: rgba(255,255,255,0.35); letter-spacing: 0.04em; }
 .save-status.saving { color: var(--accent); }
 .save-status.saved { color: rgba(100,200,130,0.8); }
@@ -201,9 +203,7 @@ header { z-index: 100; }
 }
 .detail-anim { opacity:0; animation:detailFadeUp 0.5s ease forwards; }
 
-.detail-back { font-size:11px; letter-spacing:0.08em; text-transform:uppercase; cursor:pointer; display:inline-flex; align-items:center; gap:8px; margin-bottom:32px; background:rgba(255,255,255,0.08); border:1px solid rgba(255,255,255,0.15); border-radius:20px; font-family:'DM Sans',sans-serif; transition:all 0.2s; padding:9px 18px; color:rgba(255,255,255,0.7); }
-.detail-back:hover { color:white; background:rgba(255,255,255,0.15); border-color:rgba(255,255,255,0.3); }
-.detail-back svg { width:13px; height:13px; }
+.detail-back { display:none!important; }
 .detail-eyebrow { font-size: 14px; letter-spacing: 0.2em; text-transform: uppercase; color: var(--accent-dark); margin-bottom: 12px; }
 .detail-name { font-family: 'Cormorant Garamond', serif; font-size: 38px; font-weight: 400; color: var(--charcoal); line-height: 1.12; margin-bottom: 20px; }
 .detail-divider { width: 40px; height: 1px; background: var(--accent); margin-bottom: 20px; }
@@ -545,6 +545,8 @@ img { image-rendering: auto; }
 
 <!-- LOADING -->
 <div class="loading-screen" id="loading-screen">
+<!-- Global back button - fixed position, same everywhere -->
+<div id="global-back-btn" onclick="globalBackAction()">← Back</div>
   <div class="loading-logo">Delta <span>Galil</span></div>
 </div>
 
@@ -1692,6 +1694,8 @@ function copyPitchLink(token, e) {
 
 function goToDashboard() { loadDashboard(); }
 function showCat(cat){
+  if(cat==='split'){ showGlobalBack(null); }
+  else { showGlobalBack('cat'); }
   const split=document.getElementById('cat-split');
   const warm=document.getElementById('cat-warm');
   const air=document.getElementById('cat-air');
@@ -1737,7 +1741,7 @@ function showCat(cat){
     el.innerHTML='<div class="cat-grid-built">'
       +'<div style="padding:14px 24px;background:'+headerBg+';border-bottom:1px solid '+headerBorder+';display:flex;align-items:center;justify-content:space-between">'
         +'<div style="display:flex;align-items:center;gap:16px">'
-          +'<button onclick="showCat(\'split\')" style="background:rgba(255,255,255,0.08);border:1px solid rgba(255,255,255,0.15);border-radius:20px;cursor:pointer;font-size:11px;letter-spacing:0.08em;text-transform:uppercase;font-family:DM Sans,sans-serif;color:rgba(255,255,255,0.7);padding:9px 18px;transition:all 0.2s">← Back</button>'
+          +'<span></span>' // back handled by global button
           +'<div style="font-size:10px;letter-spacing:0.15em;text-transform:uppercase;color:'+headerText+';font-weight:500">'+(cat==='warm'?(state.catWarmName||'Base Layer'):(state.catAirName||'Mid Layer'))+' · '+catProds.length+' styles</div>'
         +'</div>'
         +'<div style="display:flex;gap:5px" id="'+cat+'-filters">'
@@ -3213,7 +3217,7 @@ function updatePreview() {
     preview.style.display='block';
     safeClassName('product-detail','product-detail');
     safeDisplay('product-detail','none');
-    safeToggleClass('header-back','visible',false);
+    showGlobalBack(null);
     safeDisplay('export-hint','block');
     safeText('canvas-label','Live Preview');
   } catch (e) {
@@ -3286,7 +3290,7 @@ function openDetail(id) {
   safeDisplay('export-hint','none');
   det.style.display='block'; void det.offsetWidth;
   det.className='product-detail visible';
-  safeToggleClass('header-back','visible',true);
+  showGlobalBack('detail');
   safeText('canvas-label',p.name);
   window._savedScrollTop = document.documentElement.scrollTop || window.scrollY || 0;
   const canvasEl = g('canvas');
@@ -3326,7 +3330,7 @@ function closeDetail() {
   safeClassName('product-detail','product-detail');
   safeDisplay('product-detail','none');
   safeDisplay('showcase-preview','block');
-  safeToggleClass('header-back','visible',false);
+  showGlobalBack(null);
   safeText('canvas-label','Live Preview');
   safeDisplay('export-hint','block');
   const canvasEl2=g('canvas');
@@ -3922,6 +3926,27 @@ function previewPDF() {
 function exportToPDF() { previewPDF(); setTimeout(function(){ window.print(); }, 600); }
 function closePdfPreview() { var root = document.getElementById('pdf-print-root'); if (root) { root.classList.remove('visible'); root.innerHTML=''; } }
 
+
+// ── GLOBAL BACK BUTTON ──
+var _globalBackMode = null;
+function showGlobalBack(mode) {
+  _globalBackMode = mode;
+  var btn = document.getElementById('global-back-btn');
+  if (!btn) return;
+  if (!mode) {
+    btn.classList.remove('visible');
+  } else {
+    btn.classList.add('visible');
+    if (mode === 'detail') btn.innerText = '← Back to Collection';
+    else if (mode === 'cat') btn.innerText = '← Back';
+    else btn.innerText = '← Back';
+  }
+}
+function globalBackAction() {
+  if (_globalBackMode === 'detail') { closeDetail(); }
+  else if (_globalBackMode === 'cat') { showCat('split'); }
+  else { showGlobalBack(null); }
+}
 </script>
 </body>
 </html>
