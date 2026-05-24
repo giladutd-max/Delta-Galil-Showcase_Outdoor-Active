@@ -3184,7 +3184,7 @@ function updatePreview() {
       // Add compact class to hero
       const heroEl=preview.querySelector('.showcase-hero');
       if(heroEl) heroEl.classList.add('hero-compact');
-      // scroll observer — reveals panels on scroll and starts videos
+      // scroll observer — reveals panels on scroll and starts videos lazily
       setTimeout(()=>{
         const panels=document.querySelectorAll('.cat-panel');
         const obs=new IntersectionObserver((entries)=>{
