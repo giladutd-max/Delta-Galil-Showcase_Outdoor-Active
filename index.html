@@ -1592,6 +1592,7 @@ async function openPitch(id) {
   state.pitchId=data.id; state.shareToken=data.share_token;
   state.template=data.template||'editorial'; state.palette=data.palette||0;
   state.products=data.products||[];
+  state.title=data.title||''; state.client=data.client||''; state.tagline=data.tagline||''; state.description=data.description||'';
   g('pitch-title').value=data.title||'';
   g('pitch-client').value=data.client||'';
   g('pitch-tagline').value=data.tagline||'';
@@ -3144,7 +3145,7 @@ function updatePreview() {
         +'<div id="section-anchor"></div>'
         +'<div id="cat-split" style="display:grid;grid-template-columns:1fr 1fr;min-height:95vh">'
           +'<div onclick="showCat(\'warm\')" class="cat-panel" style="background:'+warmBg+';display:flex;flex-direction:column;justify-content:flex-end;padding:48px;cursor:pointer;border-right:1px solid rgba(255,255,255,0.08);position:relative;overflow:hidden;transition:opacity 0.8s ease,transform 0.8s ease;opacity:0;transform:translateY(40px)">'
-            +(warmVid?'<video autoplay muted playsinline preload="auto" class="cat-vid" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;opacity:0;transition:opacity 0.5s ease" oncanplay="this.style.opacity='+vidOpacity+'"><source src="'+warmVid+'" type="video/mp4"></video>':'')
+            +(warmVid?'<video muted playsinline preload="none" class="cat-vid lazy-cat-vid" data-src="'+warmVid+'" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;opacity:0;transition:opacity 0.5s ease"></video>':'')
             +'<div style="position:absolute;inset:0;background:'+textGradient+';pointer-events:none"></div>'
             +'<div style="position:absolute;top:0;left:0;right:0;height:3px;background:'+warmAcc+'"></div>'
             +'<div style="position:relative;z-index:1;transition:transform 0.4s ease" class="cat-text">'
@@ -3156,7 +3157,7 @@ function updatePreview() {
             +'</div>'
           +'</div>'
           +'<div onclick="showCat(\'air\')" class="cat-panel" style="background:'+airBg+';display:flex;flex-direction:column;justify-content:flex-end;padding:48px;cursor:pointer;position:relative;overflow:hidden;transition:opacity 0.8s ease 0.15s,transform 0.8s ease 0.15s;opacity:0;transform:translateY(40px)">'
-            +(airVid?'<video autoplay muted playsinline preload="auto" class="cat-vid" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;opacity:0;transition:opacity 0.5s ease" oncanplay="this.style.opacity='+vidOpacity+'"><source src="'+airVid+'" type="video/mp4"></video>':'')
+            +(airVid?'<video muted playsinline preload="none" class="cat-vid lazy-cat-vid" data-src="'+airVid+'" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;opacity:0;transition:opacity 0.5s ease"></video>':'')
             +'<div style="position:absolute;inset:0;background:'+textGradient+';pointer-events:none"></div>'
             +'<div style="position:absolute;top:0;left:0;right:0;height:3px;background:'+airAcc+'"></div>'
             +'<div style="position:relative;z-index:1;transition:transform 0.4s ease" class="cat-text">'
@@ -3182,7 +3183,7 @@ function updatePreview() {
       // Add compact class to hero
       const heroEl=preview.querySelector('.showcase-hero');
       if(heroEl) heroEl.classList.add('hero-compact');
-      // scroll observer — reveals panels on scroll
+      // scroll observer — reveals panels on scroll and starts videos lazily
       setTimeout(()=>{
         const panels=document.querySelectorAll('.cat-panel');
         const obs=new IntersectionObserver((entries)=>{
@@ -3190,6 +3191,16 @@ function updatePreview() {
             if(e.isIntersecting){
               e.target.style.opacity='1';
               e.target.style.transform='translateY(0)';
+              const v=e.target.querySelector('.lazy-cat-vid');
+              if(v && !v.getAttribute('data-loaded')){
+                v.setAttribute('data-loaded','1');
+                const src=v.getAttribute('data-src');
+                if(src){
+                  v.src=src; v.preload='auto'; v.loop=true;
+                  v.oncanplay=()=>{ v.style.opacity=0.9; };
+                  v.load(); v.play().catch(()=>{});
+                }
+              }
               obs.unobserve(e.target);
             }
           });
@@ -3607,6 +3618,7 @@ async function loadSharedView(token) {
   state.pitchId=data.id; state.shareToken=data.share_token;
   state.template=data.template; state.palette=data.palette||0;
   state.products=data.products||[];
+  state.title=data.title||''; state.client=data.client||''; state.tagline=data.tagline||''; state.description=data.description||'';
   g('pitch-title').value=data.title||'';
   g('pitch-client').value=data.client||'';
   g('pitch-tagline').value=data.tagline||'';
