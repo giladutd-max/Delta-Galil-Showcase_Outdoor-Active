@@ -3367,6 +3367,7 @@ async function loadPresentationView(token) {
   state.pitchId=data.id; state.shareToken=data.share_token;
   state.template=data.template; state.palette=data.palette||0;
   state.products=data.products||[];
+  state.title=data.title||''; state.client=data.client||''; state.tagline=data.tagline||''; state.description=data.description||'';
   g("pitch-title").value=data.title||"";
   g("pitch-client").value=data.client||"";
   g("pitch-tagline").value=data.tagline||"";
