@@ -1694,7 +1694,7 @@ function copyPitchLink(token, e) {
 
 function goToDashboard() { loadDashboard(); }
 function showCat(cat){
-  if(cat==='split'){ showGlobalBack(null); }
+  if(cat==='split'){ showGlobalBack('landing'); }
   else { showGlobalBack('cat'); }
   const split=document.getElementById('cat-split');
   const warm=document.getElementById('cat-warm');
@@ -3329,7 +3329,7 @@ function closeDetail() {
   safeClassName('product-detail','product-detail');
   safeDisplay('product-detail','none');
   safeDisplay('showcase-preview','block');
-  showGlobalBack(null);
+  showGlobalBack('landing');
   safeText('canvas-label','Live Preview');
   safeDisplay('export-hint','block');
   const canvasEl2=g('canvas');
