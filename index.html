@@ -3144,7 +3144,7 @@ function updatePreview() {
       const splitHTML=getOpeningScreen()+getNavCards(null)+getHero()
         +'<div id="section-anchor"></div>'
         +'<div id="cat-split" style="display:grid;grid-template-columns:1fr 1fr;min-height:95vh">'
-          +'<div onclick="showCat(\'warm\')" class="cat-panel" style="background:'+warmBg+';display:flex;flex-direction:column;justify-content:flex-end;padding:48px;cursor:pointer;border-right:1px solid rgba(255,255,255,0.08);position:relative;overflow:hidden;transition:opacity 0.8s ease,transform 0.8s ease;opacity:0;transform:translateY(40px)">'
+          +'<div onclick="showCat(\'warm\')" class="cat-panel" style="background:'+warmBg+';display:flex;flex-direction:column;justify-content:flex-end;padding:48px;cursor:pointer;border-right:1px solid rgba(255,255,255,0.08);position:relative;overflow:hidden">'
             +(warmVid?'<video muted playsinline preload="none" class="cat-vid lazy-cat-vid" data-src="'+warmVid+'" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;opacity:0;transition:opacity 0.5s ease"></video>':'')
             +'<div style="position:absolute;inset:0;background:'+textGradient+';pointer-events:none"></div>'
             +'<div style="position:absolute;top:0;left:0;right:0;height:3px;background:'+warmAcc+'"></div>'
@@ -3156,7 +3156,7 @@ function updatePreview() {
               +'<div style="font-size:10px;letter-spacing:0.2em;text-transform:uppercase;color:'+warmAcc+'">Explore →</div>'
             +'</div>'
           +'</div>'
-          +'<div onclick="showCat(\'air\')" class="cat-panel" style="background:'+airBg+';display:flex;flex-direction:column;justify-content:flex-end;padding:48px;cursor:pointer;position:relative;overflow:hidden;transition:opacity 0.8s ease 0.15s,transform 0.8s ease 0.15s;opacity:0;transform:translateY(40px)">'
+          +'<div onclick="showCat(\'air\')" class="cat-panel" style="background:'+airBg+';display:flex;flex-direction:column;justify-content:flex-end;padding:48px;cursor:pointer;position:relative;overflow:hidden">'
             +(airVid?'<video muted playsinline preload="none" class="cat-vid lazy-cat-vid" data-src="'+airVid+'" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;opacity:0;transition:opacity 0.5s ease"></video>':'')
             +'<div style="position:absolute;inset:0;background:'+textGradient+';pointer-events:none"></div>'
             +'<div style="position:absolute;top:0;left:0;right:0;height:3px;background:'+airAcc+'"></div>'
@@ -3183,30 +3183,23 @@ function updatePreview() {
       // Add compact class to hero
       const heroEl=preview.querySelector('.showcase-hero');
       if(heroEl) heroEl.classList.add('hero-compact');
-      // scroll observer — reveals panels on scroll and starts videos lazily
+      // start cat videos when user scrolls to them
       setTimeout(()=>{
-        const panels=document.querySelectorAll('.cat-panel');
-        const obs=new IntersectionObserver((entries)=>{
-          entries.forEach(e=>{
-            if(e.isIntersecting){
-              e.target.style.opacity='1';
-              e.target.style.transform='translateY(0)';
-              const v=e.target.querySelector('.lazy-cat-vid');
-              if(v && !v.getAttribute('data-loaded')){
-                v.setAttribute('data-loaded','1');
-                const src=v.getAttribute('data-src');
-                if(src){
-                  v.src=src; v.preload='auto'; v.loop=true;
-                  v.oncanplay=()=>{ v.style.opacity=0.9; };
-                  v.load(); v.play().catch(()=>{});
-                }
-              }
-              obs.unobserve(e.target);
+        document.querySelectorAll('.lazy-cat-vid').forEach(v=>{
+          const src=v.getAttribute('data-src');
+          if(!src) return;
+          const obs=new IntersectionObserver((entries)=>{
+            if(entries[0].isIntersecting && !v.getAttribute('data-loaded')){
+              v.setAttribute('data-loaded','1');
+              v.src=src; v.preload='auto'; v.loop=true;
+              v.oncanplay=()=>{ v.style.opacity=0.9; };
+              v.load(); v.play().catch(()=>{});
+              obs.disconnect();
             }
-          });
-        },{threshold:0.05});
-        panels.forEach(p=>obs.observe(p));
-      },100);
+          },{threshold:0.01});
+          obs.observe(v);
+        });
+      },200);
     } else {
       preview.innerHTML=getOpeningScreen()+getNavCards(null)+getHero()+getProducts()+getClosingFooter();
       if (existingScreen && existingVidSrc) {
