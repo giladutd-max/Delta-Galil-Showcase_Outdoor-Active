@@ -1592,6 +1592,7 @@ async function openPitch(id) {
   state.pitchId=data.id; state.shareToken=data.share_token;
   state.template=data.template||'editorial'; state.palette=data.palette||0;
   state.products=data.products||[];
+  state.title=data.title||''; state.client=data.client||''; state.tagline=data.tagline||''; state.description=data.description||'';
   g('pitch-title').value=data.title||'';
   g('pitch-client').value=data.client||'';
   g('pitch-tagline').value=data.tagline||'';
@@ -2848,8 +2849,10 @@ function getOpeningScreen() {
 
 function getHero() {
   const t=state.template,pal=PALETTES[t][state.palette];
-  const title=g('pitch-title').value,client=g('pitch-client').value;
-  const tagline=g('pitch-tagline').value,desc=g('pitch-desc').value;
+  const title=state.title||(g('pitch-title')?.value||'');
+  const client=state.client||(g('pitch-client')?.value||'');
+  const tagline=state.tagline||(g('pitch-tagline')?.value||'');
+  const desc=state.description||(g('pitch-desc')?.value||'');
   if (t==='editorial') return `<div class="showcase-hero anim-hero" style="background:${pal.bg}"><div class="hero-eyebrow" style="color:${pal.accent}">${client}</div><div class="hero-title" style="color:${pal.text}">${title}</div><div class="hero-line" style="background:${pal.accent}"></div><div class="hero-subtitle" style="color:${pal.sub}">${tagline} — ${desc}</div></div>`;
   if (t==='vivid') return `<div class="showcase-hero anim-hero" style="background:${pal.bg}"><div class="hero-eyebrow">${client}</div><div class="hero-title">${title}</div><div class="hero-tagline">${tagline}</div><div class="hero-subtitle">${desc}</div></div>`;
   if (t==='lookbook') { const isDarkL=pal.bg.startsWith('#')&&parseInt(pal.bg.slice(1,3),16)<100; const tc=isDarkL?'#fff':'#1C1C1A'; const sc=isDarkL?'rgba(255,255,255,0.4)':'rgba(28,28,26,0.5)'; return `<div class="showcase-hero anim-hero" style="background:${pal.bg}"><div class="hero-inner"><div class="hero-eyebrow" style="color:${pal.accent}">${client}</div><div class="hero-title" style="color:${tc}">${title}</div><div class="hero-subtitle" style="color:${sc}">${tagline} — ${desc}</div></div></div>`; }
@@ -3144,7 +3147,7 @@ function updatePreview() {
         +'<div id="section-anchor"></div>'
         +'<div id="cat-split" style="display:grid;grid-template-columns:1fr 1fr;min-height:95vh">'
           +'<div onclick="showCat(\'warm\')" class="cat-panel" style="background:'+warmBg+';display:flex;flex-direction:column;justify-content:flex-end;padding:48px;cursor:pointer;border-right:1px solid rgba(255,255,255,0.08);position:relative;overflow:hidden;transition:opacity 0.8s ease,transform 0.8s ease;opacity:0;transform:translateY(40px)">'
-            +(warmVid?'<video autoplay muted playsinline preload="auto" class="cat-vid" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;opacity:0;transition:opacity 0.5s ease" oncanplay="this.style.opacity='+vidOpacity+'"><source src="'+warmVid+'" type="video/mp4"></video>':'')
+            +(warmVid?'<video muted playsinline preload="none" class="cat-vid lazy-cat-vid" data-src="'+warmVid+'" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;opacity:0;transition:opacity 0.5s ease"></video>':'')
             +'<div style="position:absolute;inset:0;background:'+textGradient+';pointer-events:none"></div>'
             +'<div style="position:absolute;top:0;left:0;right:0;height:3px;background:'+warmAcc+'"></div>'
             +'<div style="position:relative;z-index:1;transition:transform 0.4s ease" class="cat-text">'
@@ -3156,7 +3159,7 @@ function updatePreview() {
             +'</div>'
           +'</div>'
           +'<div onclick="showCat(\'air\')" class="cat-panel" style="background:'+airBg+';display:flex;flex-direction:column;justify-content:flex-end;padding:48px;cursor:pointer;position:relative;overflow:hidden;transition:opacity 0.8s ease 0.15s,transform 0.8s ease 0.15s;opacity:0;transform:translateY(40px)">'
-            +(airVid?'<video autoplay muted playsinline preload="auto" class="cat-vid" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;opacity:0;transition:opacity 0.5s ease" oncanplay="this.style.opacity='+vidOpacity+'"><source src="'+airVid+'" type="video/mp4"></video>':'')
+            +(airVid?'<video muted playsinline preload="none" class="cat-vid lazy-cat-vid" data-src="'+airVid+'" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;opacity:0;transition:opacity 0.5s ease"></video>':'')
             +'<div style="position:absolute;inset:0;background:'+textGradient+';pointer-events:none"></div>'
             +'<div style="position:absolute;top:0;left:0;right:0;height:3px;background:'+airAcc+'"></div>'
             +'<div style="position:relative;z-index:1;transition:transform 0.4s ease" class="cat-text">'
@@ -3182,18 +3185,40 @@ function updatePreview() {
       // Add compact class to hero
       const heroEl=preview.querySelector('.showcase-hero');
       if(heroEl) heroEl.classList.add('hero-compact');
-      // scroll observer — reveals panels on scroll
+      // In presentation mode (no header), panels are visible immediately — don't hide them
+      const isPresentation = !document.querySelector('header') || document.querySelector('header').style.display === 'none';
+      if (isPresentation) {
+        document.querySelectorAll('.cat-panel').forEach(p => {
+          p.style.opacity = '1';
+          p.style.transform = 'translateY(0)';
+        });
+      }
+      // scroll observer — reveals panels on scroll and starts videos lazily
       setTimeout(()=>{
         const panels=document.querySelectorAll('.cat-panel');
+        const scrollRoot = document.querySelector('.canvas') || null;
         const obs=new IntersectionObserver((entries)=>{
           entries.forEach(e=>{
             if(e.isIntersecting){
               e.target.style.opacity='1';
               e.target.style.transform='translateY(0)';
+              const v=e.target.querySelector('.lazy-cat-vid');
+              if(v && !v.getAttribute('data-loaded')){
+                v.setAttribute('data-loaded','1');
+                const src=v.getAttribute('data-src');
+                if(src){
+                  v.src=src;
+                  v.preload='auto';
+                  v.loop=true;
+                  v.oncanplay=()=>{ v.style.opacity=0.9; };
+                  v.load();
+                  v.play().catch(()=>{});
+                }
+              }
               obs.unobserve(e.target);
             }
           });
-        },{threshold:0.05});
+        },{threshold:0.05, root: scrollRoot});
         panels.forEach(p=>obs.observe(p));
       },100);
     } else {
@@ -3607,6 +3632,7 @@ async function loadSharedView(token) {
   state.pitchId=data.id; state.shareToken=data.share_token;
   state.template=data.template; state.palette=data.palette||0;
   state.products=data.products||[];
+  state.title=data.title||''; state.client=data.client||''; state.tagline=data.tagline||''; state.description=data.description||'';
   g('pitch-title').value=data.title||'';
   g('pitch-client').value=data.client||'';
   g('pitch-tagline').value=data.tagline||'';
