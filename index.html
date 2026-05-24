@@ -3419,6 +3419,7 @@ async function loadPresentationView(token) {
 
 // ── LANDING SCREEN (split: Outdoor | Active) ──
 function showLandingScreen() {
+  showGlobalBack(null);
   const preview=g('showcase-preview'); if(!preview) return;
   const headline=state.landingHeadline||'Spring Summer 2026';
   const outdoorName=state.outdoorCollectionName||'Outdoor';
@@ -3509,6 +3510,7 @@ function showLandingScreen() {
 // ── ENTER COLLECTION ──
 let _activeMode=false; // true when viewer is in Active collection
 function enterCollection(which) {
+  showGlobalBack('landing');
   _activeMode=(which==='active');
   if(_activeMode) {
     // Temporarily swap state to Active data for rendering
@@ -3569,14 +3571,7 @@ function enterCollection(which) {
   // Add a back-to-landing button
   const preview=g('showcase-preview');
   if(preview){
-    const backBar=document.createElement('div');
-    backBar.id='back-to-landing';
-    backBar.style.cssText='position:fixed;top:16px;left:50%;transform:translateX(-50%);z-index:999;background:rgba(28,28,26,0.85);border:1px solid rgba(255,255,255,0.12);border-radius:20px;padding:8px 20px;display:flex;align-items:center;gap:10px;cursor:pointer;backdrop-filter:blur(8px)';
-    backBar.innerHTML='<span style="font-size:9px;letter-spacing:0.2em;text-transform:uppercase;color:rgba(255,255,255,0.5)">'+state.landingHeadline+'</span>'
-      +'<span style="color:rgba(255,255,255,0.2);font-size:10px">|</span>'
-      +'<span style="font-size:9px;letter-spacing:0.2em;text-transform:uppercase;color:#C4A882">'+(which==='outdoor'?state.outdoorCollectionName:state.activeCollectionName)+'</span>';
-    backBar.onclick=()=>{ restoreFromCollection(); showLandingScreen(); backBar.remove(); };
-    document.body.appendChild(backBar);
+    // back handled by global back button
   }
 }
 
@@ -3937,7 +3932,7 @@ function showGlobalBack(mode) {
     btn.classList.remove('visible');
   } else {
     btn.classList.add('visible');
-    if (mode === 'detail') btn.innerText = '← Back to Collection';
+    if (mode === 'detail') btn.innerText = '← Back';
     else if (mode === 'cat') btn.innerText = '← Back';
     else btn.innerText = '← Back';
   }
@@ -3945,6 +3940,7 @@ function showGlobalBack(mode) {
 function globalBackAction() {
   if (_globalBackMode === 'detail') { closeDetail(); }
   else if (_globalBackMode === 'cat') { showCat('split'); }
+  else if (_globalBackMode === 'landing') { restoreFromCollection(); showLandingScreen(); var bb=document.getElementById('back-to-landing'); if(bb) bb.remove(); }
   else { showGlobalBack(null); }
 }
 </script>
