@@ -3184,9 +3184,18 @@ function updatePreview() {
       // Add compact class to hero
       const heroEl=preview.querySelector('.showcase-hero');
       if(heroEl) heroEl.classList.add('hero-compact');
+      // In presentation mode (no header), panels are visible immediately — don't hide them
+      const isPresentation = !document.querySelector('header') || document.querySelector('header').style.display === 'none';
+      if (isPresentation) {
+        document.querySelectorAll('.cat-panel').forEach(p => {
+          p.style.opacity = '1';
+          p.style.transform = 'translateY(0)';
+        });
+      }
       // scroll observer — reveals panels on scroll and starts videos lazily
       setTimeout(()=>{
         const panels=document.querySelectorAll('.cat-panel');
+        const scrollRoot = document.querySelector('.canvas') || null;
         const obs=new IntersectionObserver((entries)=>{
           entries.forEach(e=>{
             if(e.isIntersecting){
@@ -3200,7 +3209,7 @@ function updatePreview() {
                   v.src=src;
                   v.preload='auto';
                   v.loop=true;
-                  v.oncanplay=()=>{ v.style.opacity=vidOpacity; };
+                  v.oncanplay=()=>{ v.style.opacity=0.9; };
                   v.load();
                   v.play().catch(()=>{});
                 }
@@ -3208,7 +3217,7 @@ function updatePreview() {
               obs.unobserve(e.target);
             }
           });
-        },{threshold:0.05});
+        },{threshold:0.05, root: scrollRoot});
         panels.forEach(p=>obs.observe(p));
       },100);
     } else {
