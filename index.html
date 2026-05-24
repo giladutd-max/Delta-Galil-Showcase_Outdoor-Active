@@ -511,6 +511,7 @@ header { z-index: 100; }
   .showcase, .product-detail { box-shadow: none; max-width: 100%; }
 }
 img { image-rendering: auto; }
+@keyframes shimmer { 0%{background-position:200% 0} 100%{background-position:-200% 0} }
 
 /* PDF EXPORT */
 .pdf-pool-label{font-size:10px;letter-spacing:0.08em;text-transform:uppercase;color:var(--mid);margin-bottom:6px}
@@ -2835,7 +2836,7 @@ function getOpeningScreen() {
   const activeImg=(isMob&&mobileImg)?mobileImg:img;
   const bgStyle=activeImg?'background-image:url('+activeImg+')':'background:#1C1C1A';
   const showVideo=!!activeVid&&!(isMob&&mobileImg);
-  const videoEl=showVideo?'<video id="opening-video-el" autoplay muted playsinline loop preload="auto" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;z-index:0;opacity:0;transition:opacity 0.4s ease" oncanplay="this.style.opacity=1">'+
+  const videoEl=showVideo?'<video id="opening-video-el" autoplay muted playsinline loop preload="auto" fetchpriority="high" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;z-index:0;opacity:0;transition:opacity 0.4s ease" oncanplay="this.style.opacity=1">'+
     '<source src="'+activeVid+'" type="video/mp4"></video>':'';
   return '<div class="opening-screen" style="position:relative;overflow:hidden;height:clamp(320px,100vw,600px)">'
     +'<div class="opening-screen-bg" style="'+bgStyle+'"></div>'
@@ -3421,6 +3422,23 @@ function showLandingScreen() {
   const activeCount=(state.activeProducts||[]);
   const textGrad='linear-gradient(to top, rgba(0,0,0,0.75) 0%, rgba(0,0,0,0.2) 50%, transparent 100%)';
 
+  // Inject preconnect for Supabase once
+  if (!document.querySelector('link[rel="preconnect"][href*="supabase"]')) {
+    const pc = document.createElement('link');
+    pc.rel='preconnect'; pc.href='https://dkgzhmpuqzykzebzcqdr.supabase.co'; pc.crossOrigin='anonymous';
+    document.head.appendChild(pc);
+  }
+
+  // Video element builder — image shows instantly, video fades in over it
+  function vidEl(src, img, priority) {
+    if (!src) return '';
+    const shimmer = !img ? 'background:linear-gradient(90deg,rgba(255,255,255,0.03) 0%,rgba(255,255,255,0.08) 50%,rgba(255,255,255,0.03) 100%);background-size:200% 100%;animation:shimmer 1.8s infinite' : '';
+    return '<video autoplay muted loop playsinline preload="auto"'+(priority?' fetchpriority="high"':'')+
+      ' style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;opacity:0;transition:opacity 0.6s ease;z-index:2;'+shimmer+'"'+
+      ' oncanplay="this.style.opacity=0.75">'+
+      '<source src="'+src+'" type="video/mp4"></video>';
+  }
+
   preview.className='showcase';
   const isPresent=document.querySelector('header')&&document.querySelector('header').style.display==='none';
   if(isPresent){preview.style.maxWidth='100%';preview.style.width='100%';}
@@ -3429,8 +3447,7 @@ function showLandingScreen() {
       // Outdoor half
       +'<div onclick="enterCollection(\'outdoor\')" style="position:relative;overflow:hidden;cursor:pointer;min-height:100vh;background:#0D1018;border-right:1px solid rgba(255,255,255,0.08)">'
         +'<div style="position:absolute;inset:0;z-index:0;'+(outdoorImg?'background:url(\''+outdoorImg+'\') center/cover no-repeat':'background:linear-gradient(160deg,#0D1018 0%,#1A2030 100%)')+'"></div>'
-        +(outdoorVid?'<video autoplay muted loop playsinline style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;opacity:0;transition:opacity 0.5s ease;z-index:1" oncanplay="this.style.opacity=0.75"><source src="'+outdoorVid+'" type="video/mp4"></video>':'')
-        
+        +vidEl(outdoorVid, outdoorImg, true)
         +'<div style="position:absolute;inset:0;z-index:3;background:rgba(0,0,0,0);transition:background 0.4s" class="landing-hover-overlay"></div>'
         +'<div style="position:absolute;bottom:0;left:0;right:0;padding:40px 44px 48px;z-index:4">'
           +'<div style="width:20px;height:1px;background:#C4A882;margin-bottom:14px;opacity:0.7"></div>'
@@ -3441,8 +3458,7 @@ function showLandingScreen() {
       // Active half
       +'<div onclick="enterCollection(\'active\')" style="position:relative;overflow:hidden;cursor:pointer;min-height:100vh;background:#180810">'
         +'<div style="position:absolute;inset:0;z-index:0;'+(activeImg?'background:url(\''+activeImg+'\') center/cover no-repeat':'background:linear-gradient(160deg,#180810 0%,#2A1020 100%)')+'"></div>'
-        +(activeVid?'<video autoplay muted loop playsinline style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;opacity:0;transition:opacity 0.5s ease;z-index:1" oncanplay="this.style.opacity=0.75"><source src="'+activeVid+'" type="video/mp4"></video>':'')
-        
+        +vidEl(activeVid, activeImg, false)
         +'<div style="position:absolute;inset:0;z-index:3;background:rgba(0,0,0,0);transition:background 0.4s" class="landing-hover-overlay"></div>'
         +'<div style="position:absolute;bottom:0;left:0;right:0;padding:40px 44px 48px;z-index:4">'
           +'<div style="width:20px;height:1px;background:#C4A882;margin-bottom:14px;opacity:0.7"></div>'
