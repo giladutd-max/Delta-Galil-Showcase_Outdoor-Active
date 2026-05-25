@@ -3927,17 +3927,27 @@ function previewPDF() {
   // Convert all images to base64 so they print correctly
   var imgCache = {};
   function toDataURL(url, cb) {
+    var done = false;
+    function finish(result) {
+      if (done) return;
+      done = true;
+      imgCache[url] = result;
+      cb();
+    }
     var img = new Image();
     img.crossOrigin = 'anonymous';
     img.onload = function(){
-      var c = document.createElement('canvas');
-      c.width = img.naturalWidth; c.height = img.naturalHeight;
-      c.getContext('2d').drawImage(img,0,0);
-      try { imgCache[url] = c.toDataURL('image/jpeg', 0.92); } catch(e){ imgCache[url] = url; }
-      cb();
+      try {
+        var c = document.createElement('canvas');
+        c.width = img.naturalWidth; c.height = img.naturalHeight;
+        c.getContext('2d').drawImage(img,0,0);
+        finish(c.toDataURL('image/jpeg', 0.92));
+      } catch(e){ finish(url); }
     };
-    img.onerror = function(){ imgCache[url] = url; cb(); };
+    img.onerror = function(){ finish(url); };
     img.src = url + (url.includes('?')?'&':'?') + '_t=' + Date.now();
+    // Timeout after 8 seconds - use original URL
+    setTimeout(function(){ finish(url); }, 8000);
   }
 
   var pending = imgUrls.length;
