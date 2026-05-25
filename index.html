@@ -2161,6 +2161,9 @@ function openModal() {
   if (ao) ao.textContent = state.catAirName || 'Mid Layer';
   g('modal-overlay').classList.add('open');
   g('modal-name').value=''; g('modal-fabric').value=''; g('modal-desc').value='';
+  if(g('modal-style-no')) g('modal-style-no').value='';
+  if(g('modal-style-top')) g('modal-style-top').value='';
+  if(g('modal-style-bottom')) g('modal-style-bottom').value='';
   if(g('modal-special')) g('modal-special').value='';
   if(g('modal-video')) g('modal-video').value='';
   pendingTechs=[];
