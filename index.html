@@ -962,6 +962,11 @@ img { image-rendering: auto; }
       </div>
     </div>
     <div class="field-group"><label class="field-label">Short Description</label><textarea class="field-input" id="modal-desc" placeholder="Brief product description..."></textarea></div>
+    <div class="field-group"><label class="field-label">Style No <span style="font-weight:300;opacity:0.6">(optional)</span></label><input class="field-input" id="modal-style-no" type="text" placeholder="e.g. 03067" /></div>
+    <div class="field-group" style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
+      <div><label class="field-label">Top Style No</label><input class="field-input" id="modal-style-top" type="text" placeholder="e.g. ACT1052" /></div>
+      <div><label class="field-label">Bottom Style No</label><input class="field-input" id="modal-style-bottom" type="text" placeholder="e.g. ACT1053" /></div>
+    </div>
     <div class="field-group"><label class="field-label">Product Video URL</label><input class="field-input" id="modal-video" type="text" placeholder="Paste Supabase video URL (.mp4)" /></div>
     <div class="field-group"><label class="field-label">What Makes It Special?</label><textarea class="field-input" id="modal-special" placeholder="What sets this product apart..." style="min-height:80px"></textarea></div>
     <div class="field-group">
@@ -2199,7 +2204,7 @@ async function saveProduct() {
   } else if (pendingHoverFile) {
     hoverImgUrl = await uploadImageToStorage(pendingHoverFile) || '';
   }
-  const _newProd={id:Date.now(),name,fabric:g('modal-fabric').value.trim(),desc:g('modal-desc').value.trim(),special:g('modal-special')?.value.trim()||'',video:g('modal-video')?.value.trim()||'',img:imgUrl,extraImgs,hoverImg:hoverImgUrl,warmth:pendingWarmthRating,dry:pendingDryRating,breath:pendingBreathRating,techs:[...pendingTechs],emoji:'📦',category:g('modal-category')?.value||'',layer:g('modal-layer')?.value||''};
+  const _newProd={id:Date.now(),name,fabric:g('modal-fabric').value.trim(),desc:g('modal-desc').value.trim(),special:g('modal-special')?.value.trim()||'',video:g('modal-video')?.value.trim()||'',img:imgUrl,extraImgs,hoverImg:hoverImgUrl,warmth:pendingWarmthRating,dry:pendingDryRating,breath:pendingBreathRating,techs:[...pendingTechs],emoji:'📦',category:g('modal-category')?.value||'',layer:g('modal-layer')?.value||'',styleNo:g('modal-style-no')?.value.trim()||'',styleTop:g('modal-style-top')?.value.trim()||'',styleBottom:g('modal-style-bottom')?.value.trim()||''};
   if(window._savingForActive){
     state.activeProducts=state.activeProducts||[];
     state.activeProducts.push(_newProd);
@@ -2504,7 +2509,7 @@ async function updateActiveProduct(id) {
   let hoverImgUrl=state.activeProducts[idx].hoverImg||'';
   if(pendingHoverImg)hoverImgUrl=pendingHoverImg;
   else if(pendingHoverFile)hoverImgUrl=await uploadImageToStorage(pendingHoverFile)||hoverImgUrl;
-  state.activeProducts[idx]={...state.activeProducts[idx],name,fabric:g('modal-fabric').value.trim(),desc:g('modal-desc').value.trim(),special:g('modal-special')?.value.trim()||'',video:g('modal-video')?.value.trim()||'',img:imgUrl,extraImgs:[...existingExtras,...newExtras],hoverImg:hoverImgUrl,warmth:pendingWarmthRating,dry:pendingDryRating,breath:pendingBreathRating,techs:[...pendingTechs],category:g('modal-category')?.value||'',layer:g('modal-layer')?.value||''};
+  state.activeProducts[idx]={...state.activeProducts[idx],name,fabric:g('modal-fabric').value.trim(),desc:g('modal-desc').value.trim(),special:g('modal-special')?.value.trim()||'',video:g('modal-video')?.value.trim()||'',img:imgUrl,extraImgs:[...existingExtras,...newExtras],hoverImg:hoverImgUrl,warmth:pendingWarmthRating,dry:pendingDryRating,breath:pendingBreathRating,techs:[...pendingTechs],category:g('modal-category')?.value||'',layer:g('modal-layer')?.value||'',styleNo:g('modal-style-no')?.value.trim()||'',styleTop:g('modal-style-top')?.value.trim()||'',styleBottom:g('modal-style-bottom')?.value.trim()||''};
   g('modal-save-btn').textContent='Add Product'; g('modal-save-btn').disabled=false;
   g('modal-save-btn').onclick=saveProduct;
   window._savingForActive=false; window._editingActiveProduct=null;
@@ -2624,7 +2629,7 @@ async function updateProduct(id) {
   } else if (pendingHoverFile) {
     hoverImgUrl = await uploadImageToStorage(pendingHoverFile) || hoverImgUrl;
   }
-  state.products[idx]={...state.products[idx], name, fabric:g('modal-fabric').value.trim(), desc:g('modal-desc').value.trim(), special:g('modal-special')?.value.trim()||'', video:g('modal-video')?.value.trim()||'', img:imgUrl, extraImgs:[...existingExtras,...newExtras], hoverImg:hoverImgUrl, warmth:pendingWarmthRating, dry:pendingDryRating, breath:pendingBreathRating, techs:[...pendingTechs], category:g('modal-category')?.value||'', layer:g('modal-layer')?.value||''};
+  state.products[idx]={...state.products[idx], name, fabric:g('modal-fabric').value.trim(), desc:g('modal-desc').value.trim(), special:g('modal-special')?.value.trim()||'', video:g('modal-video')?.value.trim()||'', img:imgUrl, extraImgs:[...existingExtras,...newExtras], hoverImg:hoverImgUrl, warmth:pendingWarmthRating, dry:pendingDryRating, breath:pendingBreathRating, techs:[...pendingTechs], category:g('modal-category')?.value||'', layer:g('modal-layer')?.value||'', styleNo:g('modal-style-no')?.value.trim()||'', styleTop:g('modal-style-top')?.value.trim()||'', styleBottom:g('modal-style-bottom')?.value.trim()||''};
   g('modal-save-btn').textContent='Add Product'; g('modal-save-btn').disabled=false;
   g('modal-save-btn').onclick=saveProduct;
   closeModal();
@@ -3280,6 +3285,11 @@ function openDetail(id) {
       ${p.special?'<div class="detail-anim" style="animation-delay:0.4s;margin-top:8px;padding-top:16px;border-top:1px solid '+borderColor+'">'+'<div style="font-size:14px;letter-spacing:0.12em;text-transform:uppercase;color:'+accentColor+';margin-bottom:8px">What Makes It Special</div>'+'<div style="font-size:16px;color:'+subColor+';line-height:1.8">'+p.special+'</div>'+'</div>':''}
       ${hasMultiple?`<div class="detail-anim" style="animation-delay:0.5s;font-size:11px;color:${subColor};margin-top:16px">${allImgs.length} photos</div>`:''}
       ${(p.techs&&p.techs.length)?'<div class="detail-anim" style="animation-delay:0.55s;margin-top:24px;padding-top:20px;border-top:1px solid '+borderColor+';display:flex;flex-wrap:wrap;gap:8px;align-items:center">'+p.techs.map(tid=>{const t=TECHNOLOGIES.find(x=>x.id===tid);if(!t)return'';return `<span style="font-size:10px;letter-spacing:0.1em;text-transform:uppercase;color:${accentColor};border:1px solid ${accentColor}66;border-radius:20px;padding:5px 13px;white-space:nowrap">${t.label}</span>`;}).join('')+'</div>':''}
+      ${(p.styleNo||p.styleTop||p.styleBottom)?`<div class="detail-anim" style="animation-delay:0.6s;margin-top:24px;padding-top:20px;border-top:1px solid ${borderColor};display:flex;flex-direction:column;gap:6px">
+        ${p.styleNo?`<div style="font-size:12px;color:${subColor}">Style no: <span style="color:${textColor};font-weight:500">${p.styleNo}</span></div>`:''}
+        ${p.styleTop?`<div style="font-size:12px;color:${subColor}">Top Style no: <span style="color:${textColor};font-weight:500">${p.styleTop}</span></div>`:''}
+        ${p.styleBottom?`<div style="font-size:12px;color:${subColor}">Bottom Style no: <span style="color:${textColor};font-weight:500">${p.styleBottom}</span></div>`:''}
+      </div>`:''}
     </div>
   </div>`;
 
