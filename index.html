@@ -3788,9 +3788,9 @@ function buildPdfPageHTML(pair) {
   var collLabel = _pdfCollection==='outdoor' ? 'Outdoor Collection' : 'Active Collection';
 
   var header = '<div style="display:flex;align-items:center;justify-content:space-between;padding:5mm 8mm;border-bottom:0.4mm solid #ddd;flex-shrink:0;background:#fff">' +
-    '<img src="https://dkgzhmpuqzykzebzcqdr.supabase.co/storage/v1/object/public/product-images/DELTA%20LOGO2.png" style="height:20mm;object-fit:contain;display:block" />' +
+    '<img src="https://dkgzhmpuqzykzebzcqdr.supabase.co/storage/v1/object/public/product-images/DELTA%20LOGO2.png" style="height:80mm;object-fit:contain;display:block" />' +
     '<div style="font-size:3mm;letter-spacing:0.1em;text-transform:uppercase;color:#aaa">' + collLabel + ' · Spring Summer 2028</div>' +
-    '<img src="https://dkgzhmpuqzykzebzcqdr.supabase.co/storage/v1/object/public/product-images/LULU%20OGO%202.png" style="height:20mm;object-fit:contain;display:block" />' +
+    '<img src="https://dkgzhmpuqzykzebzcqdr.supabase.co/storage/v1/object/public/product-images/LULU%20OGO%202.png" style="height:80mm;object-fit:contain;display:block" />' +
     '</div>';
 
   function ratingRowPDF(type, val, label) {
@@ -3846,7 +3846,7 @@ function buildPdfPageHTML(pair) {
     return '<div class="pdf-page" style="width:210mm;height:297mm;display:flex;flex-direction:column;background:#fff;font-family:DM Sans,sans-serif;box-sizing:border-box;overflow:hidden">' +
       header +
       '<div style="flex:1;display:flex;flex-direction:row;overflow:hidden;min-height:0">' +
-        '<div style="width:46%;background:#f5f2ee;overflow:hidden;border-right:0.5mm solid #ddd">' +
+        '<div style="width:46%;background:#f5f2ee;overflow:hidden">' +
           '<img src="'+(p1.img||'')+'" style="width:100%;height:100%;object-fit:contain;object-position:center top;display:block" />' +
         '</div>' +
         '<div style="flex:1;padding:8mm 10mm;display:flex;flex-direction:column;justify-content:center;overflow:hidden">' +
@@ -3863,12 +3863,12 @@ function buildPdfPageHTML(pair) {
     header +
     '<div style="flex:1;display:flex;flex-direction:row;overflow:hidden;min-height:0">' +
 
-      '<div style="width:46%;display:flex;flex-direction:column;border-right:0.5mm solid #ddd;overflow:hidden">' +
-        '<div style="flex:1;display:flex;flex-direction:column;border-bottom:0.3mm solid #ddd;overflow:hidden">' +
+      '<div style="width:46%;display:flex;flex-direction:column;overflow:hidden">' +
+        '<div style="flex:1;display:flex;flex-direction:column;overflow:hidden">' +
           '<div style="flex:1;background:#f5f2ee;overflow:hidden">' +
             '<img src="'+(p1.img||'')+'" style="width:100%;height:100%;object-fit:contain;object-position:center top;display:block" />' +
           '</div>' +
-          '<div style="padding:3mm 5mm 3.5mm;flex-shrink:0;background:#fff;border-top:0.3mm solid #ddd">' +
+          '<div style="padding:3mm 0 3.5mm;flex-shrink:0;background:#fff">' +
             '<div style="font-family:Cormorant Garamond,serif;font-size:6mm;font-weight:300;color:#1C1C1A;line-height:1.2">'+(p1.name||'')+'</div>' +
             styleNosPDF(p1) +
           '</div>' +
@@ -3877,7 +3877,7 @@ function buildPdfPageHTML(pair) {
           '<div style="flex:1;background:#f5f2ee;overflow:hidden">' +
             '<img src="'+(p2.img||'')+'" style="width:100%;height:100%;object-fit:contain;object-position:center top;display:block" />' +
           '</div>' +
-          '<div style="padding:3mm 5mm 3.5mm;flex-shrink:0;background:#fff;border-top:0.3mm solid #ddd">' +
+          '<div style="padding:3mm 0 3.5mm;flex-shrink:0;background:#fff">' +
             '<div style="font-family:Cormorant Garamond,serif;font-size:6mm;font-weight:300;color:#1C1C1A;line-height:1.2">'+(p2.name||'')+'</div>' +
             styleNosPDF(p2) +
           '</div>' +
