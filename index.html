@@ -3829,22 +3829,17 @@ function buildPdfPageHTML(pair) {
   }
 
   if (isSolo && p1) {
-    var allImgs = [p1.img].concat(p1.extraImgs||[]).filter(Boolean);
+    var allImgs = [p1.img].concat(p1.extraImgs||[]).filter(Boolean).slice(0,3);
     var imgGrid = '';
     if (allImgs.length === 1) {
-      imgGrid = '<img src="'+allImgs[0]+'" style="width:100%;height:100%;object-fit:contain;object-position:center top;display:block" />';
+      imgGrid = '<div style="height:100%;background:#f5f2ee"><img src="'+allImgs[0]+'" style="width:100%;height:100%;object-fit:contain;object-position:center top;display:block" /></div>';
     } else if (allImgs.length === 2) {
-      imgGrid = '<div style="display:flex;height:100%;gap:0">' +
-        allImgs.map(function(src){ return '<div style="flex:1;overflow:hidden;background:#f5f2ee"><img src="'+src+'" style="width:100%;height:100%;object-fit:contain;object-position:center top;display:block" /></div>'; }).join('') +
+      imgGrid = '<div style="display:flex;height:100%">' +
+        allImgs.map(function(src){ return '<div style="flex:1;background:#f5f2ee;border-right:1px solid #fff"><img src="'+src+'" style="width:100%;height:100%;object-fit:cover;object-position:center top;display:block" /></div>'; }).join('') +
       '</div>';
     } else {
-      // 3+ images: first image large left, rest stacked right
-      var rest = allImgs.slice(1,3);
-      imgGrid = '<div style="display:flex;height:100%;gap:0">' +
-        '<div style="flex:1.2;overflow:hidden;background:#f5f2ee"><img src="'+allImgs[0]+'" style="width:100%;height:100%;object-fit:contain;object-position:center top;display:block" /></div>' +
-        '<div style="flex:1;display:flex;flex-direction:column;gap:0">' +
-          rest.map(function(src){ return '<div style="flex:1;overflow:hidden;background:#f0ede8"><img src="'+src+'" style="width:100%;height:100%;object-fit:contain;object-position:center top;display:block" /></div>'; }).join('') +
-        '</div>' +
+      imgGrid = '<div style="display:flex;height:100%">' +
+        allImgs.map(function(src,i){ return '<div style="flex:1;background:#f5f2ee'+(i<allImgs.length-1?';border-right:1px solid #fff':'')+'""><img src="'+src+'" style="width:100%;height:100%;object-fit:cover;object-position:center top;display:block" /></div>'; }).join('') +
       '</div>';
     }
     return '<div class="pdf-page" style="width:210mm;height:297mm;display:flex;flex-direction:column;background:#fff;font-family:DM Sans,sans-serif;box-sizing:border-box;overflow:hidden">' +
