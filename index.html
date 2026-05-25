@@ -531,13 +531,12 @@ img { image-rendering: auto; }
 .pdf-page{margin:0 auto 20px;box-shadow:0 2px 20px rgba(0,0,0,0.12)}
 @media print{
   *{-webkit-print-color-adjust:exact!important;print-color-adjust:exact!important}
-  body>*:not(#pdf-print-root){display:none!important}
-  #pdf-print-root{display:block!important;position:static;overflow:visible;padding:0;margin:0;background:#fff}
-  #pdf-print-root>*:not(.pdf-page){display:none!important}
-  #pdf-controls{display:none!important}
-  .pdf-preview-wrapper{display:contents!important;margin:0!important;padding:0!important}
-  .pdf-page{margin:0!important;padding:0!important;box-shadow:none!important;page-break-after:always;break-after:page;page-break-inside:avoid;break-inside:avoid;width:210mm!important;height:297mm!important;display:flex!important;position:static!important}
-  .pdf-page:last-child{page-break-after:avoid;break-after:avoid}
+  html,body{margin:0;padding:0;background:#fff}
+  body>*{display:none!important}
+  #pdf-print-root{display:block!important;position:static!important;inset:auto!important;overflow:visible!important;padding:0!important;margin:0!important;background:#fff!important;z-index:auto!important}
+  #pdf-controls,.pdf-preview-wrapper{display:none!important}
+  .pdf-page{display:flex!important;margin:0!important;padding:0!important;box-shadow:none!important;page-break-after:always!important;break-after:page!important;width:210mm!important;height:297mm!important;overflow:hidden!important}
+  .pdf-page:last-child{page-break-after:avoid!important;break-after:avoid!important}
   @page{size:A4 portrait;margin:0}
 }
 </style>
