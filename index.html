@@ -3807,67 +3807,100 @@ function buildPdfPageHTML(pair) {
   var p2 = pair[1] ? prods.find(function(p){ return p.id===pair[1]; }) : null;
   var isSolo = !p2;
 
+  var collLabel = _pdfCollection==='outdoor' ? 'Outdoor Collection' : 'Active Collection';
+
+  var header = '<div style="display:flex;align-items:center;justify-content:space-between;padding:10px 24px;border-bottom:1px solid #e8e4df;flex-shrink:0">' +
+    '<div style="font-size:8.5px;letter-spacing:0.22em;text-transform:uppercase;color:#1C1C1A;font-weight:600">Delta Galil</div>' +
+    '<div style="font-size:7px;letter-spacing:0.12em;text-transform:uppercase;color:#bbb">' + collLabel + ' &nbsp;&middot;&nbsp; Spring Summer 2026</div>' +
+    '</div>';
+
   function ratingRow(label, val, icon) {
     if (!val) return '';
     var icons = '';
-    for (var i=0; i<5; i++) icons += '<span style="font-size:12px;opacity:'+(i<val?'1':'0.2')+'">'+icon+'</span>';
-    return '<div style="display:flex;align-items:center;gap:6px;margin-bottom:3px"><span style="font-size:7.5px;letter-spacing:0.1em;text-transform:uppercase;color:#999;width:54px;flex-shrink:0">'+label+'</span>'+icons+'</div>';
+    for (var i=0; i<5; i++) icons += '<span style="font-size:11px;opacity:'+(i<val?'1':'0.18')+'">'+icon+'</span>';
+    return '<div style="display:flex;align-items:center;gap:5px;margin-bottom:2px">' +
+      '<span style="font-size:7px;letter-spacing:0.12em;text-transform:uppercase;color:#aaa;width:52px;flex-shrink:0">'+label+'</span>' + icons +
+      '</div>';
   }
 
   function techBadgesHtml(p) {
-    if (!p.techs || !p.techs.length) return '';
+    if (!p || !p.techs || !p.techs.length) return '';
     var badges = p.techs.map(function(tid){
       var t = TECHNOLOGIES.find(function(x){ return x.id===tid; });
-      return t ? '<span style="font-size:7px;letter-spacing:0.1em;text-transform:uppercase;border:1px solid #C4A882;border-radius:20px;padding:2px 8px;color:#8C7355;white-space:nowrap">'+t.label+'</span>' : '';
+      return t ? '<span style="font-size:6.5px;letter-spacing:0.1em;text-transform:uppercase;border:1px solid #C4A882;border-radius:20px;padding:2px 7px;color:#8C7355;white-space:nowrap">'+t.label+'</span>' : '';
     }).join('');
-    return '<div style="display:flex;flex-wrap:wrap;gap:4px;margin-top:6px">'+badges+'</div>';
+    return '<div style="display:flex;flex-wrap:wrap;gap:4px;margin-top:8px">'+badges+'</div>';
   }
 
-  function productBlock(p, titleSize) {
-    return '<div style="font-family:Cormorant Garamond,serif;font-size:'+titleSize+';font-weight:300;color:#1C1C1A;margin-bottom:3px;line-height:1.15">'+(p.name||'')+'</div>'+
-      '<div style="font-size:7.5px;letter-spacing:0.14em;text-transform:uppercase;color:#bbb;margin-bottom:8px">'+(p.fabric||'')+'</div>'+
-      ratingRow('Warmth', p.warmth, '🔥')+
-      ratingRow('Dry Rate', p.dry, '💧')+
-      ratingRow('Airflow', p.breath, '❄️')+
-      ((p.special||p.desc)?'<div style="font-size:9px;color:#555;line-height:1.65;margin:8px 0">'+(p.special||p.desc||'')+'</div>':'')+
-      techBadgesHtml(p);
+  // Shared info block (right panel) - uses p1 as the reference product for shared info
+  function sharedInfoBlock(p) {
+    var styleNos = '';
+    // For pairs, style nos are shown per-product in the image panel, not here
+    return '<div style="padding:20px 24px;display:flex;flex-direction:column;justify-content:center;height:100%;box-sizing:border-box">' +
+      '<div style="width:16px;height:1px;background:#C4A882;margin-bottom:14px"></div>' +
+      '<div style="font-size:7px;letter-spacing:0.16em;text-transform:uppercase;color:#bbb;margin-bottom:10px">' + (p.fabric||'') + '</div>' +
+      (p.warmth||p.dry||p.breath ? '<div style="margin-bottom:10px">' + ratingRow('Warmth',p.warmth,'🔥') + ratingRow('Dry Rate',p.dry,'💧') + ratingRow('Airflow',p.breath,'❄️') + '</div>' : '') +
+      ((p.special||p.desc) ? '<div style="font-size:8.5px;color:#444;line-height:1.7;margin-bottom:10px;border-top:1px solid #f0ede8;padding-top:10px">'+(p.special||p.desc||'')+'</div>' : '') +
+      techBadgesHtml(p) +
+    '</div>';
   }
 
-  var collLabel = _pdfCollection==='outdoor' ? 'Outdoor Collection' : 'Active Collection';
-  var header = '<div style="display:flex;align-items:center;justify-content:space-between;padding:11px 26px;border-bottom:1px solid #eee;flex-shrink:0"><div style="font-size:9px;letter-spacing:0.2em;text-transform:uppercase;color:#1C1C1A;font-weight:500">Delta Galil</div><div style="font-size:7.5px;letter-spacing:0.1em;text-transform:uppercase;color:#ccc">'+collLabel+' &middot; Spring Summer 2026</div></div>';
-
-  // Each page is exactly A4 landscape: 297x210mm. Info section is fixed height, photo takes remaining space.
-  var INFO_H = '150px'; // fixed info panel height for pair pages
+  // Image + name + style no for one product in a pair
+  function imagePanel(p, borderRight) {
+    var styleLabel = '';
+    if (p.styleNo && p.styleNo.trim()) styleLabel += '<div style="margin-top:2px"><span style="font-size:6.5px;letter-spacing:0.12em;text-transform:uppercase;color:#C4A882">Style No&nbsp;</span><span style="font-size:8px;color:#1C1C1A;letter-spacing:0.04em">'+p.styleNo+'</span></div>';
+    if (p.styleTop && p.styleTop.trim()) styleLabel += '<div style="margin-top:2px"><span style="font-size:6.5px;letter-spacing:0.12em;text-transform:uppercase;color:#C4A882">Top&nbsp;</span><span style="font-size:8px;color:#1C1C1A;letter-spacing:0.04em">'+p.styleTop+'</span></div>';
+    if (p.styleBottom && p.styleBottom.trim()) styleLabel += '<div style="margin-top:2px"><span style="font-size:6.5px;letter-spacing:0.12em;text-transform:uppercase;color:#C4A882">Bottom&nbsp;</span><span style="font-size:8px;color:#1C1C1A;letter-spacing:0.04em">'+p.styleBottom+'</span></div>';
+    return '<div style="flex:1;display:flex;flex-direction:column;'+(borderRight?'border-right:1px solid #eee;':'')+'">' +
+      '<div style="flex:1;background:#f7f5f2;overflow:hidden">' +
+        '<img src="'+(p.img||'')+'" crossorigin="anonymous" style="width:100%;height:100%;object-fit:contain;object-position:center top;display:block" />' +
+      '</div>' +
+      '<div style="padding:8px 12px 10px;border-top:1px solid #eee;flex-shrink:0">' +
+        '<div style="font-family:\'Cormorant Garamond\',serif;font-size:13px;font-weight:300;color:#1C1C1A;line-height:1.2">'+(p.name||'')+'</div>' +
+        styleLabel +
+      '</div>' +
+    '</div>';
+  }
 
   if (isSolo && p1) {
-    return '<div class="pdf-page" style="width:297mm;height:210mm;display:flex;flex-direction:column;background:#fff;font-family:DM Sans,sans-serif;box-sizing:border-box;overflow:hidden">'+
-      header+
-      '<div style="flex:1;display:flex;flex-direction:row;overflow:hidden;min-height:0">'+
-        '<div style="flex:1.4;overflow:hidden;min-height:0;position:relative">'+
-          '<img src="'+(p1.img||'')+'" crossorigin="anonymous" style="position:absolute;inset:0;width:100%;height:100%;object-fit:contain;object-position:center top;background:#f5f3f0" />'+
-        '</div>'+
-        '<div style="flex:1;padding:24px 28px;display:flex;flex-direction:column;justify-content:center;overflow:hidden;border-left:1px solid #eee">'+
-          '<div style="width:18px;height:1px;background:#C4A882;margin-bottom:16px"></div>'+
-          productBlock(p1,'24px')+
-        '</div>'+
-      '</div>'+
+    // SOLO: image left, all info right
+    var styleNos = '';
+    if (p1.styleNo&&p1.styleNo.trim()) styleNos += '<div style="margin-top:3px"><span style="font-size:6.5px;letter-spacing:0.12em;text-transform:uppercase;color:#C4A882">Style No&nbsp;</span><span style="font-size:8.5px;color:#1C1C1A">'+p1.styleNo+'</span></div>';
+    if (p1.styleTop&&p1.styleTop.trim()) styleNos += '<div style="margin-top:2px"><span style="font-size:6.5px;letter-spacing:0.12em;text-transform:uppercase;color:#C4A882">Top&nbsp;</span><span style="font-size:8.5px;color:#1C1C1A">'+p1.styleTop+'</span></div>';
+    if (p1.styleBottom&&p1.styleBottom.trim()) styleNos += '<div style="margin-top:2px"><span style="font-size:6.5px;letter-spacing:0.12em;text-transform:uppercase;color:#C4A882">Bottom&nbsp;</span><span style="font-size:8.5px;color:#1C1C1A">'+p1.styleBottom+'</span></div>';
+
+    return '<div class="pdf-page" style="width:297mm;height:210mm;display:flex;flex-direction:column;background:#fff;font-family:DM Sans,sans-serif;box-sizing:border-box;overflow:hidden">' +
+      header +
+      '<div style="flex:1;display:flex;flex-direction:row;overflow:hidden;min-height:0">' +
+        '<div style="flex:1.1;background:#f7f5f2;overflow:hidden;border-right:1px solid #eee">' +
+          '<img src="'+(p1.img||'')+'" crossorigin="anonymous" style="width:100%;height:100%;object-fit:contain;object-position:center top;display:block" />' +
+        '</div>' +
+        '<div style="flex:1;overflow:hidden;display:flex;flex-direction:column;justify-content:center;padding:24px 28px">' +
+          '<div style="width:16px;height:1px;background:#C4A882;margin-bottom:14px"></div>' +
+          '<div style="font-family:\'Cormorant Garamond\',serif;font-size:22px;font-weight:300;color:#1C1C1A;margin-bottom:4px;line-height:1.2">'+(p1.name||'')+'</div>' +
+          styleNos +
+          '<div style="font-size:7px;letter-spacing:0.16em;text-transform:uppercase;color:#bbb;margin-top:10px;margin-bottom:10px">'+(p1.fabric||'')+'</div>' +
+          (p1.warmth||p1.dry||p1.breath ? '<div style="margin-bottom:10px">'+ratingRow('Warmth',p1.warmth,'🔥')+ratingRow('Dry Rate',p1.dry,'💧')+ratingRow('Airflow',p1.breath,'❄️')+'</div>' : '') +
+          ((p1.special||p1.desc)?'<div style="font-size:8.5px;color:#444;line-height:1.7;margin-bottom:10px;padding-top:10px;border-top:1px solid #f0ede8">'+(p1.special||p1.desc||'')+'</div>':'') +
+          techBadgesHtml(p1) +
+        '</div>' +
+      '</div>' +
     '</div>';
   }
 
-  var cols = [p1, p2].filter(Boolean).map(function(p, i){
-    return '<div style="flex:1;display:flex;flex-direction:column;'+(i===0?'border-right:1px solid #eee':'')+';overflow:hidden;min-height:0;position:relative">'+
-      '<div style="position:absolute;top:0;left:0;right:0;bottom:'+INFO_H+';overflow:hidden;background:#f5f3f0">'+
-        '<img src="'+(p.img||'')+'" crossorigin="anonymous" style="width:100%;height:100%;object-fit:contain;object-position:center top;display:block" />'+
-      '</div>'+
-      '<div style="position:absolute;bottom:0;left:0;right:0;height:'+INFO_H+';padding:10px 16px 12px;border-top:1px solid #eee;overflow:hidden;box-sizing:border-box;background:#fff">'+
-        productBlock(p,'13px')+
-      '</div>'+
-    '</div>';
-  }).join('');
-
-  return '<div class="pdf-page" style="width:297mm;height:210mm;display:flex;flex-direction:column;background:#fff;font-family:DM Sans,sans-serif;box-sizing:border-box;overflow:hidden">'+
-    header+
-    '<div style="flex:1;display:flex;flex-direction:row;overflow:hidden;min-height:0">'+cols+'</div>'+
+  // PAIR: two image panels left (~45%), shared info right (~55%)
+  return '<div class="pdf-page" style="width:297mm;height:210mm;display:flex;flex-direction:column;background:#fff;font-family:DM Sans,sans-serif;box-sizing:border-box;overflow:hidden">' +
+    header +
+    '<div style="flex:1;display:flex;flex-direction:row;overflow:hidden;min-height:0">' +
+      '<div style="width:42%;display:flex;flex-direction:column;border-right:1px solid #eee;overflow:hidden">' +
+        imagePanel(p1, true) +
+        '<div style="height:1px;background:#eee;flex-shrink:0"></div>' +
+        imagePanel(p2, false) +
+      '</div>' +
+      '<div style="flex:1;overflow:hidden">' +
+        sharedInfoBlock(p1) +
+      '</div>' +
+    '</div>' +
   '</div>';
 }
 
