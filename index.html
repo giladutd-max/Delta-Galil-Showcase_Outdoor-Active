@@ -530,13 +530,12 @@ img { image-rendering: auto; }
 #pdf-print-root.visible{display:block}
 .pdf-page{margin:0 auto 20px;box-shadow:0 2px 20px rgba(0,0,0,0.12)}
 @media print{
-  *{-webkit-print-color-adjust:exact!important;print-color-adjust:exact!important}
-  html,body{margin:0;padding:0;background:#fff}
-  body>*{display:none!important}
-  #pdf-print-root{display:block!important;position:static!important;inset:auto!important;overflow:visible!important;padding:0!important;margin:0!important;background:#fff!important;z-index:auto!important}
-  #pdf-controls,.pdf-preview-wrapper{display:none!important}
-  .pdf-page{display:flex!important;margin:0!important;padding:0!important;box-shadow:none!important;page-break-after:always!important;break-after:page!important;width:210mm!important;height:297mm!important;overflow:hidden!important}
-  .pdf-page:last-child{page-break-after:avoid!important;break-after:avoid!important}
+  body>*:not(#pdf-print-root){display:none!important}
+  #pdf-print-root{display:block!important;position:static;overflow:visible;padding:0;background:#fff}
+  #pdf-controls{display:none!important}
+  #pdf-print-root>div:not(.pdf-page){display:none!important}
+  .pdf-page{display:flex!important;margin:0;padding:0;box-shadow:none;page-break-after:always;break-after:page;page-break-inside:avoid;break-inside:avoid;width:210mm!important;height:297mm!important}
+  .pdf-page:last-child{page-break-after:avoid;break-after:avoid}
   @page{size:A4 portrait;margin:0}
 }
 </style>
@@ -3799,47 +3798,33 @@ function buildPdfPageHTML(pair) {
     var count = type==='w' ? 4 : 5;
     var icons = '';
     for (var i=0; i<count; i++) {
-      var n = i+1;
-      var active = n <= val;
+      var n = i+1; var active = n <= val;
       var filter = active ? METER_FILTERS[type][Math.min(n,METER_FILTERS[type].length)-1] : 'brightness(0) saturate(0) opacity(0.2)';
       icons += '<img src="'+METER_ICONS[type]+'" style="width:5mm;height:5mm;object-fit:contain;filter:'+filter+';display:inline-block;vertical-align:middle" />';
     }
-    return '<div style="display:flex;align-items:center;gap:2mm;margin-bottom:3mm">' +
-      '<span style="font-size:3.2mm;letter-spacing:0.12em;text-transform:uppercase;color:#777;width:20mm;flex-shrink:0">'+label+'</span>' +
-      '<div style="display:flex;gap:1mm">'+icons+'</div>' +
-      '</div>';
+    return '<div style="display:flex;align-items:center;gap:2mm;margin-bottom:3mm"><span style="font-size:3.2mm;letter-spacing:0.12em;text-transform:uppercase;color:#777;width:20mm;flex-shrink:0">'+label+'</span><div style="display:flex;gap:1mm">'+icons+'</div></div>';
   }
 
   function techBadgesPDF(p) {
     if (!p||!p.techs||!p.techs.length) return '';
-    var b = p.techs.map(function(tid){
-      var t = TECHNOLOGIES.find(function(x){ return x.id===tid; });
-      return t ? '<span style="font-size:3mm;letter-spacing:0.08em;text-transform:uppercase;border:0.4mm solid #C4A882;border-radius:10mm;padding:1.5mm 4mm;color:#8C6A3F;white-space:nowrap;display:inline-block">'+t.label+'</span>' : '';
-    }).join('');
+    var b = p.techs.map(function(tid){ var t = TECHNOLOGIES.find(function(x){ return x.id===tid; }); return t ? '<span style="font-size:3mm;letter-spacing:0.08em;text-transform:uppercase;border:0.4mm solid #C4A882;border-radius:10mm;padding:1.5mm 4mm;color:#8C6A3F;white-space:nowrap;display:inline-block">'+t.label+'</span>' : ''; }).join('');
     return '<div style="display:flex;flex-wrap:wrap;gap:2.5mm;margin-top:5mm">'+b+'</div>';
   }
 
   function styleNosPDF(p) {
     var items = [];
-    if (p.styleNo&&p.styleNo.trim()) items.push('<span style="font-size:3mm;letter-spacing:0.1em;text-transform:uppercase;color:#C4A882">Style No&nbsp;&nbsp;</span><span style="font-size:4mm;color:#1C1C1A;font-weight:400">'+p.styleNo+'</span>');
-    if (p.styleTop&&p.styleTop.trim()) items.push('<span style="font-size:3mm;letter-spacing:0.1em;text-transform:uppercase;color:#C4A882">Top&nbsp;&nbsp;</span><span style="font-size:4mm;color:#1C1C1A;font-weight:400">'+p.styleTop+'</span>');
-    if (p.styleBottom&&p.styleBottom.trim()) items.push('<span style="font-size:3mm;letter-spacing:0.1em;text-transform:uppercase;color:#C4A882">Bottom&nbsp;&nbsp;</span><span style="font-size:4mm;color:#1C1C1A;font-weight:400">'+p.styleBottom+'</span>');
+    if (p.styleNo&&p.styleNo.trim()) items.push('<span style="font-size:3mm;letter-spacing:0.1em;text-transform:uppercase;color:#C4A882">Style No  </span><span style="font-size:4mm;color:#1C1C1A">'+p.styleNo+'</span>');
+    if (p.styleTop&&p.styleTop.trim()) items.push('<span style="font-size:3mm;letter-spacing:0.1em;text-transform:uppercase;color:#C4A882">Top  </span><span style="font-size:4mm;color:#1C1C1A">'+p.styleTop+'</span>');
+    if (p.styleBottom&&p.styleBottom.trim()) items.push('<span style="font-size:3mm;letter-spacing:0.1em;text-transform:uppercase;color:#C4A882">Bottom  </span><span style="font-size:4mm;color:#1C1C1A">'+p.styleBottom+'</span>');
     if (!items.length) return '';
     return '<div style="display:flex;flex-wrap:wrap;gap:5mm;margin-top:3mm">'+items.map(function(i){return '<span>'+i+'</span>';}).join('')+'</div>';
   }
 
   function sharedInfo(p) {
-    return '' +
-      '<div style="width:10mm;height:0.7mm;background:#C4A882;margin-bottom:6mm"></div>' +
+    return '<div style="width:10mm;height:0.7mm;background:#C4A882;margin-bottom:6mm"></div>' +
       '<div style="font-size:3.5mm;letter-spacing:0.16em;text-transform:uppercase;color:#555;margin-bottom:6mm;line-height:1.7">'+(p.fabric||'')+'</div>' +
-      (p.warmth||p.dry||p.breath ?
-        '<div style="margin-bottom:6mm">'+
-          ratingRowPDF('w',p.warmth,'Warmth')+
-          ratingRowPDF('d',p.dry,'Dry Rate')+
-          ratingRowPDF('b',p.breath,'Airflow')+
-        '</div>' : '') +
-      ((p.special||p.desc) ?
-        '<div style="font-size:3.8mm;color:#222;line-height:1.85;margin-bottom:6mm;padding-top:6mm;border-top:0.3mm solid #e0dbd4">'+(p.special||p.desc||'')+'</div>' : '') +
+      (p.warmth||p.dry||p.breath ? '<div style="margin-bottom:6mm">'+ratingRowPDF('w',p.warmth,'Warmth')+ratingRowPDF('d',p.dry,'Dry Rate')+ratingRowPDF('b',p.breath,'Airflow')+'</div>' : '') +
+      ((p.special||p.desc)?'<div style="font-size:3.8mm;color:#222;line-height:1.85;margin-bottom:6mm;padding-top:6mm;border-top:0.3mm solid #e0dbd4">'+(p.special||p.desc||'')+'</div>':'') +
       techBadgesPDF(p);
   }
 
@@ -3847,7 +3832,7 @@ function buildPdfPageHTML(pair) {
     return '<div class="pdf-page" style="width:210mm;height:297mm;display:flex;flex-direction:column;background:#fff;font-family:DM Sans,sans-serif;box-sizing:border-box;overflow:hidden">' +
       header +
       '<div style="flex:1;display:flex;flex-direction:row;overflow:hidden;min-height:0">' +
-        '<div style="width:46%;background:#f5f2ee;overflow:hidden">' +
+        '<div style="width:46%;overflow:hidden;padding:0 4mm 0 4mm">' +
           '<img src="'+(p1.img||'')+'" style="width:100%;height:100%;object-fit:cover;object-position:center top;display:block" />' +
         '</div>' +
         '<div style="flex:1;padding:8mm 10mm;display:flex;flex-direction:column;justify-content:center;overflow:hidden">' +
@@ -3859,36 +3844,28 @@ function buildPdfPageHTML(pair) {
     '</div>';
   }
 
-  // PAIR: images stacked LEFT, info RIGHT
   return '<div class="pdf-page" style="width:210mm;height:297mm;display:flex;flex-direction:column;background:#fff;font-family:DM Sans,sans-serif;box-sizing:border-box;overflow:hidden">' +
     header +
     '<div style="flex:1;display:flex;flex-direction:row;overflow:hidden;min-height:0">' +
-
-      '<div style="width:46%;display:flex;flex-direction:column;overflow:hidden;padding:0 4mm 0 4mm">' +
-        '<div style="flex:1;display:flex;flex-direction:column;overflow:hidden">' +
-          '<div style="flex:1;overflow:hidden">' +
-            '<img src="'+(p1.img||'')+'" style="width:100%;height:100%;object-fit:cover;object-position:center top;display:block" />' +
-          '</div>' +
-          '<div style="padding:3mm 0 3.5mm 0;flex-shrink:0;background:#fff">' +
-            '<div style="font-family:Cormorant Garamond,serif;font-size:6mm;font-weight:300;color:#1C1C1A;line-height:1.2">'+(p1.name||'')+'</div>' +
-            styleNosPDF(p1) +
-          '</div>' +
+      '<div style="width:46%;display:flex;flex-direction:column;overflow:hidden;padding:0 4mm">' +
+        '<div style="flex:1;overflow:hidden">' +
+          '<img src="'+(p1.img||'')+'" style="width:100%;height:100%;object-fit:cover;object-position:center top;display:block" />' +
         '</div>' +
-        '<div style="flex:1;display:flex;flex-direction:column;overflow:hidden">' +
-          '<div style="flex:1;overflow:hidden">' +
-            '<img src="'+(p2.img||'')+'" style="width:100%;height:100%;object-fit:cover;object-position:center top;display:block" />' +
-          '</div>' +
-          '<div style="padding:3mm 0 3.5mm 0;flex-shrink:0;background:#fff">' +
-            '<div style="font-family:Cormorant Garamond,serif;font-size:6mm;font-weight:300;color:#1C1C1A;line-height:1.2">'+(p2.name||'')+'</div>' +
-            styleNosPDF(p2) +
-          '</div>' +
+        '<div style="padding:3mm 0;flex-shrink:0">' +
+          '<div style="font-family:Cormorant Garamond,serif;font-size:6mm;font-weight:300;color:#1C1C1A;line-height:1.2">'+(p1.name||'')+'</div>' +
+          styleNosPDF(p1) +
+        '</div>' +
+        '<div style="flex:1;overflow:hidden">' +
+          '<img src="'+(p2.img||'')+'" style="width:100%;height:100%;object-fit:cover;object-position:center top;display:block" />' +
+        '</div>' +
+        '<div style="padding:3mm 0;flex-shrink:0">' +
+          '<div style="font-family:Cormorant Garamond,serif;font-size:6mm;font-weight:300;color:#1C1C1A;line-height:1.2">'+(p2.name||'')+'</div>' +
+          styleNosPDF(p2) +
         '</div>' +
       '</div>' +
-
       '<div style="flex:1;padding:8mm 10mm;display:flex;flex-direction:column;justify-content:center;overflow:hidden">' +
         sharedInfo(p1) +
       '</div>' +
-
     '</div>' +
   '</div>';
 }
@@ -3938,7 +3915,7 @@ function previewPDF() {
         '<div style="font-size:10px;letter-spacing:0.15em;text-transform:uppercase;color:rgba(255,255,255,0.4)">PDF Preview · '+validPairs.length+' page'+(validPairs.length>1?'s':'')+'</div>'+
         '<button onclick="window.print()" style="padding:10px 22px;background:#C4A882;border:none;cursor:pointer;font-family:DM Sans,sans-serif;font-size:11px;letter-spacing:0.08em;text-transform:uppercase;border-radius:2px;font-weight:500;color:#1C1C1A">Print / Save PDF</button>'+
       '</div>'+
-      '<div style="margin-top:52px;padding:24px;display:flex;flex-direction:column;align-items:center;gap:16px" class="pdf-preview-wrapper">'+
+      '<div style="margin-top:52px;padding:24px;display:flex;flex-direction:column;align-items:center;gap:16px">'+
         validPairs.map(buildPdfPageHTML).join('')+
       '</div>';
     // Replace img srcs with cached base64
@@ -3949,8 +3926,6 @@ function previewPDF() {
     root.classList.add('visible');
   }
 
-  if (pending === 0) { buildAndShow(); return; }
-  // Skip base64 conversion - use URLs directly to avoid CORS delays
   buildAndShow();
 }
 
