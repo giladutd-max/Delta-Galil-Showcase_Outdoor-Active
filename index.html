@@ -3283,13 +3283,14 @@ function openDetail(id) {
         ${p.desc?`<div class="detail-desc" style="color:${subColor};margin-top:12px">${p.desc}</div>`:""}
       </div>
       ${p.special?'<div class="detail-anim" style="animation-delay:0.4s;margin-top:8px;padding-top:16px;border-top:1px solid '+borderColor+'">'+'<div style="font-size:14px;letter-spacing:0.12em;text-transform:uppercase;color:'+accentColor+';margin-bottom:8px">What Makes It Special</div>'+'<div style="font-size:16px;color:'+subColor+';line-height:1.8">'+p.special+'</div>'+'</div>':''}
-      ${hasMultiple?`<div class="detail-anim" style="animation-delay:0.5s;font-size:11px;color:${subColor};margin-top:16px">${allImgs.length} photos</div>`:''}
       ${(p.techs&&p.techs.length)?'<div class="detail-anim" style="animation-delay:0.55s;margin-top:24px;padding-top:20px;border-top:1px solid '+borderColor+';display:flex;flex-wrap:wrap;gap:8px;align-items:center">'+p.techs.map(tid=>{const t=TECHNOLOGIES.find(x=>x.id===tid);if(!t)return'';return `<span style="font-size:10px;letter-spacing:0.1em;text-transform:uppercase;color:${accentColor};border:1px solid ${accentColor}66;border-radius:20px;padding:5px 13px;white-space:nowrap">${t.label}</span>`;}).join('')+'</div>':''}
-      ${(p.styleNo||p.styleTop||p.styleBottom)?`<div class="detail-anim" style="animation-delay:0.6s;margin-top:24px;padding-top:20px;border-top:1px solid ${borderColor};display:flex;flex-direction:column;gap:6px">
-        ${p.styleNo?`<div style="font-size:12px;color:${subColor}">Style no: <span style="color:${textColor};font-weight:500">${p.styleNo}</span></div>`:''}
-        ${p.styleTop?`<div style="font-size:12px;color:${subColor}">Top Style no: <span style="color:${textColor};font-weight:500">${p.styleTop}</span></div>`:''}
-        ${p.styleBottom?`<div style="font-size:12px;color:${subColor}">Bottom Style no: <span style="color:${textColor};font-weight:500">${p.styleBottom}</span></div>`:''}
-      </div>`:''}
+      ${(p.styleNo||p.styleTop||p.styleBottom)?(()=>{
+        const styleItems=[];
+        if(p.styleNo) styleItems.push('<div><div style="font-size:9px;letter-spacing:0.18em;text-transform:uppercase;color:'+accentColor+';margin-bottom:4px">Style No</div><div style="font-size:13px;color:'+textColor+';letter-spacing:0.04em">'+p.styleNo+'</div></div>');
+        if(p.styleTop) styleItems.push('<div><div style="font-size:9px;letter-spacing:0.18em;text-transform:uppercase;color:'+accentColor+';margin-bottom:4px">Top Style No</div><div style="font-size:13px;color:'+textColor+';letter-spacing:0.04em">'+p.styleTop+'</div></div>');
+        if(p.styleBottom) styleItems.push('<div><div style="font-size:9px;letter-spacing:0.18em;text-transform:uppercase;color:'+accentColor+';margin-bottom:4px">Bottom Style No</div><div style="font-size:13px;color:'+textColor+';letter-spacing:0.04em">'+p.styleBottom+'</div></div>');
+        return '<div class="detail-anim" style="animation-delay:0.6s;margin-top:20px;display:flex;flex-wrap:wrap;gap:16px">'+styleItems.join('')+'</div>';
+      })():''}
     </div>
   </div>`;
 
