@@ -773,6 +773,7 @@ img { image-rendering: auto; }
         </div>
         <p class="section-label" style="margin-top:8px">Active — Opening Screen</p>
         <div class="field-group"><label class="field-label">Collection Title</label><input class="field-input" id="active-title" type="text" placeholder="e.g. Active Collection" oninput="state.activeTitle=this.value;scheduleAutoSave()" /></div>
+        <div class="field-group"><label class="field-label">Collection Tagline</label><input class="field-input" id="active-tagline" type="text" placeholder="e.g. Keep moving" oninput="state.activeTagline=this.value;scheduleAutoSave()" /></div>
         <div class="field-group"><label class="field-label">Client</label><input class="field-input" id="active-client" type="text" placeholder="e.g. Lululemon" oninput="state.activeClient=this.value;scheduleAutoSave()" /></div>
         <div class="field-group"><label class="field-label">Opening Sentence</label><textarea class="field-input" id="active-opening" placeholder="e.g. Move freely, always." oninput="state.activeOpening=this.value;scheduleAutoSave()" style="min-height:60px"></textarea></div>
         <div class="field-group">
@@ -1071,7 +1072,7 @@ let state = {
   products: [],
   // ── ACTIVE COLLECTION ──
   activeCollectionName: 'Active',
-  activeTitle: '', activeClient: '',
+  activeTitle: '', activeClient: '', activeTagline: '',
   activeOpening: '', activeOpeningImg: '', activeOpeningVideo: '',
   activeVision: '', activeVisionQuote: '', activeVisionVideo: '',
   activeTechDefaultImg: '', activeTechDefaultVideo: '', activeTechItems: [],
@@ -1629,7 +1630,7 @@ async function openPitch(id) {
   if(g('cat-air-name')) g('cat-air-name').value=state.catAirName||'Mid Layer';
   // Active collection
   state.activeCollectionName=data.active_collection_name||'Active';
-  state.activeTitle=data.active_title||''; state.activeClient=data.active_client||'';
+  state.activeTitle=data.active_title||''; state.activeClient=data.active_client||''; state.activeTagline=data.active_tagline||''; state.activeTagline=data.active_tagline||'';
   state.title=data.title||''; state.client=data.client||''; state.tagline=data.tagline||''; state.description=data.description||'';
   state.title=data.title||''; state.client=data.client||''; state.tagline=data.tagline||''; state.description=data.description||'';
   state.activeOpening=data.active_opening||''; state.activeOpeningImg=data.active_opening_img||''; state.activeOpeningVideo=data.active_opening_video||'';
@@ -1641,6 +1642,7 @@ async function openPitch(id) {
   state._activeProductsLoaded=true;
   state.activeBgSectionImgs=data.active_bg_section_imgs||{};
   if(g('active-title')) g('active-title').value=state.activeTitle;
+  if(g('active-tagline')) g('active-tagline').value=state.activeTagline||'';
   if(g('active-client')) g('active-client').value=state.activeClient;
   if(g('active-opening')) g('active-opening').value=state.activeOpening;
   if(g('active-opening-video')) g('active-opening-video').value=state.activeOpeningVideo;
@@ -1958,6 +1960,7 @@ async function savePitch() {
     // Active collection
     active_collection_name:state.activeCollectionName||'Active',
     active_title:g('active-title')?.value||state.activeTitle||'',
+    active_tagline:g('active-tagline')?.value||state.activeTagline||'',
     active_client:g('active-client')?.value||state.activeClient||'',
     active_opening:state.activeOpening||'',
     active_opening_img:state.activeOpeningImg||'',
@@ -3147,6 +3150,7 @@ function updatePreview() {
       const textOnSplit='#fff';
       const subOnSplit='rgba(255,255,255,0.5)';
       const eyebrowColor='rgba(255,255,255,0.7)';
+      const thermalLabel = _activeMode ? '' : thermalLabel;
       const textGradient='linear-gradient(to top, rgba(0,0,0,0.65) 0%, transparent 55%)';
       const splitHTML=getOpeningScreen()+getNavCards(null)+getHero()
         +'<div id="section-anchor"></div>'
@@ -3157,7 +3161,7 @@ function updatePreview() {
             +'<div style="position:absolute;top:0;left:0;right:0;height:3px;background:'+warmAcc+'"></div>'
             +'<div style="position:relative;z-index:1;transition:transform 0.4s ease" class="cat-text">'
               +'<div style="width:20px;height:1px;background:'+warmAcc+';margin-bottom:12px;opacity:0.8"></div>'
-              +'<div style="font-size:9px;letter-spacing:0.3em;text-transform:uppercase;color:'+eyebrowColor+';margin-bottom:14px">Thermal Collection</div>'
+              +thermalLabel
               +'<div style="font-family:Cormorant Garamond,serif;font-size:52px;font-weight:300;color:'+textOnSplit+';line-height:1.0;margin-bottom:16px">'+(state.catWarmName||'Base Layer').replace(' ','<br>')+'</div>'
               +'<div style="font-size:11px;color:'+subOnSplit+';margin-bottom:20px">'+warmProds.length+' styles</div>'
               +'<div style="font-size:10px;letter-spacing:0.2em;text-transform:uppercase;color:'+warmAcc+'">Explore →</div>'
@@ -3169,7 +3173,7 @@ function updatePreview() {
             +'<div style="position:absolute;top:0;left:0;right:0;height:3px;background:'+airAcc+'"></div>'
             +'<div style="position:relative;z-index:1;transition:transform 0.4s ease" class="cat-text">'
               +'<div style="width:20px;height:1px;background:'+airAcc+';margin-bottom:12px;opacity:0.8"></div>'
-              +'<div style="font-size:9px;letter-spacing:0.3em;text-transform:uppercase;color:'+eyebrowColor+';margin-bottom:14px">Thermal Collection</div>'
+              +thermalLabel
               +'<div style="font-family:Cormorant Garamond,serif;font-size:52px;font-weight:300;color:'+textOnSplit+';line-height:1.0;margin-bottom:16px">'+(state.catAirName||'Mid Layer').replace(' ','<br>')+'</div>'
               +'<div style="font-size:11px;color:'+subOnSplit+';margin-bottom:20px">'+airProds.length+' styles</div>'
               +'<div style="font-size:10px;letter-spacing:0.2em;text-transform:uppercase;color:'+airAcc+'">Explore →</div>'
@@ -3388,7 +3392,7 @@ async function loadPresentationView(token) {
   state.sellingPoints=data.selling_points||[]; state.techDefaultImg=data.tech_default_img||""; state.techDefaultVideo=data.tech_default_video||""; state.catWarmVideo=data.cat_warm_video||""; state.catAirVideo=data.cat_air_video||""; state.catWarmName=data.cat_warm_name||"Base Layer"; state.catAirName=data.cat_air_name||"Mid Layer"; state.bgSectionImgs=data.bg_section_imgs||{}; state.bgOpacity=data.bg_opacity||0.35; state.bgBlur=(data.bg_blur!==undefined&&data.bg_blur!==null)?data.bg_blur:8; state.techItems=data.tech_items||[];
   // Active
   state.activeCollectionName=data.active_collection_name||'Active';
-  state.activeTitle=data.active_title||''; state.activeClient=data.active_client||'';
+  state.activeTitle=data.active_title||''; state.activeClient=data.active_client||''; state.activeTagline=data.active_tagline||'';
   state.activeOpening=data.active_opening||''; state.activeOpeningImg=data.active_opening_img||''; state.activeOpeningVideo=data.active_opening_video||'';
   state.activeVision=data.active_vision||''; state.activeVisionQuote=data.active_vision_quote||''; state.activeVisionVideo=data.active_vision_video||'';
   state.activeTechDefaultImg=data.active_tech_default_img||''; state.activeTechDefaultVideo=data.active_tech_default_video||''; state.activeTechItems=data.active_tech_items||[];
@@ -3539,6 +3543,7 @@ function enterCollection(which) {
     state.sellingPoints=state.activeSellingPoints||[];
     state.bgSectionImgs=state.activeBgSectionImgs||{};
     state.title=state.activeTitle||'Active Collection';
+    state.tagline=state.activeTagline||state.tagline||'';
     state.client=state.activeClient||'';
   }
   // Always sync all state values to input fields so updatePreview reads them correctly
@@ -3583,7 +3588,7 @@ function restoreFromCollection() {
     state.vision=s.vision; state.visionQuote=s.visionQuote; state.visionVideo=s.visionVideo;
     state.techItems=s.techItems; state.techDefaultImg=s.techDefaultImg; state.techDefaultVideo=s.techDefaultVideo;
     state.sellingPoints=s.sellingPoints; state.bgSectionImgs=s.bgSectionImgs;
-    state.title=s.title; state.client=s.client;
+    state.title=s.title; state.client=s.client; state.tagline=s.tagline||'';
     if(g('pitch-title')) g('pitch-title').value=s.title||'';
     if(g('pitch-client')) g('pitch-client').value=s.client||'';
     window._outdoorState=null;
