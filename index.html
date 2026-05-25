@@ -534,9 +534,9 @@ img { image-rendering: auto; }
   #pdf-print-root{display:block!important;position:static;overflow:visible;padding:0;background:#fff}
   #pdf-controls{display:none!important}
   #pdf-print-root>div:last-child{margin:0;padding:0;gap:0;display:block}
-  .pdf-page{margin:0;padding:0;box-shadow:none;page-break-after:always;break-after:page;page-break-inside:avoid;break-inside:avoid;width:210mm!important;height:297mm!important}
+  .pdf-page{margin:0;padding:0;box-shadow:none;page-break-after:always;break-after:page;page-break-inside:avoid;break-inside:avoid;width:297mm!important;height:210mm!important}
   .pdf-page:last-child{page-break-after:auto;break-after:auto}
-  @page{size:A4 portrait;margin:0}
+  @page{size:A4 landscape;margin:0}
 }
 </style>
 </head>
@@ -3817,9 +3817,9 @@ function buildPdfPageHTML(pair) {
   function ratingRow(label, val, icon) {
     if (!val) return '';
     var icons = '';
-    for (var i=0; i<5; i++) icons += '<span style="font-size:13px;opacity:'+(i<val?'1':'0.15')+'">'+icon+'</span>';
-    return '<div style="display:flex;align-items:center;gap:8px;margin-bottom:4px">' +
-      '<span style="font-size:8px;letter-spacing:0.12em;text-transform:uppercase;color:#888;width:58px;flex-shrink:0">'+label+'</span>' + icons +
+    for (var i=0; i<5; i++) icons += '<span style="font-size:15px;opacity:'+(i<val?'1':'0.15')+'">'+icon+'</span>';
+    return '<div style="display:flex;align-items:center;gap:8px;margin-bottom:6px">' +
+      '<span style="font-size:10px;letter-spacing:0.12em;text-transform:uppercase;color:#777;width:66px;flex-shrink:0">'+label+'</span>' + icons +
       '</div>';
   }
 
@@ -3841,55 +3841,67 @@ function buildPdfPageHTML(pair) {
   }
 
   if (isSolo && p1) {
-    // SOLO - A4 portrait: image top ~55%, info bottom ~45%
-    return '<div class="pdf-page" style="width:210mm;height:297mm;display:flex;flex-direction:column;background:#fff;font-family:DM Sans,sans-serif;box-sizing:border-box;overflow:hidden">' +
+    // SOLO - A4 landscape: image LEFT, info RIGHT
+    return '<div class="pdf-page" style="width:297mm;height:210mm;display:flex;flex-direction:column;background:#fff;font-family:DM Sans,sans-serif;box-sizing:border-box;overflow:hidden">' +
       header +
-      '<div style="flex:1.1;background:#f5f2ee;overflow:hidden">' +
-        '<img src="'+(p1.img||'')+'" crossorigin="anonymous" style="width:100%;height:100%;object-fit:contain;object-position:center top;display:block" />' +
-      '</div>' +
-      '<div style="flex:1;padding:24px 32px;display:flex;flex-direction:column;justify-content:center;border-top:1px solid #e0dbd4">' +
-        '<div style="width:24px;height:2px;background:#B8956A;margin-bottom:14px"></div>' +
-        '<div style="font-family:Cormorant Garamond,serif;font-size:26px;font-weight:300;color:#1C1C1A;margin-bottom:4px;line-height:1.2">'+(p1.name||'')+'</div>' +
-        styleNosHtml(p1) +
-        '<div style="font-size:8px;letter-spacing:0.16em;text-transform:uppercase;color:#999;margin-top:10px;margin-bottom:12px">'+(p1.fabric||'')+'</div>' +
-        (p1.warmth||p1.dry||p1.breath ? '<div style="margin-bottom:12px">'+ratingRow('Warmth',p1.warmth,'🔥')+ratingRow('Dry Rate',p1.dry,'💧')+ratingRow('Airflow',p1.breath,'❄️')+'</div>' : '') +
-        ((p1.special||p1.desc)?'<div style="font-size:9.5px;color:#444;line-height:1.75;margin-bottom:10px;padding-top:12px;border-top:1px solid #e8e4de">'+(p1.special||p1.desc||'')+'</div>':'') +
-        techBadgesHtml(p1) +
+      '<div style="flex:1;display:flex;flex-direction:row;overflow:hidden;min-height:0">' +
+        '<div style="flex:1.2;background:#f5f2ee;overflow:hidden;border-right:2px solid #e0dbd4">' +
+          '<img src="'+(p1.img||'')+'" crossorigin="anonymous" style="width:100%;height:100%;object-fit:contain;object-position:center top;display:block" />' +
+        '</div>' +
+        '<div style="flex:1;padding:28px 36px;display:flex;flex-direction:column;justify-content:center;overflow:hidden">' +
+          '<div style="width:24px;height:2px;background:#B8956A;margin-bottom:18px"></div>' +
+          '<div style="font-family:Cormorant Garamond,serif;font-size:28px;font-weight:300;color:#1C1C1A;margin-bottom:6px;line-height:1.2">'+(p1.name||'')+'</div>' +
+          styleNosHtml(p1) +
+          '<div style="font-size:10px;letter-spacing:0.18em;text-transform:uppercase;color:#777;margin-top:14px;margin-bottom:16px">'+(p1.fabric||'')+'</div>' +
+          (p1.warmth||p1.dry||p1.breath ? '<div style="margin-bottom:16px">'+ratingRow('Warmth',p1.warmth,'🔥')+ratingRow('Dry Rate',p1.dry,'💧')+ratingRow('Airflow',p1.breath,'❄️')+'</div>' : '') +
+          ((p1.special||p1.desc)?'<div style="font-size:11px;color:#333;line-height:1.8;margin-bottom:14px;padding-top:14px;border-top:1px solid #e0dbd4">'+(p1.special||p1.desc||'')+'</div>':'') +
+          techBadgesHtml(p1) +
+        '</div>' +
       '</div>' +
     '</div>';
   }
 
-  // PAIR - A4 portrait: two images top side by side, shared info bottom
-  return '<div class="pdf-page" style="width:210mm;height:297mm;display:flex;flex-direction:column;background:#fff;font-family:DM Sans,sans-serif;box-sizing:border-box;overflow:hidden">' +
+  // PAIR - A4 landscape: images stacked on LEFT, shared info on RIGHT
+  return '<div class="pdf-page" style="width:297mm;height:210mm;display:flex;flex-direction:column;background:#fff;font-family:DM Sans,sans-serif;box-sizing:border-box;overflow:hidden">' +
     header +
-    // Images row - top ~58%
-    '<div style="flex:1.4;display:flex;flex-direction:row;overflow:hidden;min-height:0">' +
-      '<div style="flex:1;display:flex;flex-direction:column;border-right:1px solid #e0dbd4;overflow:hidden">' +
-        '<div style="flex:1;background:#f5f2ee;overflow:hidden">' +
-          '<img src="'+(p1.img||'')+'" crossorigin="anonymous" style="width:100%;height:100%;object-fit:contain;object-position:center top;display:block" />' +
+    '<div style="flex:1;display:flex;flex-direction:row;overflow:hidden;min-height:0">' +
+
+      // LEFT: two images stacked + name/style per image
+      '<div style="width:44%;display:flex;flex-direction:column;border-right:2px solid #e0dbd4;overflow:hidden">' +
+
+        // Top image
+        '<div style="flex:1;display:flex;flex-direction:column;border-bottom:1px solid #e0dbd4;overflow:hidden">' +
+          '<div style="flex:1;background:#f5f2ee;overflow:hidden">' +
+            '<img src="'+(p1.img||'')+'" crossorigin="anonymous" style="width:100%;height:100%;object-fit:contain;object-position:center top;display:block" />' +
+          '</div>' +
+          '<div style="padding:8px 14px 10px;flex-shrink:0">' +
+            '<div style="font-family:Cormorant Garamond,serif;font-size:15px;font-weight:300;color:#1C1C1A;line-height:1.2">'+(p1.name||'')+'</div>' +
+            styleNosHtml(p1) +
+          '</div>' +
         '</div>' +
-        '<div style="padding:10px 14px 12px;border-top:1px solid #e0dbd4;background:#fff;flex-shrink:0">' +
-          '<div style="font-family:Cormorant Garamond,serif;font-size:14px;font-weight:300;color:#1C1C1A;margin-bottom:2px">'+(p1.name||'')+'</div>' +
-          styleNosHtml(p1) +
+
+        // Bottom image
+        '<div style="flex:1;display:flex;flex-direction:column;overflow:hidden">' +
+          '<div style="flex:1;background:#f5f2ee;overflow:hidden">' +
+            '<img src="'+(p2.img||'')+'" crossorigin="anonymous" style="width:100%;height:100%;object-fit:contain;object-position:center top;display:block" />' +
+          '</div>' +
+          '<div style="padding:8px 14px 10px;flex-shrink:0">' +
+            '<div style="font-family:Cormorant Garamond,serif;font-size:15px;font-weight:300;color:#1C1C1A;line-height:1.2">'+(p2.name||'')+'</div>' +
+            styleNosHtml(p2) +
+          '</div>' +
         '</div>' +
+
       '</div>' +
-      '<div style="flex:1;display:flex;flex-direction:column;overflow:hidden">' +
-        '<div style="flex:1;background:#f5f2ee;overflow:hidden">' +
-          '<img src="'+(p2.img||'')+'" crossorigin="anonymous" style="width:100%;height:100%;object-fit:contain;object-position:center top;display:block" />' +
-        '</div>' +
-        '<div style="padding:10px 14px 12px;border-top:1px solid #e0dbd4;background:#fff;flex-shrink:0">' +
-          '<div style="font-family:Cormorant Garamond,serif;font-size:14px;font-weight:300;color:#1C1C1A;margin-bottom:2px">'+(p2.name||'')+'</div>' +
-          styleNosHtml(p2) +
-        '</div>' +
+
+      // RIGHT: shared info
+      '<div style="flex:1;padding:28px 32px;display:flex;flex-direction:column;justify-content:center;overflow:hidden">' +
+        '<div style="width:24px;height:2px;background:#B8956A;margin-bottom:18px"></div>' +
+        '<div style="font-size:10px;letter-spacing:0.18em;text-transform:uppercase;color:#777;margin-bottom:16px;line-height:1.6">'+(p1.fabric||'')+'</div>' +
+        (p1.warmth||p1.dry||p1.breath ? '<div style="margin-bottom:16px">'+ratingRow('Warmth',p1.warmth,'🔥')+ratingRow('Dry Rate',p1.dry,'💧')+ratingRow('Airflow',p1.breath,'❄️')+'</div>' : '') +
+        ((p1.special||p1.desc)?'<div style="font-size:11px;color:#333;line-height:1.8;margin-bottom:14px;padding-top:14px;border-top:1px solid #e0dbd4">'+(p1.special||p1.desc||'')+'</div>':'') +
+        techBadgesHtml(p1) +
       '</div>' +
-    '</div>' +
-    // Shared info - bottom ~42%
-    '<div style="flex:1;padding:20px 28px;border-top:2px solid #e0dbd4;overflow:hidden">' +
-      '<div style="width:20px;height:2px;background:#B8956A;margin-bottom:12px"></div>' +
-      '<div style="font-size:8px;letter-spacing:0.16em;text-transform:uppercase;color:#888;margin-bottom:12px">'+(p1.fabric||'')+'</div>' +
-      (p1.warmth||p1.dry||p1.breath ? '<div style="margin-bottom:12px">'+ratingRow('Warmth',p1.warmth,'🔥')+ratingRow('Dry Rate',p1.dry,'💧')+ratingRow('Airflow',p1.breath,'❄️')+'</div>' : '') +
-      ((p1.special||p1.desc)?'<div style="font-size:9.5px;color:#333;line-height:1.75;margin-bottom:10px;padding-top:12px;border-top:1px solid #e8e4de">'+(p1.special||p1.desc||'')+'</div>':'') +
-      techBadgesHtml(p1) +
+
     '</div>' +
   '</div>';
 }
