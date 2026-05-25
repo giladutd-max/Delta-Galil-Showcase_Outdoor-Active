@@ -2487,6 +2487,9 @@ function editActiveProduct(id) {
   g('modal-desc').value=p.desc||'';
   if(g('modal-special')) g('modal-special').value=p.special||'';
   if(g('modal-video')) g('modal-video').value=p.video||'';
+  if(g('modal-style-no')) g('modal-style-no').value=p.styleNo||'';
+  if(g('modal-style-top')) g('modal-style-top').value=p.styleTop||'';
+  if(g('modal-style-bottom')) g('modal-style-bottom').value=p.styleBottom||'';
   pendingTechs=[...(p.techs||[])];
   g('modal-img-preview').innerHTML=p.img?'<img src="'+p.img+'" /><div style="position:absolute;inset:0;background:rgba(0,0,0,0.3);display:flex;align-items:center;justify-content:center;color:white;font-size:12px;letter-spacing:0.06em;text-transform:uppercase">Click to change</div>':'<div class="img-preview-placeholder"><span>'+p.emoji+'</span>Click to upload image</div>';
   g('modal-img-preview').style.position='relative';
@@ -2576,6 +2579,9 @@ function editProduct(id) {
   g('modal-desc').value=p.desc||'';
   if(g('modal-special')) g('modal-special').value=p.special||'';
   if(g('modal-video')) g('modal-video').value=p.video||'';
+  if(g('modal-style-no')) g('modal-style-no').value=p.styleNo||'';
+  if(g('modal-style-top')) g('modal-style-top').value=p.styleTop||'';
+  if(g('modal-style-bottom')) g('modal-style-bottom').value=p.styleBottom||'';
   pendingTechs=[...(p.techs||[])];
   g('modal-img-preview').innerHTML=p.img?'<img src="'+p.img+'" />'+'<div style="position:absolute;inset:0;background:rgba(0,0,0,0.3);display:flex;align-items:center;justify-content:center;color:white;font-size:12px;letter-spacing:0.06em;text-transform:uppercase">Click to change</div>':'<div class="img-preview-placeholder"><span>'+p.emoji+'</span>Click to upload image</div>';
   g('modal-img-preview').style.position='relative';
