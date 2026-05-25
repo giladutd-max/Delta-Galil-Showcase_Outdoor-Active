@@ -3831,15 +3831,17 @@ function buildPdfPageHTML(pair) {
   if (isSolo && p1) {
     return '<div class="pdf-page" style="width:210mm;height:297mm;display:flex;flex-direction:column;background:#fff;font-family:DM Sans,sans-serif;box-sizing:border-box;overflow:hidden">' +
       header +
-      '<div style="flex:1;display:flex;flex-direction:row;overflow:hidden;min-height:0">' +
-        '<div style="width:46%;overflow:hidden;padding:0 4mm 0 4mm">' +
-          '<img src="'+(p1.img||'')+'" style="width:100%;height:100%;object-fit:cover;object-position:center top;display:block" />' +
-        '</div>' +
-        '<div style="flex:1;padding:8mm 10mm;display:flex;flex-direction:column;justify-content:center;overflow:hidden">' +
-          '<div style="font-family:Cormorant Garamond,serif;font-size:11mm;font-weight:300;color:#1C1C1A;margin-bottom:2mm;line-height:1.15">'+(p1.name||'')+'</div>' +
-          styleNosPDF(p1) +
-          '<div style="margin-top:7mm">'+sharedInfo(p1)+'</div>' +
-        '</div>' +
+      '<div style="flex:1;overflow:hidden">' +
+        '<img src="'+(p1.img||'')+'" style="width:100%;height:100%;object-fit:cover;object-position:center top;display:block" />' +
+      '</div>' +
+      '<div style="flex:1;padding:8mm 10mm;display:flex;flex-direction:column;justify-content:center;overflow:hidden;border-top:0.4mm solid #ddd">' +
+        '<div style="font-family:Cormorant Garamond,serif;font-size:11mm;font-weight:300;color:#1C1C1A;margin-bottom:2mm;line-height:1.15">'+(p1.name||'')+'</div>' +
+        styleNosPDF(p1) +
+        '<div style="width:10mm;height:0.7mm;background:#C4A882;margin:5mm 0"></div>' +
+        '<div style="font-size:3.5mm;letter-spacing:0.16em;text-transform:uppercase;color:#555;margin-bottom:5mm">'+(p1.fabric||'')+'</div>' +
+        (p1.warmth||p1.dry||p1.breath ? '<div style="margin-bottom:5mm">'+ratingRowPDF('w',p1.warmth,'Warmth')+ratingRowPDF('d',p1.dry,'Dry Rate')+ratingRowPDF('b',p1.breath,'Airflow')+'</div>' : '') +
+        ((p1.special||p1.desc)?'<div style="font-size:3.8mm;color:#222;line-height:1.85;margin-bottom:5mm;padding-top:5mm;border-top:0.3mm solid #e0dbd4">'+(p1.special||p1.desc||'')+'</div>':'') +
+        techBadgesPDF(p1) +
       '</div>' +
     '</div>';
   }
