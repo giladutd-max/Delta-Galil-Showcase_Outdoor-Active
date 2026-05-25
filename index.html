@@ -962,6 +962,11 @@ img { image-rendering: auto; }
       </div>
     </div>
     <div class="field-group"><label class="field-label">Short Description</label><textarea class="field-input" id="modal-desc" placeholder="Brief product description..."></textarea></div>
+    <div class="field-group"><label class="field-label">Style No <span style="font-weight:300;opacity:0.6">(optional)</span></label><input class="field-input" id="modal-style-no" type="text" placeholder="e.g. 03067" /></div>
+    <div class="field-group" style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
+      <div><label class="field-label">Top Style No</label><input class="field-input" id="modal-style-top" type="text" placeholder="e.g. ACT1052" /></div>
+      <div><label class="field-label">Bottom Style No</label><input class="field-input" id="modal-style-bottom" type="text" placeholder="e.g. ACT1053" /></div>
+    </div>
     <div class="field-group"><label class="field-label">Product Video URL</label><input class="field-input" id="modal-video" type="text" placeholder="Paste Supabase video URL (.mp4)" /></div>
     <div class="field-group"><label class="field-label">What Makes It Special?</label><textarea class="field-input" id="modal-special" placeholder="What sets this product apart..." style="min-height:80px"></textarea></div>
     <div class="field-group">
@@ -2156,6 +2161,9 @@ function openModal() {
   if (ao) ao.textContent = state.catAirName || 'Mid Layer';
   g('modal-overlay').classList.add('open');
   g('modal-name').value=''; g('modal-fabric').value=''; g('modal-desc').value='';
+  if(g('modal-style-no')) g('modal-style-no').value='';
+  if(g('modal-style-top')) g('modal-style-top').value='';
+  if(g('modal-style-bottom')) g('modal-style-bottom').value='';
   if(g('modal-special')) g('modal-special').value='';
   if(g('modal-video')) g('modal-video').value='';
   pendingTechs=[];
@@ -2199,7 +2207,7 @@ async function saveProduct() {
   } else if (pendingHoverFile) {
     hoverImgUrl = await uploadImageToStorage(pendingHoverFile) || '';
   }
-  const _newProd={id:Date.now(),name,fabric:g('modal-fabric').value.trim(),desc:g('modal-desc').value.trim(),special:g('modal-special')?.value.trim()||'',video:g('modal-video')?.value.trim()||'',img:imgUrl,extraImgs,hoverImg:hoverImgUrl,warmth:pendingWarmthRating,dry:pendingDryRating,breath:pendingBreathRating,techs:[...pendingTechs],emoji:'📦',category:g('modal-category')?.value||'',layer:g('modal-layer')?.value||''};
+  const _newProd={id:Date.now(),name,fabric:g('modal-fabric').value.trim(),desc:g('modal-desc').value.trim(),special:g('modal-special')?.value.trim()||'',video:g('modal-video')?.value.trim()||'',img:imgUrl,extraImgs,hoverImg:hoverImgUrl,warmth:pendingWarmthRating,dry:pendingDryRating,breath:pendingBreathRating,techs:[...pendingTechs],emoji:'📦',category:g('modal-category')?.value||'',layer:g('modal-layer')?.value||'',styleNo:g('modal-style-no')?.value.trim()||'',styleTop:g('modal-style-top')?.value.trim()||'',styleBottom:g('modal-style-bottom')?.value.trim()||''};
   if(window._savingForActive){
     state.activeProducts=state.activeProducts||[];
     state.activeProducts.push(_newProd);
@@ -2479,6 +2487,9 @@ function editActiveProduct(id) {
   g('modal-desc').value=p.desc||'';
   if(g('modal-special')) g('modal-special').value=p.special||'';
   if(g('modal-video')) g('modal-video').value=p.video||'';
+  if(g('modal-style-no')) g('modal-style-no').value=p.styleNo||'';
+  if(g('modal-style-top')) g('modal-style-top').value=p.styleTop||'';
+  if(g('modal-style-bottom')) g('modal-style-bottom').value=p.styleBottom||'';
   pendingTechs=[...(p.techs||[])];
   g('modal-img-preview').innerHTML=p.img?'<img src="'+p.img+'" /><div style="position:absolute;inset:0;background:rgba(0,0,0,0.3);display:flex;align-items:center;justify-content:center;color:white;font-size:12px;letter-spacing:0.06em;text-transform:uppercase">Click to change</div>':'<div class="img-preview-placeholder"><span>'+p.emoji+'</span>Click to upload image</div>';
   g('modal-img-preview').style.position='relative';
@@ -2504,7 +2515,7 @@ async function updateActiveProduct(id) {
   let hoverImgUrl=state.activeProducts[idx].hoverImg||'';
   if(pendingHoverImg)hoverImgUrl=pendingHoverImg;
   else if(pendingHoverFile)hoverImgUrl=await uploadImageToStorage(pendingHoverFile)||hoverImgUrl;
-  state.activeProducts[idx]={...state.activeProducts[idx],name,fabric:g('modal-fabric').value.trim(),desc:g('modal-desc').value.trim(),special:g('modal-special')?.value.trim()||'',video:g('modal-video')?.value.trim()||'',img:imgUrl,extraImgs:[...existingExtras,...newExtras],hoverImg:hoverImgUrl,warmth:pendingWarmthRating,dry:pendingDryRating,breath:pendingBreathRating,techs:[...pendingTechs],category:g('modal-category')?.value||'',layer:g('modal-layer')?.value||''};
+  state.activeProducts[idx]={...state.activeProducts[idx],name,fabric:g('modal-fabric').value.trim(),desc:g('modal-desc').value.trim(),special:g('modal-special')?.value.trim()||'',video:g('modal-video')?.value.trim()||'',img:imgUrl,extraImgs:[...existingExtras,...newExtras],hoverImg:hoverImgUrl,warmth:pendingWarmthRating,dry:pendingDryRating,breath:pendingBreathRating,techs:[...pendingTechs],category:g('modal-category')?.value||'',layer:g('modal-layer')?.value||'',styleNo:g('modal-style-no')?.value.trim()||'',styleTop:g('modal-style-top')?.value.trim()||'',styleBottom:g('modal-style-bottom')?.value.trim()||''};
   g('modal-save-btn').textContent='Add Product'; g('modal-save-btn').disabled=false;
   g('modal-save-btn').onclick=saveProduct;
   window._savingForActive=false; window._editingActiveProduct=null;
@@ -2568,6 +2579,9 @@ function editProduct(id) {
   g('modal-desc').value=p.desc||'';
   if(g('modal-special')) g('modal-special').value=p.special||'';
   if(g('modal-video')) g('modal-video').value=p.video||'';
+  if(g('modal-style-no')) g('modal-style-no').value=p.styleNo||'';
+  if(g('modal-style-top')) g('modal-style-top').value=p.styleTop||'';
+  if(g('modal-style-bottom')) g('modal-style-bottom').value=p.styleBottom||'';
   pendingTechs=[...(p.techs||[])];
   g('modal-img-preview').innerHTML=p.img?'<img src="'+p.img+'" />'+'<div style="position:absolute;inset:0;background:rgba(0,0,0,0.3);display:flex;align-items:center;justify-content:center;color:white;font-size:12px;letter-spacing:0.06em;text-transform:uppercase">Click to change</div>':'<div class="img-preview-placeholder"><span>'+p.emoji+'</span>Click to upload image</div>';
   g('modal-img-preview').style.position='relative';
@@ -2624,7 +2638,7 @@ async function updateProduct(id) {
   } else if (pendingHoverFile) {
     hoverImgUrl = await uploadImageToStorage(pendingHoverFile) || hoverImgUrl;
   }
-  state.products[idx]={...state.products[idx], name, fabric:g('modal-fabric').value.trim(), desc:g('modal-desc').value.trim(), special:g('modal-special')?.value.trim()||'', video:g('modal-video')?.value.trim()||'', img:imgUrl, extraImgs:[...existingExtras,...newExtras], hoverImg:hoverImgUrl, warmth:pendingWarmthRating, dry:pendingDryRating, breath:pendingBreathRating, techs:[...pendingTechs], category:g('modal-category')?.value||'', layer:g('modal-layer')?.value||''};
+  state.products[idx]={...state.products[idx], name, fabric:g('modal-fabric').value.trim(), desc:g('modal-desc').value.trim(), special:g('modal-special')?.value.trim()||'', video:g('modal-video')?.value.trim()||'', img:imgUrl, extraImgs:[...existingExtras,...newExtras], hoverImg:hoverImgUrl, warmth:pendingWarmthRating, dry:pendingDryRating, breath:pendingBreathRating, techs:[...pendingTechs], category:g('modal-category')?.value||'', layer:g('modal-layer')?.value||'', styleNo:g('modal-style-no')?.value.trim()||'', styleTop:g('modal-style-top')?.value.trim()||'', styleBottom:g('modal-style-bottom')?.value.trim()||''};
   g('modal-save-btn').textContent='Add Product'; g('modal-save-btn').disabled=false;
   g('modal-save-btn').onclick=saveProduct;
   closeModal();
@@ -2856,13 +2870,14 @@ function getHero() {
   const t=state.template,pal=PALETTES[t][state.palette];
   const title=state.title||(g('pitch-title')?.value||'');
   const client=state.client||(g('pitch-client')?.value||'');
-  const tagline=state.tagline||(g('pitch-tagline')?.value||'');
+  const tagline=_activeMode ? (state.tagline||'Keep moving') : (state.tagline||(g('pitch-tagline')?.value||''));
   const desc=state.description||(g('pitch-desc')?.value||'');
-  if (t==='editorial') return `<div class="showcase-hero anim-hero" style="background:${pal.bg}"><div class="hero-eyebrow" style="color:${pal.accent}">${client}</div><div class="hero-title" style="color:${pal.text}">${title}</div><div class="hero-line" style="background:${pal.accent}"></div><div class="hero-subtitle" style="color:${pal.sub}">${tagline} — ${desc}</div></div>`;
-  if (t==='vivid') return `<div class="showcase-hero anim-hero" style="background:${pal.bg}"><div class="hero-eyebrow">${client}</div><div class="hero-title">${title}</div><div class="hero-tagline">${tagline}</div><div class="hero-subtitle">${desc}</div></div>`;
-  if (t==='lookbook') { const isDarkL=pal.bg.startsWith('#')&&parseInt(pal.bg.slice(1,3),16)<100; const tc=isDarkL?'#fff':'#1C1C1A'; const sc=isDarkL?'rgba(255,255,255,0.4)':'rgba(28,28,26,0.5)'; return `<div class="showcase-hero anim-hero" style="background:${pal.bg}"><div class="hero-inner"><div class="hero-eyebrow" style="color:${pal.accent}">${client}</div><div class="hero-title" style="color:${tc}">${title}</div><div class="hero-subtitle" style="color:${sc}">${tagline} — ${desc}</div></div></div>`; }
-  if (t==='mosaic') return `<div class="showcase-hero anim-hero" style="border-bottom:3px solid ${pal.border}"><div><div class="hero-eyebrow">${client}</div><div class="hero-title">${title}</div></div><div class="hero-right"><span class="hero-tagline">${tagline}</span><div class="hero-subtitle">${desc}</div></div></div>`;
-  if (t==='cinematic') { const cp=PALETTES.cinematic[state.palette]; return `<div class="showcase-hero anim-hero" style="background:${cp.bg}"><div class="hero-inner"><div class="hero-rule" style="background:${cp.accent}"></div><div class="hero-eyebrow" style="color:${cp.text}">${client}</div><div class="hero-title" style="color:${cp.text}">${title}</div><div class="hero-subtitle" style="color:${cp.text}">${tagline} — ${desc}</div></div></div>`; }
+  const sub=_activeMode ? tagline : (tagline&&desc ? tagline+' \u2014 '+desc : tagline||desc);
+  if (t==='editorial') return `<div class="showcase-hero anim-hero" style="background:${pal.bg}"><div class="hero-eyebrow" style="color:${pal.accent}">${client}</div><div class="hero-title" style="color:${pal.text}">${title}</div><div class="hero-line" style="background:${pal.accent}"></div><div class="hero-subtitle" style="color:${pal.sub}">${sub}</div></div>`;
+  if (t==='vivid') return `<div class="showcase-hero anim-hero" style="background:${pal.bg}"><div class="hero-eyebrow">${client}</div><div class="hero-title">${title}</div><div class="hero-tagline">${tagline}</div><div class="hero-subtitle">${_activeMode?'':desc}</div></div>`;
+  if (t==='lookbook') { const isDarkL=pal.bg.startsWith('#')&&parseInt(pal.bg.slice(1,3),16)<100; const tc=isDarkL?'#fff':'#1C1C1A'; const sc=isDarkL?'rgba(255,255,255,0.4)':'rgba(28,28,26,0.5)'; return `<div class="showcase-hero anim-hero" style="background:${pal.bg}"><div class="hero-inner"><div class="hero-eyebrow" style="color:${pal.accent}">${client}</div><div class="hero-title" style="color:${tc}">${title}</div><div class="hero-subtitle" style="color:${sc}">${sub}</div></div></div>`; }
+  if (t==='mosaic') return `<div class="showcase-hero anim-hero" style="border-bottom:3px solid ${pal.border}"><div><div class="hero-eyebrow">${client}</div><div class="hero-title">${title}</div></div><div class="hero-right"><span class="hero-tagline">${tagline}</span><div class="hero-subtitle">${_activeMode?'':desc}</div></div></div>`;
+  if (t==='cinematic') { const cp=PALETTES.cinematic[state.palette]; return `<div class="showcase-hero anim-hero" style="background:${cp.bg}"><div class="hero-inner"><div class="hero-rule" style="background:${cp.accent}"></div><div class="hero-eyebrow" style="color:${cp.text}">${client}</div><div class="hero-title" style="color:${cp.text}">${title}</div><div class="hero-subtitle" style="color:${cp.text}">${sub}</div></div></div>`; }
 }
 function getProducts() {
   const t=state.template,pal=PALETTES[t][state.palette],prods=state.products;
@@ -3157,7 +3172,7 @@ function updatePreview() {
             +'<div style="position:absolute;top:0;left:0;right:0;height:3px;background:'+warmAcc+'"></div>'
             +'<div style="position:relative;z-index:1;transition:transform 0.4s ease" class="cat-text">'
               +'<div style="width:20px;height:1px;background:'+warmAcc+';margin-bottom:12px;opacity:0.8"></div>'
-              +'<div style="font-size:9px;letter-spacing:0.3em;text-transform:uppercase;color:'+eyebrowColor+';margin-bottom:14px">Thermal Collection</div>'
+              +(_activeMode?'':'<div style="font-size:9px;letter-spacing:0.3em;text-transform:uppercase;color:'+eyebrowColor+';margin-bottom:14px">Thermal Collection</div>')
               +'<div style="font-family:Cormorant Garamond,serif;font-size:52px;font-weight:300;color:'+textOnSplit+';line-height:1.0;margin-bottom:16px">'+(state.catWarmName||'Base Layer').replace(' ','<br>')+'</div>'
               +'<div style="font-size:11px;color:'+subOnSplit+';margin-bottom:20px">'+warmProds.length+' styles</div>'
               +'<div style="font-size:10px;letter-spacing:0.2em;text-transform:uppercase;color:'+warmAcc+'">Explore →</div>'
@@ -3169,7 +3184,7 @@ function updatePreview() {
             +'<div style="position:absolute;top:0;left:0;right:0;height:3px;background:'+airAcc+'"></div>'
             +'<div style="position:relative;z-index:1;transition:transform 0.4s ease" class="cat-text">'
               +'<div style="width:20px;height:1px;background:'+airAcc+';margin-bottom:12px;opacity:0.8"></div>'
-              +'<div style="font-size:9px;letter-spacing:0.3em;text-transform:uppercase;color:'+eyebrowColor+';margin-bottom:14px">Thermal Collection</div>'
+              +(_activeMode?'':'<div style="font-size:9px;letter-spacing:0.3em;text-transform:uppercase;color:'+eyebrowColor+';margin-bottom:14px">Thermal Collection</div>')
               +'<div style="font-family:Cormorant Garamond,serif;font-size:52px;font-weight:300;color:'+textOnSplit+';line-height:1.0;margin-bottom:16px">'+(state.catAirName||'Mid Layer').replace(' ','<br>')+'</div>'
               +'<div style="font-size:11px;color:'+subOnSplit+';margin-bottom:20px">'+airProds.length+' styles</div>'
               +'<div style="font-size:10px;letter-spacing:0.2em;text-transform:uppercase;color:'+airAcc+'">Explore →</div>'
@@ -3277,8 +3292,14 @@ function openDetail(id) {
         ${p.desc?`<div class="detail-desc" style="color:${subColor};margin-top:12px">${p.desc}</div>`:""}
       </div>
       ${p.special?'<div class="detail-anim" style="animation-delay:0.4s;margin-top:8px;padding-top:16px;border-top:1px solid '+borderColor+'">'+'<div style="font-size:14px;letter-spacing:0.12em;text-transform:uppercase;color:'+accentColor+';margin-bottom:8px">What Makes It Special</div>'+'<div style="font-size:16px;color:'+subColor+';line-height:1.8">'+p.special+'</div>'+'</div>':''}
-      ${hasMultiple?`<div class="detail-anim" style="animation-delay:0.5s;font-size:11px;color:${subColor};margin-top:16px">${allImgs.length} photos</div>`:''}
       ${(p.techs&&p.techs.length)?'<div class="detail-anim" style="animation-delay:0.55s;margin-top:24px;padding-top:20px;border-top:1px solid '+borderColor+';display:flex;flex-wrap:wrap;gap:8px;align-items:center">'+p.techs.map(tid=>{const t=TECHNOLOGIES.find(x=>x.id===tid);if(!t)return'';return `<span style="font-size:10px;letter-spacing:0.1em;text-transform:uppercase;color:${accentColor};border:1px solid ${accentColor}66;border-radius:20px;padding:5px 13px;white-space:nowrap">${t.label}</span>`;}).join('')+'</div>':''}
+      ${(p.styleNo||p.styleTop||p.styleBottom)?(()=>{
+        const styleItems=[];
+        if(p.styleNo&&p.styleNo.trim()) styleItems.push('<span style="display:inline-flex;flex-direction:column;gap:2px;padding:8px 16px;border:1px solid '+accentColor+'44;border-radius:4px"><span style="font-size:8px;letter-spacing:0.18em;text-transform:uppercase;color:'+accentColor+';opacity:0.8">Style No</span><span style="font-size:14px;color:'+textColor+';letter-spacing:0.06em;font-weight:400">'+p.styleNo+'</span></span>');
+        if(p.styleTop&&p.styleTop.trim()) styleItems.push('<span style="display:inline-flex;flex-direction:column;gap:2px;padding:8px 16px;border:1px solid '+accentColor+'44;border-radius:4px"><span style="font-size:8px;letter-spacing:0.18em;text-transform:uppercase;color:'+accentColor+';opacity:0.8">Top Style No</span><span style="font-size:14px;color:'+textColor+';letter-spacing:0.06em;font-weight:400">'+p.styleTop+'</span></span>');
+        if(p.styleBottom&&p.styleBottom.trim()) styleItems.push('<span style="display:inline-flex;flex-direction:column;gap:2px;padding:8px 16px;border:1px solid '+accentColor+'44;border-radius:4px"><span style="font-size:8px;letter-spacing:0.18em;text-transform:uppercase;color:'+accentColor+';opacity:0.8">Bottom Style No</span><span style="font-size:14px;color:'+textColor+';letter-spacing:0.06em;font-weight:400">'+p.styleBottom+'</span></span>');
+        return styleItems.length ? '<div class="detail-anim" style="animation-delay:0.6s;margin-top:20px;padding-top:16px;border-top:1px solid '+borderColor+';display:flex;flex-wrap:wrap;gap:8px">'+styleItems.join('')+'</div>' : '';
+      })():''}
     </div>
   </div>`;
 
@@ -3814,8 +3835,8 @@ function buildPdfPageHTML(pair) {
   function styleNosPDF(p) {
     var items = [];
     if (p.styleNo&&p.styleNo.trim()) items.push('<span style="font-size:3mm;letter-spacing:0.1em;text-transform:uppercase;color:#C4A882">Style No  </span><span style="font-size:4mm;color:#1C1C1A">'+p.styleNo+'</span>');
-    if (p.styleTop&&p.styleTop.trim()) items.push('<span style="font-size:3mm;letter-spacing:0.1em;text-transform:uppercase;color:#C4A882">Top  </span><span style="font-size:4mm;color:#1C1C1A">'+p.styleTop+'</span>');
-    if (p.styleBottom&&p.styleBottom.trim()) items.push('<span style="font-size:3mm;letter-spacing:0.1em;text-transform:uppercase;color:#C4A882">Bottom  </span><span style="font-size:4mm;color:#1C1C1A">'+p.styleBottom+'</span>');
+    if (p.styleTop&&p.styleTop.trim()) items.push('<span style="font-size:3mm;letter-spacing:0.1em;text-transform:uppercase;color:#C4A882">Top Style No  </span><span style="font-size:4mm;color:#1C1C1A">'+p.styleTop+'</span>');
+    if (p.styleBottom&&p.styleBottom.trim()) items.push('<span style="font-size:3mm;letter-spacing:0.1em;text-transform:uppercase;color:#C4A882">Bottom Style No  </span><span style="font-size:4mm;color:#1C1C1A">'+p.styleBottom+'</span>');
     if (!items.length) return '';
     return '<div style="display:flex;flex-wrap:wrap;gap:5mm;margin-top:3mm">'+items.map(function(i){return '<span>'+i+'</span>';}).join('')+'</div>';
   }
@@ -3833,10 +3854,6 @@ function buildPdfPageHTML(pair) {
     var imgGrid = '';
     if (allImgs.length === 1) {
       imgGrid = '<div style="height:100%;background:#f5f2ee"><img src="'+allImgs[0]+'" style="width:100%;height:100%;object-fit:contain;object-position:center top;display:block" /></div>';
-    } else if (allImgs.length === 2) {
-      imgGrid = '<div style="display:flex;height:100%">' +
-        allImgs.map(function(src){ return '<div style="flex:1;background:#f5f2ee;border-right:1px solid #fff"><img src="'+src+'" style="width:100%;height:100%;object-fit:cover;object-position:center top;display:block" /></div>'; }).join('') +
-      '</div>';
     } else {
       imgGrid = '<div style="display:flex;height:100%">' +
         allImgs.map(function(src,i){ return '<div style="flex:1;background:#f5f2ee'+(i<allImgs.length-1?';border-right:1px solid #fff':'')+'""><img src="'+src+'" style="width:100%;height:100%;object-fit:cover;object-position:center top;display:block" /></div>'; }).join('') +
