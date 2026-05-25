@@ -3788,8 +3788,9 @@ function buildPdfPageHTML(pair) {
   var collLabel = _pdfCollection==='outdoor' ? 'Outdoor Collection' : 'Active Collection';
 
   var header = '<div style="display:flex;align-items:center;justify-content:space-between;padding:4mm 8mm;border-bottom:0.4mm solid #ddd;flex-shrink:0;background:#fff">' +
-    '<div style="font-size:4.5mm;letter-spacing:0.22em;text-transform:uppercase;color:#1C1C1A;font-weight:700">Delta Galil</div>' +
+    '<img src="https://dkgzhmpuqzykzebzcqdr.supabase.co/storage/v1/object/public/product-images/DELTA%20LOGO.png" style="height:9mm;object-fit:contain;display:block" />' +
     '<div style="font-size:3mm;letter-spacing:0.1em;text-transform:uppercase;color:#aaa">' + collLabel + ' · Spring Summer 2026</div>' +
+    '<img src="https://dkgzhmpuqzykzebzcqdr.supabase.co/storage/v1/object/public/product-images/LULU%20LOGO.png" style="height:9mm;object-fit:contain;display:block" />' +
     '</div>';
 
   function ratingRowPDF(type, val, label) {
