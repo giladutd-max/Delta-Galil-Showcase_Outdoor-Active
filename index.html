@@ -534,9 +534,9 @@ img { image-rendering: auto; }
   #pdf-print-root{display:block!important;position:static;overflow:visible;padding:0;background:#fff}
   #pdf-controls{display:none!important}
   #pdf-print-root>div:last-child{margin:0;padding:0;gap:0;display:block}
-  .pdf-page{margin:0;padding:0;box-shadow:none;page-break-after:always;break-after:page;page-break-inside:avoid;break-inside:avoid;width:210mm!important;height:297mm!important}
+  .pdf-page{margin:0;padding:0;box-shadow:none;page-break-after:always;break-after:page;page-break-inside:avoid;break-inside:avoid;width:297mm!important;height:210mm!important}
   .pdf-page:last-child{page-break-after:auto;break-after:auto}
-  @page{size:A4 portrait;margin:0}
+  @page{size:A4 landscape;margin:0}
 }
 </style>
 </head>
@@ -3786,29 +3786,111 @@ function buildPdfPageHTML(pair) {
   var p2 = pair[1] ? prods.find(function(p){ return p.id===pair[1]; }) : null;
   var isSolo = !p2;
   var collLabel = _pdfCollection==='outdoor' ? 'Outdoor Collection' : 'Active Collection';
-  var header = '<div style="display:flex;align-items:center;justify-content:space-between;padding:3mm 6mm;border-bottom:0.5mm solid #e0dbd4;flex-shrink:0"><div style="font-size:3mm;letter-spacing:0.2em;text-transform:uppercase;color:#1C1C1A;font-weight:600">Delta Galil</div><div style="font-size:2.5mm;letter-spacing:0.1em;text-transform:uppercase;color:#999">'+collLabel+' · Spring Summer 2026</div></div>';
-  function ratingRow(label, val, icon) {
+
+  var header = '<div style="display:flex;align-items:center;justify-content:space-between;padding:4mm 7mm;border-bottom:0.4mm solid #e0dbd4;flex-shrink:0">' +
+    '<div style="font-size:4mm;letter-spacing:0.2em;text-transform:uppercase;color:#1C1C1A;font-weight:600">Delta Galil</div>' +
+    '<div style="font-size:3mm;letter-spacing:0.1em;text-transform:uppercase;color:#999">' + collLabel + ' · Spring Summer 2026</div>' +
+    '</div>';
+
+  // Use the same icon images as the site
+  var ICONS = {
+    w: 'https://dkgzhmpuqzykzebzcqdr.supabase.co/storage/v1/object/public/product-images/Flame_two2.png',
+    d: 'https://dkgzhmpuqzykzebzcqdr.supabase.co/storage/v1/object/public/product-images/drop.png',
+    b: 'https://dkgzhmpuqzykzebzcqdr.supabase.co/storage/v1/object/public/product-images/breathable%20new5.png'
+  };
+  var LABELS = { w: 'Warmth', d: 'Dry Rate', b: 'Airflow' };
+
+  function ratingRow(type, val) {
     if (!val) return '';
-    var icons=''; for(var i=0;i<5;i++) icons+='<span style="font-size:4.5mm;opacity:'+(i<val?'1':'0.15')+'">'+icon+'</span>';
-    return '<div style="display:flex;align-items:center;gap:2.5mm;margin-bottom:2mm"><span style="font-size:2.8mm;letter-spacing:0.1em;text-transform:uppercase;color:#666;width:16mm;flex-shrink:0">'+label+'</span>'+icons+'</div>';
+    var icons = '';
+    for (var i=0; i<5; i++) {
+      icons += '<img src="'+ICONS[type]+'" style="width:5mm;height:5mm;object-fit:contain;opacity:'+(i<val?'1':'0.15')+'" />';
+    }
+    return '<div style="display:flex;align-items:center;gap:2mm;margin-bottom:2.5mm">' +
+      '<span style="font-size:3mm;letter-spacing:0.1em;text-transform:uppercase;color:#666;width:18mm;flex-shrink:0">'+LABELS[type]+'</span>' +
+      icons + '</div>';
   }
+
   function techBadgesHtml(p) {
     if (!p||!p.techs||!p.techs.length) return '';
-    var b=p.techs.map(function(tid){ var t=TECHNOLOGIES.find(function(x){return x.id===tid;}); return t?'<span style="font-size:2.5mm;letter-spacing:0.08em;text-transform:uppercase;border:0.3mm solid #B8956A;border-radius:10mm;padding:1mm 3mm;color:#8C6A3F;white-space:nowrap">'+t.label+'</span>':''; }).join('');
-    return '<div style="display:flex;flex-wrap:wrap;gap:2mm;margin-top:3mm">'+b+'</div>';
+    var b = p.techs.map(function(tid){
+      var t = TECHNOLOGIES.find(function(x){ return x.id===tid; });
+      return t ? '<span style="font-size:3mm;letter-spacing:0.08em;text-transform:uppercase;border:0.4mm solid #B8956A;border-radius:10mm;padding:1.2mm 3.5mm;color:#8C6A3F;white-space:nowrap">'+t.label+'</span>' : '';
+    }).join('');
+    return '<div style="display:flex;flex-wrap:wrap;gap:2mm;margin-top:4mm">'+b+'</div>';
   }
+
   function styleNosHtml(p) {
-    var s='';
-    if(p.styleNo&&p.styleNo.trim()) s+='<span style="margin-right:4mm"><span style="font-size:2.3mm;letter-spacing:0.1em;text-transform:uppercase;color:#B8956A">Style No </span><span style="font-size:3mm;color:#1C1C1A;font-weight:600">'+p.styleNo+'</span></span>';
-    if(p.styleTop&&p.styleTop.trim()) s+='<span style="margin-right:4mm"><span style="font-size:2.3mm;letter-spacing:0.1em;text-transform:uppercase;color:#B8956A">Top </span><span style="font-size:3mm;color:#1C1C1A;font-weight:600">'+p.styleTop+'</span></span>';
-    if(p.styleBottom&&p.styleBottom.trim()) s+='<span><span style="font-size:2.3mm;letter-spacing:0.1em;text-transform:uppercase;color:#B8956A">Bottom </span><span style="font-size:3mm;color:#1C1C1A;font-weight:600">'+p.styleBottom+'</span></span>';
-    return s?'<div style="margin-top:1.5mm">'+s+'</div>':'';
+    var s = '';
+    if (p.styleNo&&p.styleNo.trim()) s += '<span style="margin-right:5mm"><span style="font-size:2.8mm;letter-spacing:0.1em;text-transform:uppercase;color:#B8956A">Style No </span><span style="font-size:3.5mm;color:#1C1C1A;font-weight:600">'+p.styleNo+'</span></span>';
+    if (p.styleTop&&p.styleTop.trim()) s += '<span style="margin-right:5mm"><span style="font-size:2.8mm;letter-spacing:0.1em;text-transform:uppercase;color:#B8956A">Top </span><span style="font-size:3.5mm;color:#1C1C1A;font-weight:600">'+p.styleTop+'</span></span>';
+    if (p.styleBottom&&p.styleBottom.trim()) s += '<span><span style="font-size:2.8mm;letter-spacing:0.1em;text-transform:uppercase;color:#B8956A">Bottom </span><span style="font-size:3.5mm;color:#1C1C1A;font-weight:600">'+p.styleBottom+'</span></span>';
+    return s ? '<div style="margin-top:2mm">'+s+'</div>' : '';
   }
-  var fire='🔥'; var drop='💧'; var snow='❄️';
+
+  function infoPanel(p) {
+    return '<div style="flex:1;padding:7mm 8mm;display:flex;flex-direction:column;justify-content:center;overflow:hidden">' +
+      '<div style="width:8mm;height:0.6mm;background:#B8956A;margin-bottom:5mm"></div>' +
+      '<div style="font-family:Cormorant Garamond,serif;font-size:8mm;font-weight:300;color:#1C1C1A;margin-bottom:2mm;line-height:1.2">'+(p.name||'')+'</div>' +
+      styleNosHtml(p) +
+      '<div style="font-size:3.2mm;letter-spacing:0.14em;text-transform:uppercase;color:#666;margin-top:5mm;margin-bottom:5mm;line-height:1.6">'+(p.fabric||'')+'</div>' +
+      (p.warmth||p.dry||p.breath ? '<div style="margin-bottom:5mm">'+ratingRow('w',p.warmth)+ratingRow('d',p.dry)+ratingRow('b',p.breath)+'</div>' : '') +
+      ((p.special||p.desc)?'<div style="font-size:3.5mm;color:#222;line-height:1.8;margin-bottom:4mm;padding-top:5mm;border-top:0.3mm solid #e0dbd4">'+(p.special||p.desc||'')+'</div>':'') +
+      techBadgesHtml(p) +
+    '</div>';
+  }
+
   if (isSolo && p1) {
-    return '<div class="pdf-page" style="width:210mm;height:297mm;display:flex;flex-direction:column;background:#fff;font-family:DM Sans,sans-serif;box-sizing:border-box;overflow:hidden">'+header+'<div style="flex:1.6;background:#f5f2ee;overflow:hidden;border-bottom:0.5mm solid #e0dbd4"><img src="'+(p1.img||'')+'" crossorigin="anonymous" style="width:100%;height:100%;object-fit:contain;object-position:center top;display:block" /></div><div style="flex:1;padding:6mm 8mm;display:flex;flex-direction:column;justify-content:center;overflow:hidden"><div style="width:6mm;height:0.5mm;background:#B8956A;margin-bottom:4mm"></div><div style="font-family:Cormorant Garamond,serif;font-size:9mm;font-weight:300;color:#1C1C1A;margin-bottom:2mm;line-height:1.2">'+(p1.name||'')+'</div>'+styleNosHtml(p1)+'<div style="font-size:2.8mm;letter-spacing:0.16em;text-transform:uppercase;color:#666;margin-top:3mm;margin-bottom:3mm">'+(p1.fabric||'')+'</div>'+(p1.warmth||p1.dry||p1.breath?'<div style="margin-bottom:3mm">'+ratingRow('Warmth',p1.warmth,fire)+ratingRow('Dry Rate',p1.dry,drop)+ratingRow('Airflow',p1.breath,snow)+'</div>':'')+((p1.special||p1.desc)?'<div style="font-size:3.2mm;color:#222;line-height:1.8;margin-bottom:3mm;padding-top:3mm;border-top:0.3mm solid #e0dbd4">'+(p1.special||p1.desc||'')+'</div>':'')+techBadgesHtml(p1)+'</div></div>';
+    // SOLO - A4 landscape: single image LEFT, full info RIGHT
+    return '<div class="pdf-page" style="width:297mm;height:210mm;display:flex;flex-direction:column;background:#fff;font-family:DM Sans,sans-serif;box-sizing:border-box;overflow:hidden">' +
+      header +
+      '<div style="flex:1;display:flex;flex-direction:row;overflow:hidden;min-height:0">' +
+        '<div style="width:48%;background:#f5f2ee;overflow:hidden;border-right:0.5mm solid #e0dbd4">' +
+          '<img src="'+(p1.img||'')+'" style="width:100%;height:100%;object-fit:contain;object-position:center top;display:block" />' +
+        '</div>' +
+        infoPanel(p1) +
+      '</div>' +
+    '</div>';
   }
-  return '<div class="pdf-page" style="width:210mm;height:297mm;display:flex;flex-direction:column;background:#fff;font-family:DM Sans,sans-serif;box-sizing:border-box;overflow:hidden">'+header+'<div style="flex:1.6;display:flex;flex-direction:row;border-bottom:0.5mm solid #e0dbd4;overflow:hidden;min-height:0"><div style="flex:1;display:flex;flex-direction:column;border-right:0.3mm solid #e0dbd4;overflow:hidden"><div style="flex:1;background:#f5f2ee;overflow:hidden"><img src="'+(p1.img||'')+'" crossorigin="anonymous" style="width:100%;height:100%;object-fit:contain;object-position:center top;display:block" /></div><div style="padding:3mm 4mm;border-top:0.3mm solid #e0dbd4;flex-shrink:0"><div style="font-family:Cormorant Garamond,serif;font-size:5mm;font-weight:300;color:#1C1C1A;line-height:1.2">'+(p1.name||'')+'</div>'+styleNosHtml(p1)+'</div></div><div style="flex:1;display:flex;flex-direction:column;overflow:hidden"><div style="flex:1;background:#f5f2ee;overflow:hidden"><img src="'+(p2.img||'')+'" crossorigin="anonymous" style="width:100%;height:100%;object-fit:contain;object-position:center top;display:block" /></div><div style="padding:3mm 4mm;border-top:0.3mm solid #e0dbd4;flex-shrink:0"><div style="font-family:Cormorant Garamond,serif;font-size:5mm;font-weight:300;color:#1C1C1A;line-height:1.2">'+(p2.name||'')+'</div>'+styleNosHtml(p2)+'</div></div></div><div style="flex:1;padding:5mm 8mm;overflow:hidden"><div style="width:6mm;height:0.5mm;background:#B8956A;margin-bottom:3mm"></div><div style="font-size:2.8mm;letter-spacing:0.16em;text-transform:uppercase;color:#666;margin-bottom:3mm">'+(p1.fabric||'')+'</div>'+(p1.warmth||p1.dry||p1.breath?'<div style="margin-bottom:3mm">'+ratingRow('Warmth',p1.warmth,fire)+ratingRow('Dry Rate',p1.dry,drop)+ratingRow('Airflow',p1.breath,snow)+'</div>':'')+((p1.special||p1.desc)?'<div style="font-size:3.2mm;color:#222;line-height:1.8;margin-bottom:3mm;padding-top:3mm;border-top:0.3mm solid #e0dbd4">'+(p1.special||p1.desc||'')+'</div>':'')+techBadgesHtml(p1)+'</div></div>';
+
+  // PAIR - A4 landscape: TWO images stacked on LEFT, shared info on RIGHT
+  return '<div class="pdf-page" style="width:297mm;height:210mm;display:flex;flex-direction:column;background:#fff;font-family:DM Sans,sans-serif;box-sizing:border-box;overflow:hidden">' +
+    header +
+    '<div style="flex:1;display:flex;flex-direction:row;overflow:hidden;min-height:0">' +
+
+      // LEFT: two images stacked
+      '<div style="width:48%;display:flex;flex-direction:column;border-right:0.5mm solid #e0dbd4;overflow:hidden">' +
+        '<div style="flex:1;display:flex;flex-direction:column;border-bottom:0.3mm solid #e0dbd4;overflow:hidden">' +
+          '<div style="flex:1;background:#f5f2ee;overflow:hidden">' +
+            '<img src="'+(p1.img||'')+'" style="width:100%;height:100%;object-fit:contain;object-position:center top;display:block" />' +
+          '</div>' +
+          '<div style="padding:2.5mm 4mm;flex-shrink:0;border-top:0.3mm solid #e0dbd4">' +
+            '<div style="font-family:Cormorant Garamond,serif;font-size:5.5mm;font-weight:300;color:#1C1C1A">'+(p1.name||'')+'</div>' +
+            styleNosHtml(p1) +
+          '</div>' +
+        '</div>' +
+        '<div style="flex:1;display:flex;flex-direction:column;overflow:hidden">' +
+          '<div style="flex:1;background:#f5f2ee;overflow:hidden">' +
+            '<img src="'+(p2.img||'')+'" style="width:100%;height:100%;object-fit:contain;object-position:center top;display:block" />' +
+          '</div>' +
+          '<div style="padding:2.5mm 4mm;flex-shrink:0;border-top:0.3mm solid #e0dbd4">' +
+            '<div style="font-family:Cormorant Garamond,serif;font-size:5.5mm;font-weight:300;color:#1C1C1A">'+(p2.name||'')+'</div>' +
+            styleNosHtml(p2) +
+          '</div>' +
+        '</div>' +
+      '</div>' +
+
+      // RIGHT: shared info
+      '<div style="flex:1;padding:7mm 9mm;display:flex;flex-direction:column;justify-content:center;overflow:hidden">' +
+        '<div style="width:8mm;height:0.6mm;background:#B8956A;margin-bottom:5mm"></div>' +
+        '<div style="font-size:3.2mm;letter-spacing:0.14em;text-transform:uppercase;color:#555;margin-bottom:5mm;line-height:1.6">'+(p1.fabric||'')+'</div>' +
+        (p1.warmth||p1.dry||p1.breath ? '<div style="margin-bottom:5mm">'+ratingRow('w',p1.warmth)+ratingRow('d',p1.dry)+ratingRow('b',p1.breath)+'</div>' : '') +
+        ((p1.special||p1.desc)?'<div style="font-size:3.5mm;color:#222;line-height:1.8;margin-bottom:4mm;padding-top:5mm;border-top:0.3mm solid #e0dbd4">'+(p1.special||p1.desc||'')+'</div>':'') +
+        techBadgesHtml(p1) +
+      '</div>' +
+
+    '</div>' +
+  '</div>';
 }
 
 
@@ -3868,15 +3950,8 @@ function previewPDF() {
   }
 
   if (pending === 0) { buildAndShow(); return; }
-  imgUrls.forEach(function(url){
-    toDataURL(url, function(){
-      pending--;
-      if (pending === 0) buildAndShow();
-    });
-  });
-  // Show loading state
-  root.innerHTML = '<div style="position:fixed;inset:0;background:#1C1C1A;display:flex;align-items:center;justify-content:center;color:rgba(255,255,255,0.5);font-family:DM Sans,sans-serif;font-size:13px;letter-spacing:0.1em;text-transform:uppercase">Loading images...</div>';
-  root.classList.add('visible');
+  // Skip base64 conversion - use URLs directly to avoid CORS delays
+  buildAndShow();
 }
 
 function exportToPDF() { previewPDF(); setTimeout(function(){ window.print(); }, 600); }
