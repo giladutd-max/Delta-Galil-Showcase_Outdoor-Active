@@ -534,9 +534,9 @@ img { image-rendering: auto; }
   #pdf-print-root{display:block!important;position:static;overflow:visible;padding:0;background:#fff}
   #pdf-controls{display:none!important}
   #pdf-print-root>div:last-child{margin:0;padding:0;gap:0;display:block}
-  .pdf-page{margin:0;padding:0;box-shadow:none;page-break-after:always;break-after:page;page-break-inside:avoid;break-inside:avoid;width:297mm!important;height:210mm!important}
+  .pdf-page{margin:0;padding:0;box-shadow:none;page-break-after:always;break-after:page;page-break-inside:avoid;break-inside:avoid;width:210mm!important;height:297mm!important}
   .pdf-page:last-child{page-break-after:auto;break-after:auto}
-  @page{size:A4 landscape;margin:0}
+  @page{size:A4 portrait;margin:0}
 }
 </style>
 </head>
@@ -962,11 +962,6 @@ img { image-rendering: auto; }
       </div>
     </div>
     <div class="field-group"><label class="field-label">Short Description</label><textarea class="field-input" id="modal-desc" placeholder="Brief product description..."></textarea></div>
-    <div class="field-group"><label class="field-label">Style No <span style="font-weight:300;opacity:0.6">(optional)</span></label><input class="field-input" id="modal-style-no" type="text" placeholder="e.g. 03067" /></div>
-    <div class="field-group" style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
-      <div><label class="field-label">Top Style No</label><input class="field-input" id="modal-style-top" type="text" placeholder="e.g. ACT1052" /></div>
-      <div><label class="field-label">Bottom Style No</label><input class="field-input" id="modal-style-bottom" type="text" placeholder="e.g. ACT1053" /></div>
-    </div>
     <div class="field-group"><label class="field-label">Product Video URL</label><input class="field-input" id="modal-video" type="text" placeholder="Paste Supabase video URL (.mp4)" /></div>
     <div class="field-group"><label class="field-label">What Makes It Special?</label><textarea class="field-input" id="modal-special" placeholder="What sets this product apart..." style="min-height:80px"></textarea></div>
     <div class="field-group">
@@ -2161,9 +2156,6 @@ function openModal() {
   if (ao) ao.textContent = state.catAirName || 'Mid Layer';
   g('modal-overlay').classList.add('open');
   g('modal-name').value=''; g('modal-fabric').value=''; g('modal-desc').value='';
-  if(g('modal-style-no')) g('modal-style-no').value='';
-  if(g('modal-style-top')) g('modal-style-top').value='';
-  if(g('modal-style-bottom')) g('modal-style-bottom').value='';
   if(g('modal-special')) g('modal-special').value='';
   if(g('modal-video')) g('modal-video').value='';
   pendingTechs=[];
@@ -2207,7 +2199,7 @@ async function saveProduct() {
   } else if (pendingHoverFile) {
     hoverImgUrl = await uploadImageToStorage(pendingHoverFile) || '';
   }
-  const _newProd={id:Date.now(),name,fabric:g('modal-fabric').value.trim(),desc:g('modal-desc').value.trim(),special:g('modal-special')?.value.trim()||'',video:g('modal-video')?.value.trim()||'',img:imgUrl,extraImgs,hoverImg:hoverImgUrl,warmth:pendingWarmthRating,dry:pendingDryRating,breath:pendingBreathRating,techs:[...pendingTechs],emoji:'📦',category:g('modal-category')?.value||'',layer:g('modal-layer')?.value||'',styleNo:g('modal-style-no')?.value.trim()||'',styleTop:g('modal-style-top')?.value.trim()||'',styleBottom:g('modal-style-bottom')?.value.trim()||''};
+  const _newProd={id:Date.now(),name,fabric:g('modal-fabric').value.trim(),desc:g('modal-desc').value.trim(),special:g('modal-special')?.value.trim()||'',video:g('modal-video')?.value.trim()||'',img:imgUrl,extraImgs,hoverImg:hoverImgUrl,warmth:pendingWarmthRating,dry:pendingDryRating,breath:pendingBreathRating,techs:[...pendingTechs],emoji:'📦',category:g('modal-category')?.value||'',layer:g('modal-layer')?.value||''};
   if(window._savingForActive){
     state.activeProducts=state.activeProducts||[];
     state.activeProducts.push(_newProd);
@@ -2487,9 +2479,6 @@ function editActiveProduct(id) {
   g('modal-desc').value=p.desc||'';
   if(g('modal-special')) g('modal-special').value=p.special||'';
   if(g('modal-video')) g('modal-video').value=p.video||'';
-  if(g('modal-style-no')) g('modal-style-no').value=p.styleNo||'';
-  if(g('modal-style-top')) g('modal-style-top').value=p.styleTop||'';
-  if(g('modal-style-bottom')) g('modal-style-bottom').value=p.styleBottom||'';
   pendingTechs=[...(p.techs||[])];
   g('modal-img-preview').innerHTML=p.img?'<img src="'+p.img+'" /><div style="position:absolute;inset:0;background:rgba(0,0,0,0.3);display:flex;align-items:center;justify-content:center;color:white;font-size:12px;letter-spacing:0.06em;text-transform:uppercase">Click to change</div>':'<div class="img-preview-placeholder"><span>'+p.emoji+'</span>Click to upload image</div>';
   g('modal-img-preview').style.position='relative';
@@ -2515,7 +2504,7 @@ async function updateActiveProduct(id) {
   let hoverImgUrl=state.activeProducts[idx].hoverImg||'';
   if(pendingHoverImg)hoverImgUrl=pendingHoverImg;
   else if(pendingHoverFile)hoverImgUrl=await uploadImageToStorage(pendingHoverFile)||hoverImgUrl;
-  state.activeProducts[idx]={...state.activeProducts[idx],name,fabric:g('modal-fabric').value.trim(),desc:g('modal-desc').value.trim(),special:g('modal-special')?.value.trim()||'',video:g('modal-video')?.value.trim()||'',img:imgUrl,extraImgs:[...existingExtras,...newExtras],hoverImg:hoverImgUrl,warmth:pendingWarmthRating,dry:pendingDryRating,breath:pendingBreathRating,techs:[...pendingTechs],category:g('modal-category')?.value||'',layer:g('modal-layer')?.value||'',styleNo:g('modal-style-no')?.value.trim()||'',styleTop:g('modal-style-top')?.value.trim()||'',styleBottom:g('modal-style-bottom')?.value.trim()||''};
+  state.activeProducts[idx]={...state.activeProducts[idx],name,fabric:g('modal-fabric').value.trim(),desc:g('modal-desc').value.trim(),special:g('modal-special')?.value.trim()||'',video:g('modal-video')?.value.trim()||'',img:imgUrl,extraImgs:[...existingExtras,...newExtras],hoverImg:hoverImgUrl,warmth:pendingWarmthRating,dry:pendingDryRating,breath:pendingBreathRating,techs:[...pendingTechs],category:g('modal-category')?.value||'',layer:g('modal-layer')?.value||''};
   g('modal-save-btn').textContent='Add Product'; g('modal-save-btn').disabled=false;
   g('modal-save-btn').onclick=saveProduct;
   window._savingForActive=false; window._editingActiveProduct=null;
@@ -2579,9 +2568,6 @@ function editProduct(id) {
   g('modal-desc').value=p.desc||'';
   if(g('modal-special')) g('modal-special').value=p.special||'';
   if(g('modal-video')) g('modal-video').value=p.video||'';
-  if(g('modal-style-no')) g('modal-style-no').value=p.styleNo||'';
-  if(g('modal-style-top')) g('modal-style-top').value=p.styleTop||'';
-  if(g('modal-style-bottom')) g('modal-style-bottom').value=p.styleBottom||'';
   pendingTechs=[...(p.techs||[])];
   g('modal-img-preview').innerHTML=p.img?'<img src="'+p.img+'" />'+'<div style="position:absolute;inset:0;background:rgba(0,0,0,0.3);display:flex;align-items:center;justify-content:center;color:white;font-size:12px;letter-spacing:0.06em;text-transform:uppercase">Click to change</div>':'<div class="img-preview-placeholder"><span>'+p.emoji+'</span>Click to upload image</div>';
   g('modal-img-preview').style.position='relative';
@@ -2638,7 +2624,7 @@ async function updateProduct(id) {
   } else if (pendingHoverFile) {
     hoverImgUrl = await uploadImageToStorage(pendingHoverFile) || hoverImgUrl;
   }
-  state.products[idx]={...state.products[idx], name, fabric:g('modal-fabric').value.trim(), desc:g('modal-desc').value.trim(), special:g('modal-special')?.value.trim()||'', video:g('modal-video')?.value.trim()||'', img:imgUrl, extraImgs:[...existingExtras,...newExtras], hoverImg:hoverImgUrl, warmth:pendingWarmthRating, dry:pendingDryRating, breath:pendingBreathRating, techs:[...pendingTechs], category:g('modal-category')?.value||'', layer:g('modal-layer')?.value||'', styleNo:g('modal-style-no')?.value.trim()||'', styleTop:g('modal-style-top')?.value.trim()||'', styleBottom:g('modal-style-bottom')?.value.trim()||''};
+  state.products[idx]={...state.products[idx], name, fabric:g('modal-fabric').value.trim(), desc:g('modal-desc').value.trim(), special:g('modal-special')?.value.trim()||'', video:g('modal-video')?.value.trim()||'', img:imgUrl, extraImgs:[...existingExtras,...newExtras], hoverImg:hoverImgUrl, warmth:pendingWarmthRating, dry:pendingDryRating, breath:pendingBreathRating, techs:[...pendingTechs], category:g('modal-category')?.value||'', layer:g('modal-layer')?.value||''};
   g('modal-save-btn').textContent='Add Product'; g('modal-save-btn').disabled=false;
   g('modal-save-btn').onclick=saveProduct;
   closeModal();
@@ -2870,14 +2856,13 @@ function getHero() {
   const t=state.template,pal=PALETTES[t][state.palette];
   const title=state.title||(g('pitch-title')?.value||'');
   const client=state.client||(g('pitch-client')?.value||'');
-  const tagline=_activeMode ? (state.tagline||'Keep moving') : (state.tagline||(g('pitch-tagline')?.value||''));
+  const tagline=state.tagline||(g('pitch-tagline')?.value||'');
   const desc=state.description||(g('pitch-desc')?.value||'');
-  const sub=_activeMode ? tagline : (tagline&&desc ? tagline+' \u2014 '+desc : tagline||desc);
-  if (t==='editorial') return `<div class="showcase-hero anim-hero" style="background:${pal.bg}"><div class="hero-eyebrow" style="color:${pal.accent}">${client}</div><div class="hero-title" style="color:${pal.text}">${title}</div><div class="hero-line" style="background:${pal.accent}"></div><div class="hero-subtitle" style="color:${pal.sub}">${sub}</div></div>`;
-  if (t==='vivid') return `<div class="showcase-hero anim-hero" style="background:${pal.bg}"><div class="hero-eyebrow">${client}</div><div class="hero-title">${title}</div><div class="hero-tagline">${tagline}</div><div class="hero-subtitle">${_activeMode?'':desc}</div></div>`;
-  if (t==='lookbook') { const isDarkL=pal.bg.startsWith('#')&&parseInt(pal.bg.slice(1,3),16)<100; const tc=isDarkL?'#fff':'#1C1C1A'; const sc=isDarkL?'rgba(255,255,255,0.4)':'rgba(28,28,26,0.5)'; return `<div class="showcase-hero anim-hero" style="background:${pal.bg}"><div class="hero-inner"><div class="hero-eyebrow" style="color:${pal.accent}">${client}</div><div class="hero-title" style="color:${tc}">${title}</div><div class="hero-subtitle" style="color:${sc}">${sub}</div></div></div>`; }
-  if (t==='mosaic') return `<div class="showcase-hero anim-hero" style="border-bottom:3px solid ${pal.border}"><div><div class="hero-eyebrow">${client}</div><div class="hero-title">${title}</div></div><div class="hero-right"><span class="hero-tagline">${tagline}</span><div class="hero-subtitle">${_activeMode?'':desc}</div></div></div>`;
-  if (t==='cinematic') { const cp=PALETTES.cinematic[state.palette]; return `<div class="showcase-hero anim-hero" style="background:${cp.bg}"><div class="hero-inner"><div class="hero-rule" style="background:${cp.accent}"></div><div class="hero-eyebrow" style="color:${cp.text}">${client}</div><div class="hero-title" style="color:${cp.text}">${title}</div><div class="hero-subtitle" style="color:${cp.text}">${sub}</div></div></div>`; }
+  if (t==='editorial') return `<div class="showcase-hero anim-hero" style="background:${pal.bg}"><div class="hero-eyebrow" style="color:${pal.accent}">${client}</div><div class="hero-title" style="color:${pal.text}">${title}</div><div class="hero-line" style="background:${pal.accent}"></div><div class="hero-subtitle" style="color:${pal.sub}">${tagline} — ${desc}</div></div>`;
+  if (t==='vivid') return `<div class="showcase-hero anim-hero" style="background:${pal.bg}"><div class="hero-eyebrow">${client}</div><div class="hero-title">${title}</div><div class="hero-tagline">${tagline}</div><div class="hero-subtitle">${desc}</div></div>`;
+  if (t==='lookbook') { const isDarkL=pal.bg.startsWith('#')&&parseInt(pal.bg.slice(1,3),16)<100; const tc=isDarkL?'#fff':'#1C1C1A'; const sc=isDarkL?'rgba(255,255,255,0.4)':'rgba(28,28,26,0.5)'; return `<div class="showcase-hero anim-hero" style="background:${pal.bg}"><div class="hero-inner"><div class="hero-eyebrow" style="color:${pal.accent}">${client}</div><div class="hero-title" style="color:${tc}">${title}</div><div class="hero-subtitle" style="color:${sc}">${tagline} — ${desc}</div></div></div>`; }
+  if (t==='mosaic') return `<div class="showcase-hero anim-hero" style="border-bottom:3px solid ${pal.border}"><div><div class="hero-eyebrow">${client}</div><div class="hero-title">${title}</div></div><div class="hero-right"><span class="hero-tagline">${tagline}</span><div class="hero-subtitle">${desc}</div></div></div>`;
+  if (t==='cinematic') { const cp=PALETTES.cinematic[state.palette]; return `<div class="showcase-hero anim-hero" style="background:${cp.bg}"><div class="hero-inner"><div class="hero-rule" style="background:${cp.accent}"></div><div class="hero-eyebrow" style="color:${cp.text}">${client}</div><div class="hero-title" style="color:${cp.text}">${title}</div><div class="hero-subtitle" style="color:${cp.text}">${tagline} — ${desc}</div></div></div>`; }
 }
 function getProducts() {
   const t=state.template,pal=PALETTES[t][state.palette],prods=state.products;
@@ -3172,7 +3157,7 @@ function updatePreview() {
             +'<div style="position:absolute;top:0;left:0;right:0;height:3px;background:'+warmAcc+'"></div>'
             +'<div style="position:relative;z-index:1;transition:transform 0.4s ease" class="cat-text">'
               +'<div style="width:20px;height:1px;background:'+warmAcc+';margin-bottom:12px;opacity:0.8"></div>'
-              +(_activeMode?'':'<div style="font-size:9px;letter-spacing:0.3em;text-transform:uppercase;color:'+eyebrowColor+';margin-bottom:14px">Thermal Collection</div>')
+              +'<div style="font-size:9px;letter-spacing:0.3em;text-transform:uppercase;color:'+eyebrowColor+';margin-bottom:14px">Thermal Collection</div>'
               +'<div style="font-family:Cormorant Garamond,serif;font-size:52px;font-weight:300;color:'+textOnSplit+';line-height:1.0;margin-bottom:16px">'+(state.catWarmName||'Base Layer').replace(' ','<br>')+'</div>'
               +'<div style="font-size:11px;color:'+subOnSplit+';margin-bottom:20px">'+warmProds.length+' styles</div>'
               +'<div style="font-size:10px;letter-spacing:0.2em;text-transform:uppercase;color:'+warmAcc+'">Explore →</div>'
@@ -3184,7 +3169,7 @@ function updatePreview() {
             +'<div style="position:absolute;top:0;left:0;right:0;height:3px;background:'+airAcc+'"></div>'
             +'<div style="position:relative;z-index:1;transition:transform 0.4s ease" class="cat-text">'
               +'<div style="width:20px;height:1px;background:'+airAcc+';margin-bottom:12px;opacity:0.8"></div>'
-              +(_activeMode?'':'<div style="font-size:9px;letter-spacing:0.3em;text-transform:uppercase;color:'+eyebrowColor+';margin-bottom:14px">Thermal Collection</div>')
+              +'<div style="font-size:9px;letter-spacing:0.3em;text-transform:uppercase;color:'+eyebrowColor+';margin-bottom:14px">Thermal Collection</div>'
               +'<div style="font-family:Cormorant Garamond,serif;font-size:52px;font-weight:300;color:'+textOnSplit+';line-height:1.0;margin-bottom:16px">'+(state.catAirName||'Mid Layer').replace(' ','<br>')+'</div>'
               +'<div style="font-size:11px;color:'+subOnSplit+';margin-bottom:20px">'+airProds.length+' styles</div>'
               +'<div style="font-size:10px;letter-spacing:0.2em;text-transform:uppercase;color:'+airAcc+'">Explore →</div>'
@@ -3292,14 +3277,8 @@ function openDetail(id) {
         ${p.desc?`<div class="detail-desc" style="color:${subColor};margin-top:12px">${p.desc}</div>`:""}
       </div>
       ${p.special?'<div class="detail-anim" style="animation-delay:0.4s;margin-top:8px;padding-top:16px;border-top:1px solid '+borderColor+'">'+'<div style="font-size:14px;letter-spacing:0.12em;text-transform:uppercase;color:'+accentColor+';margin-bottom:8px">What Makes It Special</div>'+'<div style="font-size:16px;color:'+subColor+';line-height:1.8">'+p.special+'</div>'+'</div>':''}
+      ${hasMultiple?`<div class="detail-anim" style="animation-delay:0.5s;font-size:11px;color:${subColor};margin-top:16px">${allImgs.length} photos</div>`:''}
       ${(p.techs&&p.techs.length)?'<div class="detail-anim" style="animation-delay:0.55s;margin-top:24px;padding-top:20px;border-top:1px solid '+borderColor+';display:flex;flex-wrap:wrap;gap:8px;align-items:center">'+p.techs.map(tid=>{const t=TECHNOLOGIES.find(x=>x.id===tid);if(!t)return'';return `<span style="font-size:10px;letter-spacing:0.1em;text-transform:uppercase;color:${accentColor};border:1px solid ${accentColor}66;border-radius:20px;padding:5px 13px;white-space:nowrap">${t.label}</span>`;}).join('')+'</div>':''}
-      ${(p.styleNo||p.styleTop||p.styleBottom)?(()=>{
-        const styleItems=[];
-        if(p.styleNo&&p.styleNo.trim()) styleItems.push('<span style="display:inline-flex;flex-direction:column;gap:2px;padding:8px 16px;border:1px solid '+accentColor+'44;border-radius:4px"><span style="font-size:8px;letter-spacing:0.18em;text-transform:uppercase;color:'+accentColor+';opacity:0.8">Style No</span><span style="font-size:14px;color:'+textColor+';letter-spacing:0.06em;font-weight:400">'+p.styleNo+'</span></span>');
-        if(p.styleTop&&p.styleTop.trim()) styleItems.push('<span style="display:inline-flex;flex-direction:column;gap:2px;padding:8px 16px;border:1px solid '+accentColor+'44;border-radius:4px"><span style="font-size:8px;letter-spacing:0.18em;text-transform:uppercase;color:'+accentColor+';opacity:0.8">Top Style No</span><span style="font-size:14px;color:'+textColor+';letter-spacing:0.06em;font-weight:400">'+p.styleTop+'</span></span>');
-        if(p.styleBottom&&p.styleBottom.trim()) styleItems.push('<span style="display:inline-flex;flex-direction:column;gap:2px;padding:8px 16px;border:1px solid '+accentColor+'44;border-radius:4px"><span style="font-size:8px;letter-spacing:0.18em;text-transform:uppercase;color:'+accentColor+';opacity:0.8">Bottom Style No</span><span style="font-size:14px;color:'+textColor+';letter-spacing:0.06em;font-weight:400">'+p.styleBottom+'</span></span>');
-        return styleItems.length ? '<div class="detail-anim" style="animation-delay:0.6s;margin-top:20px;padding-top:16px;border-top:1px solid '+borderColor+';display:flex;flex-wrap:wrap;gap:8px">'+styleItems.join('')+'</div>' : '';
-      })():''}
     </div>
   </div>`;
 
@@ -3806,105 +3785,32 @@ function buildPdfPageHTML(pair) {
   var p1 = pair[0] ? prods.find(function(p){ return p.id===pair[0]; }) : null;
   var p2 = pair[1] ? prods.find(function(p){ return p.id===pair[1]; }) : null;
   var isSolo = !p2;
-
   var collLabel = _pdfCollection==='outdoor' ? 'Outdoor Collection' : 'Active Collection';
-
-  var header = '<div style="display:flex;align-items:center;justify-content:space-between;padding:12px 28px;border-bottom:1px solid #e0dbd4;flex-shrink:0">' +
-    '<div style="font-size:10px;letter-spacing:0.25em;text-transform:uppercase;color:#1C1C1A;font-weight:600">Delta Galil</div>' +
-    '<div style="font-size:8px;letter-spacing:0.12em;text-transform:uppercase;color:#999">' + collLabel + ' &nbsp;&middot;&nbsp; Spring Summer 2026</div>' +
-    '</div>';
-
+  var header = '<div style="display:flex;align-items:center;justify-content:space-between;padding:3mm 6mm;border-bottom:0.5mm solid #e0dbd4;flex-shrink:0"><div style="font-size:3mm;letter-spacing:0.2em;text-transform:uppercase;color:#1C1C1A;font-weight:600">Delta Galil</div><div style="font-size:2.5mm;letter-spacing:0.1em;text-transform:uppercase;color:#999">'+collLabel+' · Spring Summer 2026</div></div>';
   function ratingRow(label, val, icon) {
     if (!val) return '';
-    var icons = '';
-    for (var i=0; i<5; i++) icons += '<span style="font-size:15px;opacity:'+(i<val?'1':'0.15')+'">'+icon+'</span>';
-    return '<div style="display:flex;align-items:center;gap:8px;margin-bottom:6px">' +
-      '<span style="font-size:10px;letter-spacing:0.12em;text-transform:uppercase;color:#777;width:66px;flex-shrink:0">'+label+'</span>' + icons +
-      '</div>';
+    var icons=''; for(var i=0;i<5;i++) icons+='<span style="font-size:4.5mm;opacity:'+(i<val?'1':'0.15')+'">'+icon+'</span>';
+    return '<div style="display:flex;align-items:center;gap:2.5mm;margin-bottom:2mm"><span style="font-size:2.8mm;letter-spacing:0.1em;text-transform:uppercase;color:#666;width:16mm;flex-shrink:0">'+label+'</span>'+icons+'</div>';
   }
-
   function techBadgesHtml(p) {
-    if (!p || !p.techs || !p.techs.length) return '';
-    var badges = p.techs.map(function(tid){
-      var t = TECHNOLOGIES.find(function(x){ return x.id===tid; });
-      return t ? '<span style="font-size:7.5px;letter-spacing:0.1em;text-transform:uppercase;border:1px solid #B8956A;border-radius:20px;padding:3px 10px;color:#8C6A3F;white-space:nowrap">'+t.label+'</span>' : '';
-    }).join('');
-    return '<div style="display:flex;flex-wrap:wrap;gap:5px;margin-top:10px">'+badges+'</div>';
+    if (!p||!p.techs||!p.techs.length) return '';
+    var b=p.techs.map(function(tid){ var t=TECHNOLOGIES.find(function(x){return x.id===tid;}); return t?'<span style="font-size:2.5mm;letter-spacing:0.08em;text-transform:uppercase;border:0.3mm solid #B8956A;border-radius:10mm;padding:1mm 3mm;color:#8C6A3F;white-space:nowrap">'+t.label+'</span>':''; }).join('');
+    return '<div style="display:flex;flex-wrap:wrap;gap:2mm;margin-top:3mm">'+b+'</div>';
   }
-
   function styleNosHtml(p) {
-    var s = '';
-    if (p.styleNo&&p.styleNo.trim()) s += '<span style="margin-right:16px"><span style="font-size:7.5px;letter-spacing:0.12em;text-transform:uppercase;color:#B8956A">Style No </span><span style="font-size:9px;color:#1C1C1A;font-weight:500">'+p.styleNo+'</span></span>';
-    if (p.styleTop&&p.styleTop.trim()) s += '<span style="margin-right:16px"><span style="font-size:7.5px;letter-spacing:0.12em;text-transform:uppercase;color:#B8956A">Top </span><span style="font-size:9px;color:#1C1C1A;font-weight:500">'+p.styleTop+'</span></span>';
-    if (p.styleBottom&&p.styleBottom.trim()) s += '<span><span style="font-size:7.5px;letter-spacing:0.12em;text-transform:uppercase;color:#B8956A">Bottom </span><span style="font-size:9px;color:#1C1C1A;font-weight:500">'+p.styleBottom+'</span></span>';
-    return s ? '<div style="margin-top:4px">'+s+'</div>' : '';
+    var s='';
+    if(p.styleNo&&p.styleNo.trim()) s+='<span style="margin-right:4mm"><span style="font-size:2.3mm;letter-spacing:0.1em;text-transform:uppercase;color:#B8956A">Style No </span><span style="font-size:3mm;color:#1C1C1A;font-weight:600">'+p.styleNo+'</span></span>';
+    if(p.styleTop&&p.styleTop.trim()) s+='<span style="margin-right:4mm"><span style="font-size:2.3mm;letter-spacing:0.1em;text-transform:uppercase;color:#B8956A">Top </span><span style="font-size:3mm;color:#1C1C1A;font-weight:600">'+p.styleTop+'</span></span>';
+    if(p.styleBottom&&p.styleBottom.trim()) s+='<span><span style="font-size:2.3mm;letter-spacing:0.1em;text-transform:uppercase;color:#B8956A">Bottom </span><span style="font-size:3mm;color:#1C1C1A;font-weight:600">'+p.styleBottom+'</span></span>';
+    return s?'<div style="margin-top:1.5mm">'+s+'</div>':'';
   }
-
+  var fire='🔥'; var drop='💧'; var snow='❄️';
   if (isSolo && p1) {
-    // SOLO - A4 landscape: image LEFT, info RIGHT
-    return '<div class="pdf-page" style="width:297mm;height:210mm;display:flex;flex-direction:column;background:#fff;font-family:DM Sans,sans-serif;box-sizing:border-box;overflow:hidden">' +
-      header +
-      '<div style="flex:1;display:flex;flex-direction:row;overflow:hidden;min-height:0">' +
-        '<div style="flex:1.2;background:#f5f2ee;overflow:hidden;border-right:2px solid #e0dbd4">' +
-          '<img src="'+(p1.img||'')+'" crossorigin="anonymous" style="width:100%;height:100%;object-fit:contain;object-position:center top;display:block" />' +
-        '</div>' +
-        '<div style="flex:1;padding:28px 36px;display:flex;flex-direction:column;justify-content:center;overflow:hidden">' +
-          '<div style="width:24px;height:2px;background:#B8956A;margin-bottom:18px"></div>' +
-          '<div style="font-family:Cormorant Garamond,serif;font-size:28px;font-weight:300;color:#1C1C1A;margin-bottom:6px;line-height:1.2">'+(p1.name||'')+'</div>' +
-          styleNosHtml(p1) +
-          '<div style="font-size:10px;letter-spacing:0.18em;text-transform:uppercase;color:#777;margin-top:14px;margin-bottom:16px">'+(p1.fabric||'')+'</div>' +
-          (p1.warmth||p1.dry||p1.breath ? '<div style="margin-bottom:16px">'+ratingRow('Warmth',p1.warmth,'🔥')+ratingRow('Dry Rate',p1.dry,'💧')+ratingRow('Airflow',p1.breath,'❄️')+'</div>' : '') +
-          ((p1.special||p1.desc)?'<div style="font-size:11px;color:#333;line-height:1.8;margin-bottom:14px;padding-top:14px;border-top:1px solid #e0dbd4">'+(p1.special||p1.desc||'')+'</div>':'') +
-          techBadgesHtml(p1) +
-        '</div>' +
-      '</div>' +
-    '</div>';
+    return '<div class="pdf-page" style="width:210mm;height:297mm;display:flex;flex-direction:column;background:#fff;font-family:DM Sans,sans-serif;box-sizing:border-box;overflow:hidden">'+header+'<div style="flex:1.6;background:#f5f2ee;overflow:hidden;border-bottom:0.5mm solid #e0dbd4"><img src="'+(p1.img||'')+'" crossorigin="anonymous" style="width:100%;height:100%;object-fit:contain;object-position:center top;display:block" /></div><div style="flex:1;padding:6mm 8mm;display:flex;flex-direction:column;justify-content:center;overflow:hidden"><div style="width:6mm;height:0.5mm;background:#B8956A;margin-bottom:4mm"></div><div style="font-family:Cormorant Garamond,serif;font-size:9mm;font-weight:300;color:#1C1C1A;margin-bottom:2mm;line-height:1.2">'+(p1.name||'')+'</div>'+styleNosHtml(p1)+'<div style="font-size:2.8mm;letter-spacing:0.16em;text-transform:uppercase;color:#666;margin-top:3mm;margin-bottom:3mm">'+(p1.fabric||'')+'</div>'+(p1.warmth||p1.dry||p1.breath?'<div style="margin-bottom:3mm">'+ratingRow('Warmth',p1.warmth,fire)+ratingRow('Dry Rate',p1.dry,drop)+ratingRow('Airflow',p1.breath,snow)+'</div>':'')+((p1.special||p1.desc)?'<div style="font-size:3.2mm;color:#222;line-height:1.8;margin-bottom:3mm;padding-top:3mm;border-top:0.3mm solid #e0dbd4">'+(p1.special||p1.desc||'')+'</div>':'')+techBadgesHtml(p1)+'</div></div>';
   }
-
-  // PAIR - A4 landscape: images stacked on LEFT, shared info on RIGHT
-  return '<div class="pdf-page" style="width:297mm;height:210mm;display:flex;flex-direction:column;background:#fff;font-family:DM Sans,sans-serif;box-sizing:border-box;overflow:hidden">' +
-    header +
-    '<div style="flex:1;display:flex;flex-direction:row;overflow:hidden;min-height:0">' +
-
-      // LEFT: two images stacked + name/style per image
-      '<div style="width:44%;display:flex;flex-direction:column;border-right:2px solid #e0dbd4;overflow:hidden">' +
-
-        // Top image
-        '<div style="flex:1;display:flex;flex-direction:column;border-bottom:1px solid #e0dbd4;overflow:hidden">' +
-          '<div style="flex:1;background:#f5f2ee;overflow:hidden">' +
-            '<img src="'+(p1.img||'')+'" crossorigin="anonymous" style="width:100%;height:100%;object-fit:contain;object-position:center top;display:block" />' +
-          '</div>' +
-          '<div style="padding:8px 14px 10px;flex-shrink:0">' +
-            '<div style="font-family:Cormorant Garamond,serif;font-size:15px;font-weight:300;color:#1C1C1A;line-height:1.2">'+(p1.name||'')+'</div>' +
-            styleNosHtml(p1) +
-          '</div>' +
-        '</div>' +
-
-        // Bottom image
-        '<div style="flex:1;display:flex;flex-direction:column;overflow:hidden">' +
-          '<div style="flex:1;background:#f5f2ee;overflow:hidden">' +
-            '<img src="'+(p2.img||'')+'" crossorigin="anonymous" style="width:100%;height:100%;object-fit:contain;object-position:center top;display:block" />' +
-          '</div>' +
-          '<div style="padding:8px 14px 10px;flex-shrink:0">' +
-            '<div style="font-family:Cormorant Garamond,serif;font-size:15px;font-weight:300;color:#1C1C1A;line-height:1.2">'+(p2.name||'')+'</div>' +
-            styleNosHtml(p2) +
-          '</div>' +
-        '</div>' +
-
-      '</div>' +
-
-      // RIGHT: shared info
-      '<div style="flex:1;padding:28px 32px;display:flex;flex-direction:column;justify-content:center;overflow:hidden">' +
-        '<div style="width:24px;height:2px;background:#B8956A;margin-bottom:18px"></div>' +
-        '<div style="font-size:10px;letter-spacing:0.18em;text-transform:uppercase;color:#777;margin-bottom:16px;line-height:1.6">'+(p1.fabric||'')+'</div>' +
-        (p1.warmth||p1.dry||p1.breath ? '<div style="margin-bottom:16px">'+ratingRow('Warmth',p1.warmth,'🔥')+ratingRow('Dry Rate',p1.dry,'💧')+ratingRow('Airflow',p1.breath,'❄️')+'</div>' : '') +
-        ((p1.special||p1.desc)?'<div style="font-size:11px;color:#333;line-height:1.8;margin-bottom:14px;padding-top:14px;border-top:1px solid #e0dbd4">'+(p1.special||p1.desc||'')+'</div>':'') +
-        techBadgesHtml(p1) +
-      '</div>' +
-
-    '</div>' +
-  '</div>';
+  return '<div class="pdf-page" style="width:210mm;height:297mm;display:flex;flex-direction:column;background:#fff;font-family:DM Sans,sans-serif;box-sizing:border-box;overflow:hidden">'+header+'<div style="flex:1.6;display:flex;flex-direction:row;border-bottom:0.5mm solid #e0dbd4;overflow:hidden;min-height:0"><div style="flex:1;display:flex;flex-direction:column;border-right:0.3mm solid #e0dbd4;overflow:hidden"><div style="flex:1;background:#f5f2ee;overflow:hidden"><img src="'+(p1.img||'')+'" crossorigin="anonymous" style="width:100%;height:100%;object-fit:contain;object-position:center top;display:block" /></div><div style="padding:3mm 4mm;border-top:0.3mm solid #e0dbd4;flex-shrink:0"><div style="font-family:Cormorant Garamond,serif;font-size:5mm;font-weight:300;color:#1C1C1A;line-height:1.2">'+(p1.name||'')+'</div>'+styleNosHtml(p1)+'</div></div><div style="flex:1;display:flex;flex-direction:column;overflow:hidden"><div style="flex:1;background:#f5f2ee;overflow:hidden"><img src="'+(p2.img||'')+'" crossorigin="anonymous" style="width:100%;height:100%;object-fit:contain;object-position:center top;display:block" /></div><div style="padding:3mm 4mm;border-top:0.3mm solid #e0dbd4;flex-shrink:0"><div style="font-family:Cormorant Garamond,serif;font-size:5mm;font-weight:300;color:#1C1C1A;line-height:1.2">'+(p2.name||'')+'</div>'+styleNosHtml(p2)+'</div></div></div><div style="flex:1;padding:5mm 8mm;overflow:hidden"><div style="width:6mm;height:0.5mm;background:#B8956A;margin-bottom:3mm"></div><div style="font-size:2.8mm;letter-spacing:0.16em;text-transform:uppercase;color:#666;margin-bottom:3mm">'+(p1.fabric||'')+'</div>'+(p1.warmth||p1.dry||p1.breath?'<div style="margin-bottom:3mm">'+ratingRow('Warmth',p1.warmth,fire)+ratingRow('Dry Rate',p1.dry,drop)+ratingRow('Airflow',p1.breath,snow)+'</div>':'')+((p1.special||p1.desc)?'<div style="font-size:3.2mm;color:#222;line-height:1.8;margin-bottom:3mm;padding-top:3mm;border-top:0.3mm solid #e0dbd4">'+(p1.special||p1.desc||'')+'</div>':'')+techBadgesHtml(p1)+'</div></div>';
 }
+
 
 function previewPDF() {
   var root = document.getElementById('pdf-print-root');
@@ -3927,27 +3833,17 @@ function previewPDF() {
   // Convert all images to base64 so they print correctly
   var imgCache = {};
   function toDataURL(url, cb) {
-    var done = false;
-    function finish(result) {
-      if (done) return;
-      done = true;
-      imgCache[url] = result;
-      cb();
-    }
     var img = new Image();
     img.crossOrigin = 'anonymous';
     img.onload = function(){
-      try {
-        var c = document.createElement('canvas');
-        c.width = img.naturalWidth; c.height = img.naturalHeight;
-        c.getContext('2d').drawImage(img,0,0);
-        finish(c.toDataURL('image/jpeg', 0.92));
-      } catch(e){ finish(url); }
+      var c = document.createElement('canvas');
+      c.width = img.naturalWidth; c.height = img.naturalHeight;
+      c.getContext('2d').drawImage(img,0,0);
+      try { imgCache[url] = c.toDataURL('image/jpeg', 0.92); } catch(e){ imgCache[url] = url; }
+      cb();
     };
-    img.onerror = function(){ finish(url); };
+    img.onerror = function(){ imgCache[url] = url; cb(); };
     img.src = url + (url.includes('?')?'&':'?') + '_t=' + Date.now();
-    // Timeout after 8 seconds - use original URL
-    setTimeout(function(){ finish(url); }, 8000);
   }
 
   var pending = imgUrls.length;
