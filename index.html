@@ -534,9 +534,9 @@ img { image-rendering: auto; }
   #pdf-print-root{display:block!important;position:static;overflow:visible;padding:0;background:#fff}
   #pdf-controls{display:none!important}
   #pdf-pages-wrapper{display:block!important;margin:0!important;padding:0!important}
-  .pdf-page{margin:0;padding:0;box-shadow:none;page-break-after:always;break-after:page;page-break-inside:avoid;break-inside:avoid;width:210mm!important;height:297mm!important}
+  .pdf-page{margin:0;padding:0;box-shadow:none;page-break-after:always;break-after:page;page-break-inside:avoid;break-inside:avoid;width:297mm!important;height:210mm!important}
   .pdf-page:last-child{page-break-after:avoid;break-after:avoid}
-  @page{size:A4 portrait;margin:0}
+  @page{size:A4 landscape;margin:0}
 }
 </style>
 </head>
@@ -3808,10 +3808,15 @@ function buildPdfPageHTML(pair) {
   var isSolo = !p2;
   var collLabel = _pdfCollection==='outdoor' ? 'Outdoor Collection' : 'Active Collection';
 
-  var header = '<div style="display:flex;align-items:center;justify-content:space-between;padding:3mm 8mm;border-bottom:0.4mm solid #ddd;flex-shrink:0;background:#fff">' +
-    '<img src="https://dkgzhmpuqzykzebzcqdr.supabase.co/storage/v1/object/public/product-images/DELTA%20LOGO2.png" style="height:28mm;object-fit:contain;display:block" />' +
-    '<div style="font-size:3mm;letter-spacing:0.1em;text-transform:uppercase;color:#aaa">' + collLabel + ' · Spring Summer 2028</div>' +
-    '<img src="https://dkgzhmpuqzykzebzcqdr.supabase.co/storage/v1/object/public/product-images/LULU%20OGO%202.png" style="height:28mm;object-fit:contain;display:block" />' +
+  // Header: logos + big season title
+  var header = '<div style="display:flex;align-items:center;justify-content:space-between;padding:4mm 8mm 3mm;border-bottom:0.3mm solid #ddd;flex-shrink:0;background:#fff">' +
+    '<img src="https://dkgzhmpuqzykzebzcqdr.supabase.co/storage/v1/object/public/product-images/DELTA%20LOGO2.png" style="height:14mm;object-fit:contain;display:block" />' +
+    '<div style="text-align:center">' +
+      '<div style="font-size:2.5mm;letter-spacing:0.2em;text-transform:uppercase;color:#aaa;margin-bottom:1mm">Delta Galil</div>' +
+      '<div style="font-family:Cormorant Garamond,serif;font-size:10mm;font-weight:300;color:#1C1C1A;letter-spacing:0.02em;line-height:1">Spring Summer 2028</div>' +
+      '<div style="font-size:2.2mm;letter-spacing:0.15em;text-transform:uppercase;color:#bbb;margin-top:1mm">' + collLabel + '</div>' +
+    '</div>' +
+    '<img src="https://dkgzhmpuqzykzebzcqdr.supabase.co/storage/v1/object/public/product-images/LULU%20OGO%202.png" style="height:14mm;object-fit:contain;display:block" />' +
     '</div>';
 
   function ratingRowPDF(type, val, label) {
@@ -3834,68 +3839,72 @@ function buildPdfPageHTML(pair) {
 
   function styleNosPDF(p) {
     var items = [];
-    if (p.styleNo&&p.styleNo.trim()) items.push('<span style="font-size:3mm;letter-spacing:0.1em;text-transform:uppercase;color:#C4A882">Style No  </span><span style="font-size:4mm;color:#1C1C1A">'+p.styleNo+'</span>');
-    if (p.styleTop&&p.styleTop.trim()) items.push('<span style="font-size:3mm;letter-spacing:0.1em;text-transform:uppercase;color:#C4A882">Top Style No  </span><span style="font-size:4mm;color:#1C1C1A">'+p.styleTop+'</span>');
-    if (p.styleBottom&&p.styleBottom.trim()) items.push('<span style="font-size:3mm;letter-spacing:0.1em;text-transform:uppercase;color:#C4A882">Bottom Style No  </span><span style="font-size:4mm;color:#1C1C1A">'+p.styleBottom+'</span>');
+    if (p.styleNo&&p.styleNo.trim()) items.push('<span style="font-size:3mm;letter-spacing:0.1em;text-transform:uppercase;color:#C4A882">Style No  </span><span style="font-size:3.5mm;color:#1C1C1A">'+p.styleNo+'</span>');
+    if (p.styleTop&&p.styleTop.trim()) items.push('<span style="font-size:3mm;letter-spacing:0.1em;text-transform:uppercase;color:#C4A882">Top  </span><span style="font-size:3.5mm;color:#1C1C1A">'+p.styleTop+'</span>');
+    if (p.styleBottom&&p.styleBottom.trim()) items.push('<span style="font-size:3mm;letter-spacing:0.1em;text-transform:uppercase;color:#C4A882">Bottom  </span><span style="font-size:3.5mm;color:#1C1C1A">'+p.styleBottom+'</span>');
     if (!items.length) return '';
-    return '<div style="display:flex;flex-wrap:wrap;gap:5mm;margin-top:3mm">'+items.map(function(i){return '<span>'+i+'</span>';}).join('')+'</div>';
+    return '<div style="display:flex;flex-wrap:wrap;gap:4mm;margin-top:2mm">'+items.map(function(i){return '<span>'+i+'</span>';}).join('')+'</div>';
   }
 
   function sharedInfo(p) {
-    return '<div style="width:10mm;height:0.7mm;background:#C4A882;margin-bottom:6mm"></div>' +
-      '<div style="font-size:3.5mm;letter-spacing:0.16em;text-transform:uppercase;color:#555;margin-bottom:6mm;line-height:1.7">'+(p.fabric||'')+'</div>' +
-      (p.warmth||p.dry||p.breath ? '<div style="margin-bottom:6mm">'+ratingRowPDF('w',p.warmth,'Warmth')+ratingRowPDF('d',p.dry,'Dry Rate')+ratingRowPDF('b',p.breath,'Airflow')+'</div>' : '') +
-      ((p.special||p.desc)?'<div style="font-size:3.8mm;color:#222;line-height:1.85;margin-bottom:6mm;padding-top:6mm;border-top:0.3mm solid #e0dbd4">'+(p.special||p.desc||'')+'</div>':'') +
+    return '<div style="font-size:3.2mm;letter-spacing:0.14em;text-transform:uppercase;color:#555;margin-bottom:5mm;line-height:1.7">'+(p.fabric||'')+'</div>' +
+      (p.warmth||p.dry||p.breath ? '<div style="margin-bottom:5mm">'+ratingRowPDF('w',p.warmth,'Warmth')+ratingRowPDF('d',p.dry,'Dry Rate')+ratingRowPDF('b',p.breath,'Airflow')+'</div>' : '') +
+      ((p.special||p.desc)?'<div style="font-size:3.5mm;color:#222;line-height:1.85;margin-bottom:5mm;padding-top:5mm;border-top:0.3mm solid #e0dbd4">'+(p.special||p.desc||'')+'</div>':'') +
       techBadgesPDF(p);
   }
 
   if (isSolo && p1) {
     var allImgs = [p1.img].concat(p1.extraImgs||[]).filter(Boolean).slice(0,3);
-    var imgGrid = '';
-    if (allImgs.length === 1) {
-      imgGrid = '<div style="height:100%;background:#f5f2ee"><img src="'+allImgs[0]+'" style="width:100%;height:100%;object-fit:contain;object-position:center top;display:block" /></div>';
-    } else {
-      imgGrid = '<div style="display:flex;height:100%">' +
-        allImgs.map(function(src,i){ return '<div style="flex:1;background:#f5f2ee'+(i<allImgs.length-1?';border-right:1px solid #fff':'')+'""><img src="'+src+'" style="width:100%;height:100%;object-fit:cover;object-position:center top;display:block" /></div>'; }).join('') +
-      '</div>';
-    }
-    return '<div class="pdf-page" style="width:210mm;height:297mm;display:flex;flex-direction:column;background:#fff;font-family:DM Sans,sans-serif;box-sizing:border-box;overflow:hidden">' +
+    var imgGrid = allImgs.length === 1
+      ? '<div style="height:100%;background:#f5f2ee"><img src="'+allImgs[0]+'" style="width:100%;height:100%;object-fit:contain;object-position:center top;display:block" /></div>'
+      : '<div style="display:flex;height:100%">'+allImgs.map(function(src,i){return '<div style="flex:1;background:#f5f2ee'+(i<allImgs.length-1?';border-right:1px solid #fff':'')+'""><img src="'+src+'" style="width:100%;height:100%;object-fit:cover;object-position:center top;display:block"/></div>';}).join('')+'</div>';
+
+    return '<div class="pdf-page" style="width:297mm;height:210mm;display:flex;flex-direction:column;background:#fff;font-family:DM Sans,sans-serif;box-sizing:border-box;overflow:hidden">' +
       header +
-      '<div style="flex:1;overflow:hidden">' + imgGrid + '</div>' +
-      '<div style="flex:1;padding:8mm 10mm;display:flex;flex-direction:column;justify-content:center;overflow:hidden;border-top:0.4mm solid #ddd">' +
-        '<div style="font-family:Cormorant Garamond,serif;font-size:11mm;font-weight:300;color:#1C1C1A;margin-bottom:2mm;line-height:1.15">'+(p1.name||'')+'</div>' +
-        styleNosPDF(p1) +
-        '<div style="width:10mm;height:0.7mm;background:#C4A882;margin:5mm 0"></div>' +
-        '<div style="font-size:3.5mm;letter-spacing:0.16em;text-transform:uppercase;color:#555;margin-bottom:5mm">'+(p1.fabric||'')+'</div>' +
-        (p1.warmth||p1.dry||p1.breath ? '<div style="margin-bottom:5mm">'+ratingRowPDF('w',p1.warmth,'Warmth')+ratingRowPDF('d',p1.dry,'Dry Rate')+ratingRowPDF('b',p1.breath,'Airflow')+'</div>' : '') +
-        ((p1.special||p1.desc)?'<div style="font-size:3.8mm;color:#222;line-height:1.85;margin-bottom:5mm;padding-top:5mm;border-top:0.3mm solid #e0dbd4">'+(p1.special||p1.desc||'')+'</div>':'') +
-        techBadgesPDF(p1) +
+      '<div style="flex:1;display:flex;flex-direction:row;overflow:hidden;min-height:0">' +
+        '<div style="flex:1.4;overflow:hidden">' + imgGrid + '</div>' +
+        '<div style="flex:1;padding:6mm 8mm;display:flex;flex-direction:column;justify-content:center;overflow:hidden;border-left:0.3mm solid #eee">' +
+          '<div style="font-family:Cormorant Garamond,serif;font-size:8mm;font-weight:300;color:#1C1C1A;margin-bottom:2mm;line-height:1.2">'+(p1.name||'')+'</div>' +
+          styleNosPDF(p1) +
+          '<div style="width:8mm;height:0.5mm;background:#C4A882;margin:5mm 0"></div>' +
+          sharedInfo(p1) +
+        '</div>' +
       '</div>' +
     '</div>';
   }
 
-  return '<div class="pdf-page" style="width:210mm;height:297mm;display:flex;flex-direction:column;background:#fff;font-family:DM Sans,sans-serif;box-sizing:border-box;overflow:hidden">' +
+  // PAIR - landscape: two images side by side LEFT (~65%), info RIGHT (~35%)
+  return '<div class="pdf-page" style="width:297mm;height:210mm;display:flex;flex-direction:column;background:#fff;font-family:DM Sans,sans-serif;box-sizing:border-box;overflow:hidden">' +
     header +
     '<div style="flex:1;display:flex;flex-direction:row;overflow:hidden;min-height:0">' +
-      '<div style="width:46%;display:flex;flex-direction:column;overflow:hidden;padding:0 4mm">' +
-        '<div style="flex:1;overflow:hidden">' +
-          '<img src="'+(p1.img||'')+'" style="width:100%;height:100%;object-fit:cover;object-position:center top;display:block" />' +
+
+      // LEFT: two images side by side
+      '<div style="flex:1.8;display:flex;flex-direction:row;border-right:0.3mm solid #eee;overflow:hidden">' +
+        '<div style="flex:1;display:flex;flex-direction:column;border-right:0.3mm solid #eee;overflow:hidden">' +
+          '<div style="flex:1;overflow:hidden">' +
+            '<img src="'+(p1.img||'')+'" style="width:100%;height:100%;object-fit:cover;object-position:center top;display:block" />' +
+          '</div>' +
+          '<div style="padding:2.5mm 3mm 3mm;flex-shrink:0;background:#fff">' +
+            '<div style="font-family:Cormorant Garamond,serif;font-size:5.5mm;font-weight:300;color:#1C1C1A;line-height:1.2">'+(p1.name||'')+'</div>' +
+            styleNosPDF(p1) +
+          '</div>' +
         '</div>' +
-        '<div style="padding:3mm 0;flex-shrink:0">' +
-          '<div style="font-family:Cormorant Garamond,serif;font-size:6mm;font-weight:300;color:#1C1C1A;line-height:1.2">'+(p1.name||'')+'</div>' +
-          styleNosPDF(p1) +
-        '</div>' +
-        '<div style="flex:1;overflow:hidden">' +
-          '<img src="'+(p2.img||'')+'" style="width:100%;height:100%;object-fit:cover;object-position:center top;display:block" />' +
-        '</div>' +
-        '<div style="padding:3mm 0;flex-shrink:0">' +
-          '<div style="font-family:Cormorant Garamond,serif;font-size:6mm;font-weight:300;color:#1C1C1A;line-height:1.2">'+(p2.name||'')+'</div>' +
-          styleNosPDF(p2) +
+        '<div style="flex:1;display:flex;flex-direction:column;overflow:hidden">' +
+          '<div style="flex:1;overflow:hidden">' +
+            '<img src="'+(p2.img||'')+'" style="width:100%;height:100%;object-fit:cover;object-position:center top;display:block" />' +
+          '</div>' +
+          '<div style="padding:2.5mm 3mm 3mm;flex-shrink:0;background:#fff">' +
+            '<div style="font-family:Cormorant Garamond,serif;font-size:5.5mm;font-weight:300;color:#1C1C1A;line-height:1.2">'+(p2.name||'')+'</div>' +
+            styleNosPDF(p2) +
+          '</div>' +
         '</div>' +
       '</div>' +
-      '<div style="flex:1;padding:8mm 10mm;display:flex;flex-direction:column;justify-content:center;overflow:hidden">' +
+
+      // RIGHT: shared info
+      '<div style="flex:1;padding:6mm 8mm;display:flex;flex-direction:column;justify-content:center;overflow:hidden">' +
         sharedInfo(p1) +
       '</div>' +
+
     '</div>' +
   '</div>';
 }
