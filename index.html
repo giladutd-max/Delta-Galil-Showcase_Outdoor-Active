@@ -1874,6 +1874,7 @@ function buildCatGrid(catProds,acc){
           +'<div style="display:inline-block;font-size:8px;letter-spacing:0.15em;text-transform:uppercase;color:'+acc+';border:1px solid '+badgeBorder+';padding:3px 8px;border-radius:2px;margin-bottom:10px">'+(p.layer==='base'?'Base Layer':p.layer==='mid'?'Mid Layer':'')+'</div>'
           +'<div style="font-family:Cormorant Garamond,serif;font-size:22px;font-weight:300;color:'+nameColor+';line-height:1.2;margin-bottom:8px">'+p.name+'</div>'
           +(p.fabric?'<div style="font-size:11px;color:'+subColor+';line-height:1.5">'+p.fabric+'</div>':'')
+          +(p.machine?'<div style="font-size:10px;color:'+subColor+';opacity:0.6;line-height:1.5;letter-spacing:0.05em;text-transform:uppercase">'+p.machine+'</div>':'')
           +(p.warmth?getWarmthHTML(p.warmth,false,true,isDark,'w','Warmth'):'')
           +(p.dry?getWarmthHTML(p.dry,false,true,isDark,'d','Dry rate'):'')
           +(p.breath?getWarmthHTML(p.breath,false,true,isDark,'b','AirFlow'):'')
@@ -3280,8 +3281,8 @@ function openDetail(id) {
         <div class="detail-eyebrow" style="color:${accentColor}">${g('pitch-client').value}</div>
         <div class="detail-name" style="color:${textColor}">${p.name}</div>
         <div class="detail-divider" style="background:${accentColor}"></div>
-        ${p.fabric?`<div class="detail-fabric" style="color:${subColor}">${p.fabric}</div>`:""}
-        ${p.machine?`<div class="detail-fabric" style="color:${subColor};opacity:0.7;font-size:12px;margin-top:2px">${p.machine}</div>`:""}
+        ${p.fabric?`<div style="font-size:9px;letter-spacing:0.15em;text-transform:uppercase;color:${accentColor};opacity:0.7;margin-bottom:2px">Fabric &amp; Material</div><div class="detail-fabric" style="color:${subColor};margin-bottom:8px">${p.fabric}</div>`:""}
+        ${p.machine?`<div style="font-size:9px;letter-spacing:0.15em;text-transform:uppercase;color:${accentColor};opacity:0.7;margin-bottom:2px">Machine</div><div class="detail-fabric" style="color:${subColor};margin-bottom:8px">${p.machine}</div>`:""}
         ${p.warmth?getWarmthHTML(p.warmth,true,false,isDark,'w','Warmth'):""}
         ${p.dry?getWarmthHTML(p.dry,true,false,isDark,'d','Dry rate'):""}
         ${p.breath?getWarmthHTML(p.breath,true,false,isDark,'b','AirFlow'):""}
@@ -3877,7 +3878,7 @@ function buildPdfPageHTML(pair) {
       '<div style="width:100%;height:0.3mm;background:#e0dbd4;margin-bottom:5mm"></div>' +
       '<div style="font-size:3mm;letter-spacing:0.15em;text-transform:uppercase;color:#C4A882;margin-bottom:3mm">FABRIC COMPOSITION</div>' +
       '<div style="font-size:4mm;color:#444;margin-bottom:1.5mm;line-height:1.7">'+(p.fabric||'')+'</div>' +
-      (p.machine?'<div style="font-size:3mm;letter-spacing:0.12em;text-transform:uppercase;color:#999;margin-bottom:1.5mm">MACHINE</div><div style="font-size:4mm;color:#444;margin-bottom:5mm;line-height:1.7">'+p.machine+'</div>':'<div style="margin-bottom:5mm"></div>') +
+      (p.machine?'<div style="font-size:3mm;letter-spacing:0.15em;text-transform:uppercase;color:#C4A882;margin-bottom:3mm">MACHINE</div><div style="font-size:4mm;color:#444;margin-bottom:5mm;line-height:1.7">'+p.machine+'</div>':'<div style="margin-bottom:5mm"></div>') +
       techBadgesPDF(p) +
     '</div>';
   }
