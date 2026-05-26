@@ -3834,7 +3834,7 @@ function buildPdfPageHTML(pair) {
 
   function ratingRowPDF(type, val, label) {
     if (!val||val<1) return '';
-    var count = type==='w' ? 4 : 5;
+    var count = 5;
     var icons = '';
     for (var i=0; i<count; i++) {
       var n=i+1; var active=n<=val;
