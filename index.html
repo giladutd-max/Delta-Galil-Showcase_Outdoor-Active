@@ -1702,7 +1702,7 @@ function copyPitchLink(token, e) {
 
 function goToDashboard() { loadDashboard(); }
 function showCat(cat){
-  if(cat==='split'){ showGlobalBack('landing'); }
+  if(cat==='split'){ showGlobalBack('cat'); }
   else { showGlobalBack('cat'); }
   const split=document.getElementById('cat-split');
   const warm=document.getElementById('cat-warm');
@@ -3237,6 +3237,7 @@ function updatePreview() {
 
 // ── DETAIL PAGE ──
 function openDetail(id) {
+  _preDetailBackMode = _globalBackMode;
   // stop any playing video immediately
   const existingVid=document.getElementById('detail-video');
   if(existingVid){existingVid.pause();existingVid.style.opacity='0';}
@@ -3347,7 +3348,7 @@ function closeDetail() {
   safeClassName('product-detail','product-detail');
   safeDisplay('product-detail','none');
   safeDisplay('showcase-preview','block');
-  showGlobalBack('landing');
+  showGlobalBack(_preDetailBackMode || 'landing');
   safeText('canvas-label','Live Preview');
   safeDisplay('export-hint','block');
   const canvasEl2=g('canvas');
@@ -4018,6 +4019,7 @@ window.addEventListener('afterprint', function() {
 
 // ── GLOBAL BACK BUTTON ──
 var _globalBackMode = null;
+var _preDetailBackMode = null;
 function showGlobalBack(mode) {
   _globalBackMode = mode;
   var btn = document.getElementById('global-back-btn');
