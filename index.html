@@ -1702,8 +1702,7 @@ function copyPitchLink(token, e) {
 
 function goToDashboard() { loadDashboard(); }
 function showCat(cat){
-  if(cat==='split'){ navPush(function(){ restoreFromCollection(); showLandingScreen(); }); }
-  else { navPush(function(){ showCat('split'); }); }
+  if(cat!=='split'){ navPush(function(){ showCat('split'); }); }
   const split=document.getElementById('cat-split');
   const warm=document.getElementById('cat-warm');
   const air=document.getElementById('cat-air');
