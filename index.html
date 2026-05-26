@@ -1702,8 +1702,8 @@ function copyPitchLink(token, e) {
 
 function goToDashboard() { loadDashboard(); }
 function showCat(cat){
-  if(cat==='split'){ showGlobalBack('cat'); }
-  else { showGlobalBack('cat'); }
+  if(cat==='split'){ navPush(function(){ restoreFromCollection(); showLandingScreen(); }); }
+  else { navPush(function(){ showCat('split'); }); }
   const split=document.getElementById('cat-split');
   const warm=document.getElementById('cat-warm');
   const air=document.getElementById('cat-air');
@@ -3237,8 +3237,7 @@ function updatePreview() {
 
 // ── DETAIL PAGE ──
 function openDetail(id) {
-  _preDetailBackMode = _globalBackMode;
-  // stop any playing video immediately
+    // stop any playing video immediately
   const existingVid=document.getElementById('detail-video');
   if(existingVid){existingVid.pause();existingVid.style.opacity='0';}
   const p=state.products.find(x=>x.id===id); if (!p) return;
@@ -3308,7 +3307,7 @@ function openDetail(id) {
   safeDisplay('export-hint','none');
   det.style.display='block'; void det.offsetWidth;
   det.className='product-detail visible';
-  showGlobalBack('detail');
+  navPush(function(){ closeDetail(); });
   safeText('canvas-label',p.name);
   window._savedScrollTop = document.documentElement.scrollTop || window.scrollY || 0;
   const canvasEl = g('canvas');
@@ -3348,7 +3347,7 @@ function closeDetail() {
   safeClassName('product-detail','product-detail');
   safeDisplay('product-detail','none');
   safeDisplay('showcase-preview','block');
-  showGlobalBack(_preDetailBackMode || 'landing');
+  
   safeText('canvas-label','Live Preview');
   safeDisplay('export-hint','block');
   const canvasEl2=g('canvas');
@@ -3437,7 +3436,7 @@ async function loadPresentationView(token) {
 
 // ── LANDING SCREEN (split: Outdoor | Active) ──
 function showLandingScreen() {
-  showGlobalBack(null);
+  navClear();
   const preview=g('showcase-preview'); if(!preview) return;
   const headline=state.landingHeadline||'Spring Summer 2026';
   const outdoorName=state.outdoorCollectionName||'Outdoor';
@@ -3528,7 +3527,7 @@ function showLandingScreen() {
 // ── ENTER COLLECTION ──
 let _activeMode=false; // true when viewer is in Active collection
 function enterCollection(which) {
-  showGlobalBack('landing');
+  navPush(function(){ restoreFromCollection(); showLandingScreen(); });
   _activeMode=(which==='active');
   if(_activeMode) {
     // Temporarily swap state to Active data for rendering
@@ -4018,24 +4017,28 @@ window.addEventListener('afterprint', function() {
 
 
 // ── GLOBAL BACK BUTTON ──
-var _globalBackMode = null;
-var _preDetailBackMode = null;
+var _navStack = [];
 function showGlobalBack(mode) {
-  _globalBackMode = mode;
+  // legacy calls ignored — stack drives everything now
+}
+function navPush(fn) {
+  _navStack.push(fn);
   var btn = document.getElementById('global-back-btn');
-  if (!btn) return;
-  if (!mode) {
-    btn.style.display = 'none';
-  } else {
-    btn.style.display = 'flex';
-    btn.innerText = '← Back';
-  }
+  if (btn) { btn.style.display = 'flex'; btn.innerText = '← Back'; }
+}
+function navClear() {
+  _navStack = [];
+  var btn = document.getElementById('global-back-btn');
+  if (btn) btn.style.display = 'none';
 }
 function globalBackAction() {
-  if (_globalBackMode === 'detail') { closeDetail(); }
-  else if (_globalBackMode === 'cat') { showCat('split'); }
-  else if (_globalBackMode === 'landing') { restoreFromCollection(); showLandingScreen(); }
-  else { showGlobalBack(null); }
+  if (_navStack.length === 0) return;
+  var fn = _navStack.pop();
+  if (_navStack.length === 0) {
+    var btn = document.getElementById('global-back-btn');
+    if (btn) btn.style.display = 'none';
+  }
+  fn();
 }
 </script>
 </body>
