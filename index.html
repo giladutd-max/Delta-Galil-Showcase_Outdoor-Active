@@ -3812,7 +3812,6 @@ function buildPdfPageHTML(pair) {
     '<div style="display:flex;align-items:center;justify-content:space-between;padding:4mm 8mm;border-bottom:0.3mm solid #ddd;flex-shrink:0;background:#fff">' +
       '<img src="https://dkgzhmpuqzykzebzcqdr.supabase.co/storage/v1/object/public/product-images/DELTA%20LOGO2.png" style="height:30mm;object-fit:contain;display:block" />' +
       '<div style="text-align:center;line-height:1">' +
-        '<div style="font-size:2.8mm;letter-spacing:0.25em;text-transform:uppercase;color:#999;margin-bottom:2mm">Delta Galil\u2019s</div>' +
         '<div style="font-family:Cormorant Garamond,serif;font-size:14mm;font-weight:300;color:#1C1C1A;line-height:1">Spring Summer 2028</div>' +
         '<div style="font-size:2.8mm;letter-spacing:0.2em;text-transform:uppercase;color:#999;margin-top:2mm">' + collLabel + '</div>' +
       '</div>' +
@@ -3833,8 +3832,12 @@ function buildPdfPageHTML(pair) {
 
   function techBadgesPDF(p) {
     if (!p||!p.techs||!p.techs.length) return '';
-    var b=p.techs.map(function(tid){ var t=TECHNOLOGIES.find(function(x){return x.id===tid;}); return t?'<span style="font-size:2.8mm;letter-spacing:0.08em;text-transform:uppercase;border:0.4mm solid #C4A882;border-radius:10mm;padding:1.2mm 3.5mm;color:#8C6A3F;white-space:nowrap;display:inline-block">'+t.label+'</span>':''; }).join('');
-    return '<div style="display:flex;flex-wrap:wrap;gap:2mm;margin-top:4mm">'+b+'</div>';
+    var labels=p.techs.map(function(tid){ var t=TECHNOLOGIES.find(function(x){return x.id===tid;}); return t?t.label:''; }).filter(Boolean);
+    if (!labels.length) return '';
+    return '<div style="margin-top:0">' +
+      '<div style="font-size:2.5mm;letter-spacing:0.2em;text-transform:uppercase;color:#aaa;margin-bottom:2mm">Technologies</div>' +
+      '<div style="font-size:3.2mm;color:#444;line-height:1.9">'+labels.join(' &nbsp;·&nbsp; ')+'</div>' +
+    '</div>';
   }
 
   function styleNosPDF(p) {
