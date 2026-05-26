@@ -3281,8 +3281,8 @@ function openDetail(id) {
         <div class="detail-eyebrow" style="color:${accentColor}">${g('pitch-client').value}</div>
         <div class="detail-name" style="color:${textColor}">${p.name}</div>
         <div class="detail-divider" style="background:${accentColor}"></div>
-        ${p.fabric?`<div style="font-size:9px;letter-spacing:0.15em;text-transform:uppercase;color:${accentColor};opacity:0.7;margin-bottom:2px">Fabric &amp; Material</div><div class="detail-fabric" style="color:${subColor};margin-bottom:8px">${p.fabric}</div>`:""}
-        ${p.machine?`<div style="font-size:9px;letter-spacing:0.15em;text-transform:uppercase;color:${accentColor};opacity:0.7;margin-bottom:2px">Machine</div><div class="detail-fabric" style="color:${subColor};margin-bottom:8px">${p.machine}</div>`:""}
+        ${p.fabric?`<div style="font-size:9px;letter-spacing:0.15em;text-transform:uppercase;color:${accentColor};margin-bottom:2px">Fabric &amp; Material</div><div class="detail-fabric" style="color:${subColor};margin-bottom:8px">${p.fabric}</div>`:""}
+        ${p.machine?`<div style="font-size:9px;letter-spacing:0.15em;text-transform:uppercase;color:${accentColor};margin-bottom:2px">Machine</div><div class="detail-fabric" style="color:${subColor};margin-bottom:8px">${p.machine}</div>`:""}
         ${p.warmth?getWarmthHTML(p.warmth,true,false,isDark,'w','Warmth'):""}
         ${p.dry?getWarmthHTML(p.dry,true,false,isDark,'d','Dry rate'):""}
         ${p.breath?getWarmthHTML(p.breath,true,false,isDark,'b','AirFlow'):""}
