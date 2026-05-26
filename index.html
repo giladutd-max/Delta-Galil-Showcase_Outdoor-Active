@@ -1744,17 +1744,7 @@ function showCat(cat){
   el.style.background=catBg;
   if(!el.querySelector('.cat-grid-built')){
     el.innerHTML='<div class="cat-grid-built">'
-      +'<div style="padding:14px 24px;background:'+headerBg+';border-bottom:1px solid '+headerBorder+';display:flex;align-items:center;justify-content:space-between">'
-        +'<div style="display:flex;align-items:center;gap:16px">'
-          +'<span></span>' // back handled by global button
-          +'<div style="font-size:10px;letter-spacing:0.15em;text-transform:uppercase;color:'+headerText+';font-weight:500">'+(cat==='warm'?(state.catWarmName||'Base Layer'):(state.catAirName||'Mid Layer'))+' · '+catProds.length+' styles</div>'
-        +'</div>'
-        +'<div style="display:flex;gap:5px" id="'+cat+'-filters">'
-          +'<button onclick="filterCat(\''+cat+'\',\'all\',this)" style="font-size:9px;letter-spacing:0.08em;text-transform:uppercase;font-family:DM Sans,sans-serif;padding:5px 12px;border-radius:20px;cursor:pointer;border:1px solid '+headerText+';background:'+headerText+';color:'+(isDark?pal.bg:'#fff')+'">All</button>'
-          +'<button onclick="filterCat(\''+cat+'\',\'base\',this)" style="font-size:9px;letter-spacing:0.08em;text-transform:uppercase;font-family:DM Sans,sans-serif;padding:5px 12px;border-radius:20px;cursor:pointer;border:1px solid '+headerBorder+';background:transparent;color:'+btnInactive+'">Base</button>'
-          +'<button onclick="filterCat(\''+cat+'\',\'mid\',this)" style="font-size:9px;letter-spacing:0.08em;text-transform:uppercase;font-family:DM Sans,sans-serif;padding:5px 12px;border-radius:20px;cursor:pointer;border:1px solid '+headerBorder+';background:transparent;color:'+btnInactive+'">Mid</button>'
-        +'</div>'
-      +'</div>'
+
       +'<div id="'+cat+'-grid">'+buildCatGrid(catProds,acc)+'</div>'
     +'</div>';
   }
