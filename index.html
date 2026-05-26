@@ -3726,6 +3726,7 @@ var _pdfCollection = 'outdoor';
 var _pdfPairs = [];
 
 function setPdfCollection(which) {
+  savePdfPairsToStorage();
   _pdfCollection = which;
   var ob = document.getElementById('pdf-outdoor-btn');
   var ab = document.getElementById('pdf-active-btn');
@@ -3734,11 +3735,31 @@ function setPdfCollection(which) {
   initPdfPairs();
 }
 
+function savePdfPairsToStorage() {
+  try { localStorage.setItem('pdfPairs_'+_pdfCollection, JSON.stringify(_pdfPairs)); } catch(e) {}
+}
+
 function initPdfPairs() {
   var prods = (_pdfCollection==='outdoor' ? state.products : state.activeProducts) || [];
-  _pdfPairs = [];
-  for (var i=0; i<prods.length; i+=2) {
-    _pdfPairs.push([prods[i] ? prods[i].id : null, prods[i+1] ? prods[i+1].id : null]);
+  var saved = null;
+  try { saved = JSON.parse(localStorage.getItem('pdfPairs_'+_pdfCollection)); } catch(e) {}
+  if (saved && Array.isArray(saved) && saved.length) {
+    var validIds = {};
+    prods.forEach(function(p){ validIds[p.id]=true; });
+    _pdfPairs = saved.map(function(pair){
+      return [pair[0] && validIds[pair[0]] ? pair[0] : null, pair[1] && validIds[pair[1]] ? pair[1] : null];
+    }).filter(function(pair){ return pair[0]!==null || pair[1]!==null; });
+    if (!_pdfPairs.length) {
+      _pdfPairs = [];
+      for (var i=0; i<prods.length; i+=2) {
+        _pdfPairs.push([prods[i] ? prods[i].id : null, prods[i+1] ? prods[i+1].id : null]);
+      }
+    }
+  } else {
+    _pdfPairs = [];
+    for (var i=0; i<prods.length; i+=2) {
+      _pdfPairs.push([prods[i] ? prods[i].id : null, prods[i+1] ? prods[i+1].id : null]);
+    }
   }
   renderPdfPairs();
 }
@@ -3795,11 +3816,12 @@ function pdfDrop(e, pairIdx, slot) {
   _pdfPairs = _pdfPairs.map(function(pair){ return [pair[0]===id?null:pair[0], pair[1]===id?null:pair[1]]; });
   if (pairIdx !== null) { _pdfPairs[pairIdx][slot] = id; }
   _pdfPairs = _pdfPairs.filter(function(pair){ return pair[0]!==null || pair[1]!==null; });
+  savePdfPairsToStorage();
   renderPdfPairs();
 }
 
-function addPdfPair() { _pdfPairs.push([null, null]); renderPdfPairs(); }
-function removePdfPair(pi) { _pdfPairs.splice(pi, 1); renderPdfPairs(); }
+function addPdfPair() { _pdfPairs.push([null, null]); savePdfPairsToStorage(); renderPdfPairs(); }
+function removePdfPair(pi) { _pdfPairs.splice(pi, 1); savePdfPairsToStorage(); renderPdfPairs(); }
 
 function buildPdfPageHTML(pair) {
   var prods = (_pdfCollection==='outdoor' ? state.products : state.activeProducts) || [];
