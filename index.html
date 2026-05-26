@@ -3827,7 +3827,7 @@ function buildPdfPageHTML(pair) {
       var filter=active?METER_FILTERS[type][Math.min(n,METER_FILTERS[type].length)-1]:'brightness(0) saturate(0) opacity(0.2)';
       icons+='<img src="'+METER_ICONS[type]+'" style="width:5mm;height:5mm;object-fit:contain;filter:'+filter+';display:inline-block;vertical-align:middle" />';
     }
-    return '<div style="display:flex;align-items:center;gap:2mm;margin-bottom:3mm"><span style="font-size:3mm;letter-spacing:0.12em;text-transform:uppercase;color:#777;width:18mm;flex-shrink:0">'+label+'</span><div style="display:flex;gap:1mm">'+icons+'</div></div>';
+    return '<div style="display:flex;align-items:center;gap:2mm;margin-bottom:3mm"><span style="font-size:3.5mm;letter-spacing:0.12em;text-transform:uppercase;color:#777;width:20mm;flex-shrink:0">'+label+'</span><div style="display:flex;gap:1mm">'+icons+'</div></div>';
   }
 
   function techBadgesPDF(p) {
@@ -3836,7 +3836,7 @@ function buildPdfPageHTML(pair) {
     if (!labels.length) return '';
     var rows = labels.map(function(l, i){
       return (i>0?'<div style="width:100%;height:0.3mm;background:#e0dbd4;margin:1.5mm 0"></div>':'')+
-             '<div style="font-size:3mm;color:#444;letter-spacing:0.03em;padding:1mm 0">'+l.charAt(0).toUpperCase()+l.slice(1).toLowerCase()+'</div>';
+             '<div style="font-size:4mm;color:#444;letter-spacing:0.03em;padding:1mm 0">'+l.split(' ').map(function(w){return w.charAt(0).toUpperCase()+w.slice(1).toLowerCase();}).join(' ')+'</div>';
     }).join('');
     return '<div style="margin-top:0">' +
       '<div style="font-size:3mm;letter-spacing:0.15em;text-transform:uppercase;color:#C4A882;margin-bottom:3mm">TECHNOLOGIES</div>' +
@@ -3858,7 +3858,7 @@ function buildPdfPageHTML(pair) {
       (p.warmth||p.dry||p.breath?'<div style="margin-bottom:5mm">'+ratingRowPDF('w',p.warmth,'Warmth')+ratingRowPDF('d',p.dry,'Dry Rate')+ratingRowPDF('b',p.breath,'Airflow')+'</div>':'') +
       '<div style="width:100%;height:0.3mm;background:#e0dbd4;margin-bottom:5mm"></div>' +
       '<div style="font-size:3mm;letter-spacing:0.15em;text-transform:uppercase;color:#C4A882;margin-bottom:3mm">FABRIC COMPOSITION</div>' +
-      '<div style="font-size:3mm;color:#444;margin-bottom:5mm;line-height:1.7">'+(p.fabric?p.fabric.charAt(0).toUpperCase()+p.fabric.slice(1).toLowerCase():'')+'</div>' +
+      '<div style="font-size:4mm;color:#444;margin-bottom:5mm;line-height:1.7">'+(p.fabric||'')+'</div>' +
       techBadgesPDF(p) +
     '</div>';
   }
