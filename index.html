@@ -86,8 +86,7 @@ header { height: 56px; background: var(--charcoal); display: flex; align-items: 
 .header-back-dash:hover { color: white; }
 .header-actions { display: flex; gap: 8px; align-items: center; }
 /* Unified back button — fixed top-left, always same size and position */
-#global-back-btn { position:fixed; top:20px; left:24px; z-index:9999; display:none; align-items:center; gap:8px; padding:12px 22px; background:rgba(28,28,26,0.85); border:1px solid rgba(255,255,255,0.18); border-radius:24px; cursor:pointer; font-family:'DM Sans',sans-serif; font-size:12px; letter-spacing:0.1em; text-transform:uppercase; color:rgba(255,255,255,0.85); backdrop-filter:blur(10px); transition:background 0.2s,border-color 0.2s; }
-#global-back-btn:hover { background:rgba(28,28,26,0.98); border-color:rgba(255,255,255,0.35); color:#fff; }
+#global-back-btn:hover { background:rgba(28,28,26,0.98) !important; border-color:rgba(255,255,255,0.35) !important; color:#fff !important; }
 .header-back { display:none!important; }
 .save-status { font-size: 11px; color: rgba(255,255,255,0.35); letter-spacing: 0.04em; }
 .save-status.saving { color: var(--accent); }
@@ -548,9 +547,6 @@ img { image-rendering: auto; }
   <div class="loading-logo">Delta <span>Galil</span></div>
 </div>
 
-<!-- Global back button - fixed position, same everywhere -->
-<div id="global-back-btn" onclick="globalBackAction()">← Back</div>
-
 <!-- LOGIN SCREEN -->
 <div class="screen" id="screen-login">
   <div class="login-box">
@@ -900,6 +896,7 @@ img { image-rendering: auto; }
         </div>
         <button class="share-banner-copy" onclick="copyShareLink()">Copy</button>
       </div>
+      <div id="global-back-btn" onclick="globalBackAction()" style="display:none;position:sticky;top:20px;left:24px;z-index:9999;width:fit-content;margin-left:0;margin-bottom:-52px;align-items:center;gap:8px;padding:12px 22px;background:rgba(28,28,26,0.85);border:1px solid rgba(255,255,255,0.18);border-radius:24px;cursor:pointer;font-family:DM Sans,sans-serif;font-size:12px;letter-spacing:0.1em;text-transform:uppercase;color:rgba(255,255,255,0.85);backdrop-filter:blur(10px)">← Back</div>
       <div id="showcase-preview" class="showcase tpl-preview-editorial" style="position:relative;z-index:1"></div>
       <div id="product-detail" class="product-detail"></div>
       <p class="export-hint" id="export-hint">Click any product image to open its detail page</p>
