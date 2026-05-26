@@ -4017,27 +4017,23 @@ window.addEventListener('afterprint', function() {
 
 
 // ── GLOBAL BACK BUTTON ──
-var _navStack = [];
-function showGlobalBack(mode) {
-  // legacy calls ignored — stack drives everything now
-}
+var _backFn = null;
+function showGlobalBack(mode) { /* legacy no-op */ }
 function navPush(fn) {
-  _navStack.push(fn);
+  // only store the most recent back destination — no stacking
+  _backFn = fn;
   var btn = document.getElementById('global-back-btn');
   if (btn) { btn.style.display = 'flex'; btn.innerText = '← Back'; }
 }
 function navClear() {
-  _navStack = [];
+  _backFn = null;
   var btn = document.getElementById('global-back-btn');
   if (btn) btn.style.display = 'none';
 }
 function globalBackAction() {
-  if (_navStack.length === 0) return;
-  var fn = _navStack.pop();
-  if (_navStack.length === 0) {
-    var btn = document.getElementById('global-back-btn');
-    if (btn) btn.style.display = 'none';
-  }
+  if (!_backFn) return;
+  var fn = _backFn;
+  _backFn = null;
   fn();
 }
 </script>
