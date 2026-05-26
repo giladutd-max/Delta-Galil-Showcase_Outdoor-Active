@@ -3813,7 +3813,7 @@ function buildPdfPageHTML(pair) {
       '<img src="https://dkgzhmpuqzykzebzcqdr.supabase.co/storage/v1/object/public/product-images/DELTA%20LOGO2.png" style="height:30mm;object-fit:contain;display:block" />' +
       '<div style="text-align:center;line-height:1">' +
         '<div style="font-family:Cormorant Garamond,serif;font-size:14mm;font-weight:300;color:#1C1C1A;line-height:1">Spring Summer 2028</div>' +
-        '<div style="font-size:2.8mm;letter-spacing:0.2em;text-transform:uppercase;color:#999;margin-top:2mm">' + collLabel + '</div>' +
+        '<div style="font-size:2.8mm;letter-spacing:0.12em;color:#C4A882;margin-top:2mm">' + collLabel + '</div>' +
       '</div>' +
       '<img src="https://dkgzhmpuqzykzebzcqdr.supabase.co/storage/v1/object/public/product-images/LULU%20OGO%202.png" style="height:30mm;object-fit:contain;display:block" />' +
     '</div>';
@@ -3839,7 +3839,7 @@ function buildPdfPageHTML(pair) {
              '<div style="font-size:3mm;color:#444;letter-spacing:0.06em;text-transform:uppercase;padding:1mm 0">'+l+'</div>';
     }).join('');
     return '<div style="margin-top:0">' +
-      '<div style="font-size:2.5mm;letter-spacing:0.2em;text-transform:uppercase;color:#aaa;margin-bottom:3mm">Technologies</div>' +
+      '<div style="font-size:2.5mm;letter-spacing:0.12em;color:#C4A882;margin-bottom:3mm">Technologies</div>' +
       rows +
     '</div>';
   }
@@ -3854,10 +3854,10 @@ function buildPdfPageHTML(pair) {
 
   function infoPanel(p) {
     return '<div style="padding:6mm 8mm;display:flex;flex-direction:column;justify-content:flex-start;overflow:hidden;height:100%;box-sizing:border-box">' +
-      ((p.special||p.desc)?'<div style="font-size:2.5mm;letter-spacing:0.2em;text-transform:uppercase;color:#aaa;margin-bottom:2mm">What Makes It Special</div><div style="font-size:3.5mm;color:#222;line-height:1.85;margin-bottom:5mm">'+(p.special||p.desc||'')+'</div>':'') +
+      ((p.special||p.desc)?'<div style="font-size:2.5mm;letter-spacing:0.12em;color:#C4A882;margin-bottom:2mm">What makes it special</div><div style="font-size:3.5mm;color:#222;line-height:1.85;margin-bottom:5mm">'+(p.special||p.desc||'')+'</div>':'') +
       (p.warmth||p.dry||p.breath?'<div style="margin-bottom:5mm">'+ratingRowPDF('w',p.warmth,'Warmth')+ratingRowPDF('d',p.dry,'Dry Rate')+ratingRowPDF('b',p.breath,'Airflow')+'</div>':'') +
       '<div style="width:100%;height:0.3mm;background:#e0dbd4;margin-bottom:5mm"></div>' +
-      '<div style="font-size:2.5mm;letter-spacing:0.2em;text-transform:uppercase;color:#aaa;margin-bottom:2mm">Fabric Composition</div>' +
+      '<div style="font-size:2.5mm;letter-spacing:0.12em;color:#C4A882;margin-bottom:2mm">Fabric composition</div>' +
       '<div style="font-size:3mm;letter-spacing:0.1em;text-transform:uppercase;color:#444;margin-bottom:5mm;line-height:1.7">'+(p.fabric||'')+'</div>' +
       techBadgesPDF(p) +
     '</div>';
