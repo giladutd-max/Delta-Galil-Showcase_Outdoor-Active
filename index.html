@@ -1702,7 +1702,8 @@ function copyPitchLink(token, e) {
 
 function goToDashboard() { loadDashboard(); }
 function showCat(cat){
-  if(cat!=='split'){ navPush(function(){ showCat('split'); }); }
+  if(cat==='split'){ navPush(function(){ restoreFromCollection(); showLandingScreen(); }); }
+  else { navPush(function(){ showCat('split'); }); }
   const split=document.getElementById('cat-split');
   const warm=document.getElementById('cat-warm');
   const air=document.getElementById('cat-air');
@@ -3526,7 +3527,6 @@ function showLandingScreen() {
 // ── ENTER COLLECTION ──
 let _activeMode=false; // true when viewer is in Active collection
 function enterCollection(which) {
-  navPush(function(){ restoreFromCollection(); showLandingScreen(); });
   _activeMode=(which==='active');
   if(_activeMode) {
     // Temporarily swap state to Active data for rendering
@@ -3583,6 +3583,7 @@ function enterCollection(which) {
   const prev=g('showcase-preview');
   if(prev){prev.style.maxWidth='';prev.style.width='';}
   updatePreview();
+  navPush(function(){ restoreFromCollection(); showLandingScreen(); });
   window.scrollTo({top:0,behavior:'smooth'});
   // Add a back-to-landing button
   const preview=g('showcase-preview');
