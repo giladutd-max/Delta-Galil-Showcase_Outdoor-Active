@@ -933,6 +933,7 @@ img { image-rendering: auto; }
     <div class="field-group"><label class="field-label">Category</label><select class="field-input" id="modal-category"><option value="">— No category —</option><option value="warm" id="cat-warm-option">Base Layer</option><option value="air" id="cat-air-option">Mid Layer</option></select></div>
     <div class="field-group"><label class="field-label">Layer</label><select class="field-input" id="modal-layer"><option value="">— No layer —</option><option value="base">Base Layer</option><option value="mid">Mid Layer</option></select></div>
     <div class="field-group"><label class="field-label">Fabric &amp; Material</label><input class="field-input" id="modal-fabric" type="text" placeholder="e.g. 82% Nylon, 18% Elastane" /></div>
+    <div class="field-group"><label class="field-label">Machine</label><input class="field-input" id="modal-machine" type="text" placeholder="e.g. Seamless TR 28gg" /></div>
     <div class="field-group">
       <label class="field-label">Warmth Rating <span style="font-size:9px;color:var(--mid);font-weight:400;letter-spacing:0;text-transform:none">— 0 = none, 4 = max</span></label>
       <div id="modal-warmth-picker" style="display:flex;align-items:center;gap:6px;margin-top:4px">
@@ -2152,7 +2153,7 @@ function openModal() {
   if (wo) wo.textContent = state.catWarmName || 'Base Layer';
   if (ao) ao.textContent = state.catAirName || 'Mid Layer';
   g('modal-overlay').classList.add('open');
-  g('modal-name').value=''; g('modal-fabric').value=''; g('modal-desc').value='';
+  g('modal-name').value=''; g('modal-fabric').value=''; if(g('modal-machine')) g('modal-machine').value=''; g('modal-desc').value='';
   if(g('modal-style-no')) g('modal-style-no').value='';
   if(g('modal-style-top')) g('modal-style-top').value='';
   if(g('modal-style-bottom')) g('modal-style-bottom').value='';
@@ -2199,7 +2200,7 @@ async function saveProduct() {
   } else if (pendingHoverFile) {
     hoverImgUrl = await uploadImageToStorage(pendingHoverFile) || '';
   }
-  const _newProd={id:Date.now(),name,fabric:g('modal-fabric').value.trim(),desc:g('modal-desc').value.trim(),special:g('modal-special')?.value.trim()||'',video:g('modal-video')?.value.trim()||'',img:imgUrl,extraImgs,hoverImg:hoverImgUrl,warmth:pendingWarmthRating,dry:pendingDryRating,breath:pendingBreathRating,techs:[...pendingTechs],emoji:'📦',category:g('modal-category')?.value||'',layer:g('modal-layer')?.value||'',styleNo:g('modal-style-no')?.value.trim()||'',styleTop:g('modal-style-top')?.value.trim()||'',styleBottom:g('modal-style-bottom')?.value.trim()||''};
+  const _newProd={id:Date.now(),name,fabric:g('modal-fabric').value.trim(),machine:g('modal-machine')?.value.trim()||'',desc:g('modal-desc').value.trim(),special:g('modal-special')?.value.trim()||'',video:g('modal-video')?.value.trim()||'',img:imgUrl,extraImgs,hoverImg:hoverImgUrl,warmth:pendingWarmthRating,dry:pendingDryRating,breath:pendingBreathRating,techs:[...pendingTechs],emoji:'📦',category:g('modal-category')?.value||'',layer:g('modal-layer')?.value||'',styleNo:g('modal-style-no')?.value.trim()||'',styleTop:g('modal-style-top')?.value.trim()||'',styleBottom:g('modal-style-bottom')?.value.trim()||''};
   if(window._savingForActive){
     state.activeProducts=state.activeProducts||[];
     state.activeProducts.push(_newProd);
@@ -2476,6 +2477,7 @@ function editActiveProduct(id) {
   if(g('modal-category')) g('modal-category').value=p.category||'';
   if(g('modal-layer')) g('modal-layer').value=p.layer||'';
   g('modal-fabric').value=p.fabric||'';
+  if(g('modal-machine')) g('modal-machine').value=p.machine||'';
   g('modal-desc').value=p.desc||'';
   if(g('modal-special')) g('modal-special').value=p.special||'';
   if(g('modal-video')) g('modal-video').value=p.video||'';
@@ -2507,7 +2509,7 @@ async function updateActiveProduct(id) {
   let hoverImgUrl=state.activeProducts[idx].hoverImg||'';
   if(pendingHoverImg)hoverImgUrl=pendingHoverImg;
   else if(pendingHoverFile)hoverImgUrl=await uploadImageToStorage(pendingHoverFile)||hoverImgUrl;
-  state.activeProducts[idx]={...state.activeProducts[idx],name,fabric:g('modal-fabric').value.trim(),desc:g('modal-desc').value.trim(),special:g('modal-special')?.value.trim()||'',video:g('modal-video')?.value.trim()||'',img:imgUrl,extraImgs:[...existingExtras,...newExtras],hoverImg:hoverImgUrl,warmth:pendingWarmthRating,dry:pendingDryRating,breath:pendingBreathRating,techs:[...pendingTechs],category:g('modal-category')?.value||'',layer:g('modal-layer')?.value||'',styleNo:g('modal-style-no')?.value.trim()||'',styleTop:g('modal-style-top')?.value.trim()||'',styleBottom:g('modal-style-bottom')?.value.trim()||''};
+  state.activeProducts[idx]={...state.activeProducts[idx],name,fabric:g('modal-fabric').value.trim(),machine:g('modal-machine')?.value.trim()||'',desc:g('modal-desc').value.trim(),special:g('modal-special')?.value.trim()||'',video:g('modal-video')?.value.trim()||'',img:imgUrl,extraImgs:[...existingExtras,...newExtras],hoverImg:hoverImgUrl,warmth:pendingWarmthRating,dry:pendingDryRating,breath:pendingBreathRating,techs:[...pendingTechs],category:g('modal-category')?.value||'',layer:g('modal-layer')?.value||'',styleNo:g('modal-style-no')?.value.trim()||'',styleTop:g('modal-style-top')?.value.trim()||'',styleBottom:g('modal-style-bottom')?.value.trim()||''};
   g('modal-save-btn').textContent='Add Product'; g('modal-save-btn').disabled=false;
   g('modal-save-btn').onclick=saveProduct;
   window._savingForActive=false; window._editingActiveProduct=null;
@@ -2568,6 +2570,7 @@ function editProduct(id) {
   if(g('modal-category')) g('modal-category').value=p.category||'';
   if(g('modal-layer')) g('modal-layer').value=p.layer||'';
   g('modal-fabric').value=p.fabric||'';
+  if(g('modal-machine')) g('modal-machine').value=p.machine||'';
   g('modal-desc').value=p.desc||'';
   if(g('modal-special')) g('modal-special').value=p.special||'';
   if(g('modal-video')) g('modal-video').value=p.video||'';
@@ -2630,7 +2633,7 @@ async function updateProduct(id) {
   } else if (pendingHoverFile) {
     hoverImgUrl = await uploadImageToStorage(pendingHoverFile) || hoverImgUrl;
   }
-  state.products[idx]={...state.products[idx], name, fabric:g('modal-fabric').value.trim(), desc:g('modal-desc').value.trim(), special:g('modal-special')?.value.trim()||'', video:g('modal-video')?.value.trim()||'', img:imgUrl, extraImgs:[...existingExtras,...newExtras], hoverImg:hoverImgUrl, warmth:pendingWarmthRating, dry:pendingDryRating, breath:pendingBreathRating, techs:[...pendingTechs], category:g('modal-category')?.value||'', layer:g('modal-layer')?.value||'', styleNo:g('modal-style-no')?.value.trim()||'', styleTop:g('modal-style-top')?.value.trim()||'', styleBottom:g('modal-style-bottom')?.value.trim()||''};
+  state.products[idx]={...state.products[idx], name, fabric:g('modal-fabric').value.trim(), machine:g('modal-machine')?.value.trim()||'', desc:g('modal-desc').value.trim(), special:g('modal-special')?.value.trim()||'', video:g('modal-video')?.value.trim()||'', img:imgUrl, extraImgs:[...existingExtras,...newExtras], hoverImg:hoverImgUrl, warmth:pendingWarmthRating, dry:pendingDryRating, breath:pendingBreathRating, techs:[...pendingTechs], category:g('modal-category')?.value||'', layer:g('modal-layer')?.value||'', styleNo:g('modal-style-no')?.value.trim()||'', styleTop:g('modal-style-top')?.value.trim()||'', styleBottom:g('modal-style-bottom')?.value.trim()||''};
   g('modal-save-btn').textContent='Add Product'; g('modal-save-btn').disabled=false;
   g('modal-save-btn').onclick=saveProduct;
   closeModal();
@@ -3278,6 +3281,7 @@ function openDetail(id) {
         <div class="detail-name" style="color:${textColor}">${p.name}</div>
         <div class="detail-divider" style="background:${accentColor}"></div>
         ${p.fabric?`<div class="detail-fabric" style="color:${subColor}">${p.fabric}</div>`:""}
+        ${p.machine?`<div class="detail-fabric" style="color:${subColor};opacity:0.7;font-size:12px;margin-top:2px">${p.machine}</div>`:""}
         ${p.warmth?getWarmthHTML(p.warmth,true,false,isDark,'w','Warmth'):""}
         ${p.dry?getWarmthHTML(p.dry,true,false,isDark,'d','Dry rate'):""}
         ${p.breath?getWarmthHTML(p.breath,true,false,isDark,'b','AirFlow'):""}
@@ -3872,7 +3876,8 @@ function buildPdfPageHTML(pair) {
       (p.warmth||p.dry||p.breath?'<div style="margin-bottom:5mm">'+ratingRowPDF('w',p.warmth,'Warmth')+ratingRowPDF('d',p.dry,'Dry Rate')+ratingRowPDF('b',p.breath,'Airflow')+'</div>':'') +
       '<div style="width:100%;height:0.3mm;background:#e0dbd4;margin-bottom:5mm"></div>' +
       '<div style="font-size:3mm;letter-spacing:0.15em;text-transform:uppercase;color:#C4A882;margin-bottom:3mm">FABRIC COMPOSITION</div>' +
-      '<div style="font-size:4mm;color:#444;margin-bottom:5mm;line-height:1.7">'+(p.fabric||'')+'</div>' +
+      '<div style="font-size:4mm;color:#444;margin-bottom:1.5mm;line-height:1.7">'+(p.fabric||'')+'</div>' +
+      (p.machine?'<div style="font-size:3mm;letter-spacing:0.12em;text-transform:uppercase;color:#999;margin-bottom:1.5mm">MACHINE</div><div style="font-size:4mm;color:#444;margin-bottom:5mm;line-height:1.7">'+p.machine+'</div>':'<div style="margin-bottom:5mm"></div>') +
       techBadgesPDF(p) +
     '</div>';
   }
