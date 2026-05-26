@@ -3808,15 +3808,15 @@ function buildPdfPageHTML(pair) {
   var isSolo = !p2;
   var collLabel = _pdfCollection==='outdoor' ? 'Outdoor Collection' : 'Active Collection';
 
-  // Header: logos + big season title
-  var header = '<div style="display:flex;align-items:center;justify-content:space-between;padding:4mm 8mm 3mm;border-bottom:0.3mm solid #ddd;flex-shrink:0;background:#fff">' +
-    '<img src="https://dkgzhmpuqzykzebzcqdr.supabase.co/storage/v1/object/public/product-images/DELTA%20LOGO2.png" style="height:14mm;object-fit:contain;display:block" />' +
-    '<div style="text-align:center">' +
-      '<div style="font-size:2.5mm;letter-spacing:0.2em;text-transform:uppercase;color:#aaa;margin-bottom:1mm">Delta Galil</div>' +
-      '<div style="font-family:Cormorant Garamond,serif;font-size:10mm;font-weight:300;color:#1C1C1A;letter-spacing:0.02em;line-height:1">Spring Summer 2028</div>' +
-      '<div style="font-size:2.2mm;letter-spacing:0.15em;text-transform:uppercase;color:#bbb;margin-top:1mm">' + collLabel + '</div>' +
-    '</div>' +
-    '<img src="https://dkgzhmpuqzykzebzcqdr.supabase.co/storage/v1/object/public/product-images/LULU%20OGO%202.png" style="height:14mm;object-fit:contain;display:block" />' +
+  var header =
+    '<div style="display:flex;align-items:center;justify-content:space-between;padding:4mm 8mm;border-bottom:0.3mm solid #ddd;flex-shrink:0;background:#fff">' +
+      '<img src="https://dkgzhmpuqzykzebzcqdr.supabase.co/storage/v1/object/public/product-images/DELTA%20LOGO2.png" style="height:22mm;object-fit:contain;display:block" />' +
+      '<div style="text-align:center;line-height:1">' +
+        '<div style="font-size:2.8mm;letter-spacing:0.25em;text-transform:uppercase;color:#999;margin-bottom:2mm">Delta Galil</div>' +
+        '<div style="font-family:Cormorant Garamond,serif;font-size:14mm;font-weight:300;color:#1C1C1A;line-height:1">Spring Summer 2028</div>' +
+        '<div style="font-size:2.8mm;letter-spacing:0.2em;text-transform:uppercase;color:#999;margin-top:2mm">' + collLabel + '</div>' +
+      '</div>' +
+      '<img src="https://dkgzhmpuqzykzebzcqdr.supabase.co/storage/v1/object/public/product-images/LULU%20OGO%202.png" style="height:22mm;object-fit:contain;display:block" />' +
     '</div>';
 
   function ratingRowPDF(type, val, label) {
@@ -3824,88 +3824,90 @@ function buildPdfPageHTML(pair) {
     var count = type==='w' ? 4 : 5;
     var icons = '';
     for (var i=0; i<count; i++) {
-      var n = i+1; var active = n <= val;
-      var filter = active ? METER_FILTERS[type][Math.min(n,METER_FILTERS[type].length)-1] : 'brightness(0) saturate(0) opacity(0.2)';
-      icons += '<img src="'+METER_ICONS[type]+'" style="width:5mm;height:5mm;object-fit:contain;filter:'+filter+';display:inline-block;vertical-align:middle" />';
+      var n=i+1; var active=n<=val;
+      var filter=active?METER_FILTERS[type][Math.min(n,METER_FILTERS[type].length)-1]:'brightness(0) saturate(0) opacity(0.2)';
+      icons+='<img src="'+METER_ICONS[type]+'" style="width:5mm;height:5mm;object-fit:contain;filter:'+filter+';display:inline-block;vertical-align:middle" />';
     }
-    return '<div style="display:flex;align-items:center;gap:2mm;margin-bottom:3mm"><span style="font-size:3.2mm;letter-spacing:0.12em;text-transform:uppercase;color:#777;width:20mm;flex-shrink:0">'+label+'</span><div style="display:flex;gap:1mm">'+icons+'</div></div>';
+    return '<div style="display:flex;align-items:center;gap:2mm;margin-bottom:3mm"><span style="font-size:3mm;letter-spacing:0.12em;text-transform:uppercase;color:#777;width:18mm;flex-shrink:0">'+label+'</span><div style="display:flex;gap:1mm">'+icons+'</div></div>';
   }
 
   function techBadgesPDF(p) {
     if (!p||!p.techs||!p.techs.length) return '';
-    var b = p.techs.map(function(tid){ var t = TECHNOLOGIES.find(function(x){ return x.id===tid; }); return t ? '<span style="font-size:3mm;letter-spacing:0.08em;text-transform:uppercase;border:0.4mm solid #C4A882;border-radius:10mm;padding:1.5mm 4mm;color:#8C6A3F;white-space:nowrap;display:inline-block">'+t.label+'</span>' : ''; }).join('');
-    return '<div style="display:flex;flex-wrap:wrap;gap:2.5mm;margin-top:5mm">'+b+'</div>';
+    var b=p.techs.map(function(tid){ var t=TECHNOLOGIES.find(function(x){return x.id===tid;}); return t?'<span style="font-size:2.8mm;letter-spacing:0.08em;text-transform:uppercase;border:0.4mm solid #C4A882;border-radius:10mm;padding:1.2mm 3.5mm;color:#8C6A3F;white-space:nowrap;display:inline-block">'+t.label+'</span>':''; }).join('');
+    return '<div style="display:flex;flex-wrap:wrap;gap:2mm;margin-top:4mm">'+b+'</div>';
   }
 
   function styleNosPDF(p) {
-    var items = [];
-    if (p.styleNo&&p.styleNo.trim()) items.push('<span style="font-size:3mm;letter-spacing:0.1em;text-transform:uppercase;color:#C4A882">Style No  </span><span style="font-size:3.5mm;color:#1C1C1A">'+p.styleNo+'</span>');
-    if (p.styleTop&&p.styleTop.trim()) items.push('<span style="font-size:3mm;letter-spacing:0.1em;text-transform:uppercase;color:#C4A882">Top  </span><span style="font-size:3.5mm;color:#1C1C1A">'+p.styleTop+'</span>');
-    if (p.styleBottom&&p.styleBottom.trim()) items.push('<span style="font-size:3mm;letter-spacing:0.1em;text-transform:uppercase;color:#C4A882">Bottom  </span><span style="font-size:3.5mm;color:#1C1C1A">'+p.styleBottom+'</span>');
-    if (!items.length) return '';
-    return '<div style="display:flex;flex-wrap:wrap;gap:4mm;margin-top:2mm">'+items.map(function(i){return '<span>'+i+'</span>';}).join('')+'</div>';
+    var s='';
+    if (p.styleNo&&p.styleNo.trim()) s+='<span style="font-size:2.8mm;letter-spacing:0.1em;text-transform:uppercase;color:#C4A882">Style No </span><span style="font-size:3.5mm;color:#1C1C1A">'+p.styleNo+'</span>';
+    if (p.styleTop&&p.styleTop.trim()) s+='<span style="margin-left:4mm;font-size:2.8mm;letter-spacing:0.1em;text-transform:uppercase;color:#C4A882">Top </span><span style="font-size:3.5mm;color:#1C1C1A">'+p.styleTop+'</span>';
+    if (p.styleBottom&&p.styleBottom.trim()) s+='<span style="margin-left:4mm;font-size:2.8mm;letter-spacing:0.1em;text-transform:uppercase;color:#C4A882">Bottom </span><span style="font-size:3.5mm;color:#1C1C1A">'+p.styleBottom+'</span>';
+    return s?'<div style="margin-top:1.5mm">'+s+'</div>':'';
   }
 
-  function sharedInfo(p) {
-    return '<div style="font-size:3.2mm;letter-spacing:0.14em;text-transform:uppercase;color:#555;margin-bottom:5mm;line-height:1.7">'+(p.fabric||'')+'</div>' +
-      (p.warmth||p.dry||p.breath ? '<div style="margin-bottom:5mm">'+ratingRowPDF('w',p.warmth,'Warmth')+ratingRowPDF('d',p.dry,'Dry Rate')+ratingRowPDF('b',p.breath,'Airflow')+'</div>' : '') +
+  function infoPanel(p) {
+    return '<div style="padding:6mm 8mm;display:flex;flex-direction:column;justify-content:flex-start;overflow:hidden;height:100%;box-sizing:border-box">' +
+      '<div style="font-size:3mm;letter-spacing:0.14em;text-transform:uppercase;color:#555;margin-bottom:5mm;line-height:1.7">'+(p.fabric||'')+'</div>' +
+      (p.warmth||p.dry||p.breath?'<div style="margin-bottom:5mm">'+ratingRowPDF('w',p.warmth,'Warmth')+ratingRowPDF('d',p.dry,'Dry Rate')+ratingRowPDF('b',p.breath,'Airflow')+'</div>':'') +
       ((p.special||p.desc)?'<div style="font-size:3.5mm;color:#222;line-height:1.85;margin-bottom:5mm;padding-top:5mm;border-top:0.3mm solid #e0dbd4">'+(p.special||p.desc||'')+'</div>':'') +
-      techBadgesPDF(p);
-  }
-
-  if (isSolo && p1) {
-    var allImgs = [p1.img].concat(p1.extraImgs||[]).filter(Boolean).slice(0,3);
-    var imgGrid = allImgs.length === 1
-      ? '<div style="height:100%;background:#f5f2ee"><img src="'+allImgs[0]+'" style="width:100%;height:100%;object-fit:contain;object-position:center top;display:block" /></div>'
-      : '<div style="display:flex;height:100%">'+allImgs.map(function(src,i){return '<div style="flex:1;background:#f5f2ee'+(i<allImgs.length-1?';border-right:1px solid #fff':'')+'""><img src="'+src+'" style="width:100%;height:100%;object-fit:cover;object-position:center top;display:block"/></div>';}).join('')+'</div>';
-
-    return '<div class="pdf-page" style="width:297mm;height:210mm;display:flex;flex-direction:column;background:#fff;font-family:DM Sans,sans-serif;box-sizing:border-box;overflow:hidden">' +
-      header +
-      '<div style="flex:1;display:flex;flex-direction:row;overflow:hidden;min-height:0">' +
-        '<div style="flex:1.4;overflow:hidden">' + imgGrid + '</div>' +
-        '<div style="flex:1;padding:6mm 8mm;display:flex;flex-direction:column;justify-content:center;overflow:hidden;border-left:0.3mm solid #eee">' +
-          '<div style="font-family:Cormorant Garamond,serif;font-size:8mm;font-weight:300;color:#1C1C1A;margin-bottom:2mm;line-height:1.2">'+(p1.name||'')+'</div>' +
-          styleNosPDF(p1) +
-          '<div style="width:8mm;height:0.5mm;background:#C4A882;margin:5mm 0"></div>' +
-          sharedInfo(p1) +
-        '</div>' +
-      '</div>' +
+      techBadgesPDF(p) +
     '</div>';
   }
 
-  // PAIR - landscape: two images side by side LEFT (~65%), info RIGHT (~35%)
-  return '<div class="pdf-page" style="width:297mm;height:210mm;display:flex;flex-direction:column;background:#fff;font-family:DM Sans,sans-serif;box-sizing:border-box;overflow:hidden">' +
-    header +
-    '<div style="flex:1;display:flex;flex-direction:row;overflow:hidden;min-height:0">' +
+  if (isSolo && p1) {
+    var allImgs=[p1.img].concat(p1.extraImgs||[]).filter(Boolean).slice(0,3);
+    var imgGrid=allImgs.length===1
+      ?'<div style="height:100%;background:#f5f2ee"><img src="'+allImgs[0]+'" style="width:100%;height:100%;object-fit:contain;object-position:center top;display:block"/></div>'
+      :'<div style="display:flex;height:100%">'+allImgs.map(function(src,i){return '<div style="flex:1;background:#f5f2ee'+(i<allImgs.length-1?';border-right:1px solid #eee':'')+'""><img src="'+src+'" style="width:100%;height:100%;object-fit:cover;object-position:center top;display:block"/></div>';}).join('')+'</div>';
+    return '<div class="pdf-page" style="width:297mm;height:210mm;display:flex;flex-direction:column;background:#fff;font-family:DM Sans,sans-serif;box-sizing:border-box;overflow:hidden">'+
+      header+
+      '<div style="flex:1;display:flex;flex-direction:row;overflow:hidden;min-height:0">'+
+        '<div style="flex:1.5;display:flex;flex-direction:column;overflow:hidden;border-right:0.3mm solid #eee">'+
+          '<div style="flex:1;overflow:hidden">'+imgGrid+'</div>'+
+          '<div style="padding:3mm 0 3mm;flex-shrink:0">'+
+            '<div style="font-family:Cormorant Garamond,serif;font-size:7mm;font-weight:300;color:#1C1C1A">'+(p1.name||'')+'</div>'+
+            styleNosPDF(p1)+
+          '</div>'+
+        '</div>'+
+        '<div style="flex:1;overflow:hidden">'+infoPanel(p1)+'</div>'+
+      '</div>'+
+    '</div>';
+  }
 
-      // LEFT: two images side by side
-      '<div style="flex:1.8;display:flex;flex-direction:row;border-right:0.3mm solid #eee;overflow:hidden">' +
-        '<div style="flex:1;display:flex;flex-direction:column;border-right:0.3mm solid #eee;overflow:hidden">' +
-          '<div style="flex:1;overflow:hidden">' +
-            '<img src="'+(p1.img||'')+'" style="width:100%;height:100%;object-fit:cover;object-position:center top;display:block" />' +
-          '</div>' +
-          '<div style="padding:2.5mm 3mm 3mm;flex-shrink:0;background:#fff">' +
-            '<div style="font-family:Cormorant Garamond,serif;font-size:5.5mm;font-weight:300;color:#1C1C1A;line-height:1.2">'+(p1.name||'')+'</div>' +
-            styleNosPDF(p1) +
-          '</div>' +
-        '</div>' +
-        '<div style="flex:1;display:flex;flex-direction:column;overflow:hidden">' +
-          '<div style="flex:1;overflow:hidden">' +
-            '<img src="'+(p2.img||'')+'" style="width:100%;height:100%;object-fit:cover;object-position:center top;display:block" />' +
-          '</div>' +
-          '<div style="padding:2.5mm 3mm 3mm;flex-shrink:0;background:#fff">' +
-            '<div style="font-family:Cormorant Garamond,serif;font-size:5.5mm;font-weight:300;color:#1C1C1A;line-height:1.2">'+(p2.name||'')+'</div>' +
-            styleNosPDF(p2) +
-          '</div>' +
-        '</div>' +
-      '</div>' +
+  // PAIR - landscape
+  return '<div class="pdf-page" style="width:297mm;height:210mm;display:flex;flex-direction:column;background:#fff;font-family:DM Sans,sans-serif;box-sizing:border-box;overflow:hidden">'+
+    header+
+    '<div style="flex:1;display:flex;flex-direction:row;overflow:hidden;min-height:0">'+
 
-      // RIGHT: shared info
-      '<div style="flex:1;padding:6mm 8mm;display:flex;flex-direction:column;justify-content:center;overflow:hidden">' +
-        sharedInfo(p1) +
-      '</div>' +
+      // Images + names (left ~65%)
+      '<div style="flex:1.9;display:flex;flex-direction:row;border-right:0.3mm solid #eee;overflow:hidden">'+
 
-    '</div>' +
+        '<div style="flex:1;display:flex;flex-direction:column;border-right:0.3mm solid #eee;overflow:hidden">'+
+          '<div style="flex:1;overflow:hidden">'+
+            '<img src="'+(p1.img||'')+'" style="width:100%;height:100%;object-fit:cover;object-position:center top;display:block"/>'+
+          '</div>'+
+          '<div style="padding:3mm 0 3mm;flex-shrink:0">'+
+            '<div style="font-family:Cormorant Garamond,serif;font-size:6mm;font-weight:300;color:#1C1C1A;line-height:1.2">'+(p1.name||'')+'</div>'+
+            styleNosPDF(p1)+
+          '</div>'+
+        '</div>'+
+
+        '<div style="flex:1;display:flex;flex-direction:column;overflow:hidden">'+
+          '<div style="flex:1;overflow:hidden">'+
+            '<img src="'+(p2.img||'')+'" style="width:100%;height:100%;object-fit:cover;object-position:center top;display:block"/>'+
+          '</div>'+
+          '<div style="padding:3mm 0 3mm;flex-shrink:0">'+
+            '<div style="font-family:Cormorant Garamond,serif;font-size:6mm;font-weight:300;color:#1C1C1A;line-height:1.2">'+(p2.name||'')+'</div>'+
+            styleNosPDF(p2)+
+          '</div>'+
+        '</div>'+
+
+      '</div>'+
+
+      // Info panel (right ~35%)
+      '<div style="flex:1;overflow:hidden">'+infoPanel(p1)+'</div>'+
+
+    '</div>'+
   '</div>';
 }
 
