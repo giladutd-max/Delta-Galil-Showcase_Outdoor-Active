@@ -3942,64 +3942,6 @@ function buildPdfPageHTML(pair) {
 }
 
 
-
-function buildTechPageHTML() {
-  var techs = (_pdfCollection==='outdoor' ? state.techItems : state.activeTechItems) || [];
-  if (!techs.length) return '';
-  var collLabel = _pdfCollection==='outdoor' ? (state.title||'Outdoor Collection') : (state.activeTitle||'Active Collection');
-  var defaultImg = state.techDefaultImg || (_pdfCollection==='outdoor' ? state.techDefaultImg : state.activeTechDefaultImg) || '';
-
-  var header =
-    '<div style="display:flex;align-items:center;justify-content:space-between;padding:4mm 8mm;border-bottom:0.3mm solid #ddd;flex-shrink:0;background:#fff;-webkit-print-color-adjust:exact;print-color-adjust:exact">' +
-      '<img src="https://dkgzhmpuqzykzebzcqdr.supabase.co/storage/v1/object/public/product-images/DELTA%20LOGO2.png" style="height:30mm;object-fit:contain;display:block" />' +
-      '<div style="text-align:center">' +
-        '<div style="font-family:Cormorant Garamond,serif;font-size:14mm;font-weight:300;color:#1C1C1A;line-height:1">'+collLabel+'</div>' +
-        '<div style="font-size:3mm;letter-spacing:0.15em;text-transform:uppercase;color:#A0722A;margin-top:2mm">Spring Summer 2028</div>' +
-      '</div>' +
-      '<img src="https://dkgzhmpuqzykzebzcqdr.supabase.co/storage/v1/object/public/product-images/LULU%20OGO%202.png" style="height:30mm;object-fit:contain;display:block" />' +
-    '</div>';
-
-  // Put all techs on as few pages as needed, max 4 per page in a 2x2 grid
-  var perPage = 4;
-  var pages = [];
-  for (var i = 0; i < techs.length; i += perPage) {
-    pages.push(techs.slice(i, i + perPage));
-  }
-  var totalPages = pages.length;
-
-  return pages.map(function(pageTechs, pi) {
-    var cells = pageTechs.map(function(t) {
-      var img = t.img || defaultImg || '';
-      var color = t.color || '#A0722A';
-      var imgBlock = img
-        ? '<div style="height:35mm;overflow:hidden;border-radius:1.5mm;background:#f0ede8;margin-bottom:3mm"><img src="'+img+'" style="width:100%;height:100%;object-fit:cover;display:block"/></div>'
-        : '<div style="height:35mm;border-radius:1.5mm;background:#f0ede8;margin-bottom:3mm;display:flex;align-items:center;justify-content:center"><div style="font-size:3mm;letter-spacing:0.1em;text-transform:uppercase;color:#bbb">No image</div></div>';
-      return '<div style="flex:1;min-width:0;padding:4mm;border:0.3mm solid #e8e4df;border-radius:2mm;display:flex;flex-direction:column;-webkit-print-color-adjust:exact;print-color-adjust:exact">'+
-        imgBlock+
-        '<div style="font-size:2.3mm;letter-spacing:0.18em;text-transform:uppercase;color:'+color+';margin-bottom:1.5mm">'+(t.label||'')+'</div>'+
-        '<div style="font-family:Cormorant Garamond,serif;font-size:5.5mm;color:#1C1C1A;line-height:1.2;margin-bottom:2mm">'+(t.name||t.label||'')+'</div>'+
-        '<div style="font-size:3mm;color:#555;line-height:1.6;flex:1">'+(t.desc||'')+'</div>'+
-      '</div>';
-    });
-
-    // Fill remaining slots so grid is even
-    while (cells.length < perPage) {
-      cells.push('<div style="flex:1;min-width:0"></div>');
-    }
-
-    var row1 = '<div style="display:flex;gap:4mm;flex:1">'+cells[0]+cells[1]+'</div>';
-    var row2 = '<div style="display:flex;gap:4mm;flex:1">'+cells[2]+cells[3]+'</div>';
-
-    return '<div class="pdf-page" style="width:297mm;height:210mm;display:flex;flex-direction:column;background:#fff;font-family:DM Sans,sans-serif;box-sizing:border-box;overflow:hidden;-webkit-print-color-adjust:exact;print-color-adjust:exact">'+
-      header+
-      '<div style="flex:1;padding:4mm 6mm;display:flex;flex-direction:column;gap:3mm;overflow:hidden">'+
-        '<div style="font-size:2.8mm;letter-spacing:0.2em;text-transform:uppercase;color:#A0722A;margin-bottom:1mm">The Technology'+(totalPages>1?' · Part '+(pi+1):'')+'</div>'+
-        row1+row2+
-      '</div>'+
-    '</div>';
-  }).join('');
-}
-
 function previewPDF() {
   var root = document.getElementById('pdf-print-root');
   if (!root) { root = document.createElement('div'); root.id='pdf-print-root'; document.body.appendChild(root); }
@@ -4016,11 +3958,7 @@ function previewPDF() {
       if (p && p.img) imgUrls.push(p.img);
     });
   });
-  // Also add tech item images
-  var techItems = (_pdfCollection==='outdoor' ? state.techItems : state.activeTechItems) || [];
-  if (state.techDefaultImg) imgUrls.push(state.techDefaultImg);
-  techItems.forEach(function(t){ if(t.img) imgUrls.push(t.img); });
-  imgUrls = imgUrls.filter(function(u,i,a){ return u && a.indexOf(u)===i; }); // dedupe
+  imgUrls = imgUrls.filter(function(u,i,a){ return a.indexOf(u)===i; }); // dedupe
 
   // Convert all images to base64 so they print correctly
   var imgCache = {};
@@ -4049,8 +3987,7 @@ function previewPDF() {
         '<button onclick="window.print()" style="padding:10px 22px;background:#C4A882;border:none;cursor:pointer;font-family:DM Sans,sans-serif;font-size:11px;letter-spacing:0.08em;text-transform:uppercase;border-radius:2px;font-weight:500;color:#1C1C1A">Print / Save PDF</button>'+
       '</div>'+
       '<div id="pdf-pages-wrapper" style="margin-top:52px;padding:24px;display:flex;flex-direction:column;align-items:center;gap:16px">'+
-        validPairs.map(buildPdfPageHTML).join('') +
-        buildTechPageHTML() +
+        validPairs.map(buildPdfPageHTML).join('')+
       '</div>';
     // Replace img srcs with cached base64
     root.querySelectorAll('img').forEach(function(img){
