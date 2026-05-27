@@ -2194,10 +2194,10 @@ async function saveProduct() {
     if (url) extraImgs.push(url);
   }
   let hoverImgUrl='';
-  if (pendingHoverImg) {
-    hoverImgUrl = pendingHoverImg;
-  } else if (pendingHoverFile) {
+  if (pendingHoverFile) {
     hoverImgUrl = await uploadImageToStorage(pendingHoverFile) || '';
+  } else if (pendingHoverImg && !pendingHoverImg.startsWith('blob:')) {
+    hoverImgUrl = pendingHoverImg;
   }
   const _newProd={id:Date.now(),name,fabric:g('modal-fabric').value.trim(),machine:g('modal-machine')?.value.trim()||'',desc:g('modal-desc').value.trim(),special:g('modal-special')?.value.trim()||'',video:g('modal-video')?.value.trim()||'',img:imgUrl,extraImgs,hoverImg:hoverImgUrl,warmth:pendingWarmthRating,dry:pendingDryRating,breath:pendingBreathRating,techs:[...pendingTechs],emoji:'📦',category:g('modal-category')?.value||'',layer:g('modal-layer')?.value||'',styleNo:g('modal-style-no')?.value.trim()||'',styleTop:g('modal-style-top')?.value.trim()||'',styleBottom:g('modal-style-bottom')?.value.trim()||''};
   if(window._savingForActive){
@@ -2506,8 +2506,8 @@ async function updateActiveProduct(id) {
   for(const ef of pendingExtraFiles.filter(Boolean)){const url=await uploadImageToStorage(ef.file);if(url)newExtras.push(url);}
   const existingExtras=(state.activeProducts[idx].extraImgs||[]).filter(url=>!removedExtraUrls.includes(url));
   let hoverImgUrl=state.activeProducts[idx].hoverImg||'';
-  if(pendingHoverImg)hoverImgUrl=pendingHoverImg;
-  else if(pendingHoverFile)hoverImgUrl=await uploadImageToStorage(pendingHoverFile)||hoverImgUrl;
+  if(pendingHoverFile)hoverImgUrl=await uploadImageToStorage(pendingHoverFile)||hoverImgUrl;
+  else if(pendingHoverImg&&!pendingHoverImg.startsWith('blob:'))hoverImgUrl=pendingHoverImg;
   state.activeProducts[idx]={...state.activeProducts[idx],name,fabric:g('modal-fabric').value.trim(),machine:g('modal-machine')?.value.trim()||'',desc:g('modal-desc').value.trim(),special:g('modal-special')?.value.trim()||'',video:g('modal-video')?.value.trim()||'',img:imgUrl,extraImgs:[...existingExtras,...newExtras],hoverImg:hoverImgUrl,warmth:pendingWarmthRating,dry:pendingDryRating,breath:pendingBreathRating,techs:[...pendingTechs],category:g('modal-category')?.value||'',layer:g('modal-layer')?.value||'',styleNo:g('modal-style-no')?.value.trim()||'',styleTop:g('modal-style-top')?.value.trim()||'',styleBottom:g('modal-style-bottom')?.value.trim()||''};
   g('modal-save-btn').textContent='Add Product'; g('modal-save-btn').disabled=false;
   g('modal-save-btn').onclick=saveProduct;
