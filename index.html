@@ -3268,13 +3268,13 @@ function openDetail(id) {
     <div class="detail-img-col" style="background:${imgBg};overflow:hidden">
       <div class="gallery-wrap" onclick="openLightboxFromGallery(${id})" style="background:${imgBg};cursor:zoom-in">${slides}${p.video ? '<video id="detail-video" src="'+p.video+'" autoplay muted playsinline style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;z-index:1;transition:opacity 0.8s ease" onended="fadeOutVideo()"></video>' : ''}${nav}</div>
     </div>
-    <div class="detail-info-col" style="background:${bg};border-left:1px solid ${borderColor}">
-      <div style="display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:8px">
+    <div class="detail-info-col" style="background:${bg};border-left:1px solid ${borderColor};position:relative">
+      <div style="position:absolute;top:0;right:0;display:flex;gap:0;z-index:10">
+        ${state.products.indexOf(p)>0?'<button onclick="openDetail(state.products['+(state.products.indexOf(p)-1)+'].id)" style="font-size:11px;letter-spacing:0.12em;text-transform:uppercase;color:#fff;background:rgba(30,30,30,0.92);border:none;border-bottom:1px solid rgba(255,255,255,0.12);padding:14px 20px;cursor:pointer;font-family:DM Sans,sans-serif;font-weight:600">← Prev</button>':''}
+        ${state.products.indexOf(p)<state.products.length-1?'<button onclick="openDetail(state.products['+(state.products.indexOf(p)+1)+'].id)" style="font-size:11px;letter-spacing:0.12em;text-transform:uppercase;color:#fff;background:rgba(30,30,30,0.92);border:none;border-left:1px solid rgba(255,255,255,0.12);border-bottom:1px solid rgba(255,255,255,0.12);padding:14px 20px;cursor:pointer;font-family:DM Sans,sans-serif;font-weight:600">Next →</button>':''}
+      </div>
+      <div style="margin-bottom:8px">
         <button class="detail-back" style="color:${backColor}" onclick="closeDetail()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 12H5M12 5l-7 7 7 7"/></svg>Back to collection</button>
-        <div style="display:flex;gap:0;margin-top:-20px;margin-right:-20px">
-          ${state.products.indexOf(p)>0?'<button onclick="openDetail(state.products['+(state.products.indexOf(p)-1)+'].id)" style="font-size:13px;letter-spacing:0.12em;text-transform:uppercase;color:#fff;background:#000;border:none;padding:14px 22px;cursor:pointer;font-family:DM Sans,sans-serif;font-weight:600">← Prev</button>':''}
-          ${state.products.indexOf(p)<state.products.length-1?'<button onclick="openDetail(state.products['+(state.products.indexOf(p)+1)+'].id)" style="font-size:13px;letter-spacing:0.12em;text-transform:uppercase;color:#fff;background:#000;border:none;padding:14px 22px;cursor:pointer;font-family:DM Sans,sans-serif;font-weight:600">Next →</button>':''}
-        </div>
       </div>
       <div class="detail-anim" style="animation-delay:0.1s">
         <div class="detail-eyebrow" style="color:${accentColor}">${g('pitch-client').value}</div>
