@@ -3872,6 +3872,7 @@ function buildPdfPageHTML(pair) {
 
   function infoPanel(p) {
     return '<div style="padding:6mm 8mm;display:flex;flex-direction:column;justify-content:flex-start;overflow:hidden;height:100%;box-sizing:border-box">' +
+      (_pdfCollection==='outdoor'&&p.layer?'<div style="font-size:3mm;letter-spacing:0.2em;text-transform:uppercase;color:#888;margin-bottom:3mm">'+p.layer+'</div>':'') +
       ((p.special||p.desc)?'<div style="font-size:4.5mm;letter-spacing:0.15em;text-transform:uppercase;color:#C4A882;margin-bottom:3mm">WHAT MAKES IT SPECIAL</div><div style="font-size:3.5mm;color:#222;line-height:1.85;margin-bottom:5mm">'+(p.special||p.desc||'')+'</div>':'') +
       (p.warmth||p.dry||p.breath?'<div style="margin-bottom:5mm">'+ratingRowPDF('w',p.warmth,'Warmth')+ratingRowPDF('d',p.dry,'Dry Rate')+ratingRowPDF('b',p.breath,'Airflow')+'</div>':'') +
       '<div style="width:100%;height:0.3mm;background:#e0dbd4;margin-bottom:5mm"></div>' +
