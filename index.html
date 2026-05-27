@@ -3581,6 +3581,7 @@ function enterCollection(which) {
   const prev=g('showcase-preview');
   if(prev){prev.style.maxWidth='';prev.style.width='';}
   updatePreview();
+  navClear();
   navPush(function(){ restoreFromCollection(); showLandingScreen(); });
   window.scrollTo({top:0,behavior:'smooth'});
   // Add a back-to-landing button
