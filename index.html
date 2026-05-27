@@ -3942,6 +3942,83 @@ function buildPdfPageHTML(pair) {
 }
 
 
+
+function buildTechPageHTML() {
+  var techs = (_pdfCollection==='outdoor' ? state.techItems : state.activeTechItems) || [];
+  if (!techs.length) return '';
+  var collLabel = _pdfCollection==='outdoor' ? (state.title||'Outdoor Collection') : (state.activeTitle||'Active Collection');
+  var header =
+    '<div style="display:flex;align-items:center;justify-content:space-between;padding:4mm 8mm;border-bottom:0.3mm solid #ddd;flex-shrink:0;background:#fff">' +
+      '<img src="https://dkgzhmpuqzykzebzcqdr.supabase.co/storage/v1/object/public/product-images/DELTA%20LOGO2.png" style="height:30mm;object-fit:contain;display:block" />' +
+      '<div style="text-align:center;line-height:1">' +
+        '<div style="font-family:Cormorant Garamond,serif;font-size:14mm;font-weight:300;color:#1C1C1A;line-height:1">'+collLabel+'</div>' +
+        '<div style="font-size:3mm;letter-spacing:0.15em;text-transform:uppercase;color:#A0722A;margin-top:2mm">Spring Summer 2028</div>' +
+      '</div>' +
+      '<img src="https://dkgzhmpuqzykzebzcqdr.supabase.co/storage/v1/object/public/product-images/LULU%20OGO%202.png" style="height:30mm;object-fit:contain;display:block" />' +
+    '</div>';
+
+  // Split techs into two pages
+  var half = Math.ceil(techs.length / 2);
+  var pages = [techs.slice(0, half), techs.slice(half)];
+  var defaultImg = state.techDefaultImg || '';
+
+  return pages.map(function(pageTechs, pi) {
+    if (!pageTechs.length) return '';
+    var perRow = pageTechs.length <= 3 ? 1 : 2;
+    var cols = Math.min(pageTechs.length, perRow === 1 ? 1 : 2);
+    var itemWidth = cols === 1 ? '100%' : '48%';
+
+    var items = pageTechs.map(function(t) {
+      var img = t.img || defaultImg || '';
+      var color = t.color || '#A0722A';
+      var imgBlock = img
+        ? '<div style="width:40mm;min-width:40mm;height:28mm;overflow:hidden;border-radius:2mm;background:#f0ede8"><img src="'+img+'" style="width:100%;height:100%;object-fit:cover;display:block"/></div>'
+        : '<div style="width:40mm;min-width:40mm;height:28mm;border-radius:2mm;background:#f0ede8;display:flex;align-items:center;justify-content:center"><span style="font-size:8mm">⚡</span></div>';
+      return '<div style="display:flex;gap:4mm;align-items:flex-start;padding:4mm 0;border-bottom:0.3mm solid #e8e4df">' +
+        imgBlock +
+        '<div style="flex:1;min-width:0">' +
+          '<div style="font-size:2.5mm;letter-spacing:0.15em;text-transform:uppercase;color:'+color+';margin-bottom:1mm">'+(t.label||'')+'</div>' +
+          '<div style="font-family:Cormorant Garamond,serif;font-size:5.5mm;color:#1C1C1A;line-height:1.2;margin-bottom:2mm">'+(t.name||t.label||'')+'</div>' +
+          '<div style="font-size:3.2mm;color:#555;line-height:1.65">'+(t.desc||'')+'</div>' +
+        '</div>' +
+      '</div>';
+    }).join('');
+
+    // Page title
+    var techTitle = '<div style="font-size:3mm;letter-spacing:0.2em;text-transform:uppercase;color:#A0722A;margin-bottom:3mm;padding-top:2mm">The Technology · Part '+(pi+1)+'</div>';
+
+    return '<div class="pdf-page" style="width:297mm;height:210mm;display:flex;flex-direction:column;background:#fff;font-family:DM Sans,sans-serif;box-sizing:border-box;overflow:hidden;-webkit-print-color-adjust:exact;print-color-adjust:exact">' +
+      header +
+      '<div style="flex:1;padding:5mm 8mm;overflow:hidden;display:flex;flex-direction:column">' +
+        techTitle +
+        '<div style="flex:1;overflow:hidden;display:flex;flex-wrap:wrap;gap:0 6mm;align-content:flex-start">' +
+          (pageTechs.length > 3
+            ? '<div style="flex:1;min-width:0">'+pageTechs.slice(0,Math.ceil(pageTechs.length/2)).map(function(t){return buildTechItem(t,defaultImg);}).join('')+'</div>' +
+              '<div style="flex:1;min-width:0;border-left:0.3mm solid #e8e4df;padding-left:6mm">'+pageTechs.slice(Math.ceil(pageTechs.length/2)).map(function(t){return buildTechItem(t,defaultImg);}).join('')+'</div>'
+            : '<div style="flex:1">'+pageTechs.map(function(t){return buildTechItem(t,defaultImg);}).join('')+'</div>'
+          ) +
+        '</div>' +
+      '</div>' +
+    '</div>';
+  }).join('');
+}
+
+function buildTechItem(t, defaultImg) {
+  var img = t.img || defaultImg || '';
+  var color = t.color || '#A0722A';
+  var imgBlock = img
+    ? '<div style="width:36mm;min-width:36mm;height:24mm;overflow:hidden;border-radius:1.5mm;background:#f0ede8"><img src="'+img+'" style="width:100%;height:100%;object-fit:cover;display:block"/></div>'
+    : '<div style="width:36mm;min-width:36mm;height:24mm;border-radius:1.5mm;background:#f0ede8;display:flex;align-items:center;justify-content:center"><span style="font-size:6mm;opacity:0.3">◆</span></div>';
+  return '<div style="display:flex;gap:3.5mm;align-items:flex-start;padding:3mm 0;border-bottom:0.3mm solid #e8e4df">' +
+    imgBlock +
+    '<div style="flex:1;min-width:0">' +
+      '<div style="font-size:2.3mm;letter-spacing:0.15em;text-transform:uppercase;color:'+color+';margin-bottom:0.8mm">'+(t.label||'')+'</div>' +
+      '<div style="font-family:Cormorant Garamond,serif;font-size:5mm;color:#1C1C1A;line-height:1.2;margin-bottom:1.5mm">'+(t.name||t.label||'')+'</div>' +
+      '<div style="font-size:3mm;color:#555;line-height:1.6">'+(t.desc||'')+'</div>' +
+    '</div>' +
+  '</div>';
+}
+
 function previewPDF() {
   var root = document.getElementById('pdf-print-root');
   if (!root) { root = document.createElement('div'); root.id='pdf-print-root'; document.body.appendChild(root); }
@@ -3958,7 +4035,11 @@ function previewPDF() {
       if (p && p.img) imgUrls.push(p.img);
     });
   });
-  imgUrls = imgUrls.filter(function(u,i,a){ return a.indexOf(u)===i; }); // dedupe
+  // Also add tech item images
+  var techItems = (_pdfCollection==='outdoor' ? state.techItems : state.activeTechItems) || [];
+  if (state.techDefaultImg) imgUrls.push(state.techDefaultImg);
+  techItems.forEach(function(t){ if(t.img) imgUrls.push(t.img); });
+  imgUrls = imgUrls.filter(function(u,i,a){ return u && a.indexOf(u)===i; }); // dedupe
 
   // Convert all images to base64 so they print correctly
   var imgCache = {};
@@ -3987,7 +4068,8 @@ function previewPDF() {
         '<button onclick="window.print()" style="padding:10px 22px;background:#C4A882;border:none;cursor:pointer;font-family:DM Sans,sans-serif;font-size:11px;letter-spacing:0.08em;text-transform:uppercase;border-radius:2px;font-weight:500;color:#1C1C1A">Print / Save PDF</button>'+
       '</div>'+
       '<div id="pdf-pages-wrapper" style="margin-top:52px;padding:24px;display:flex;flex-direction:column;align-items:center;gap:16px">'+
-        validPairs.map(buildPdfPageHTML).join('')+
+        validPairs.map(buildPdfPageHTML).join('') +
+        buildTechPageHTML() +
       '</div>';
     // Replace img srcs with cached base64
     root.querySelectorAll('img').forEach(function(img){
