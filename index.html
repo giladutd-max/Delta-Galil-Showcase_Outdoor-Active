@@ -3853,8 +3853,8 @@ function buildPdfPageHTML(pair) {
     var labels=p.techs.map(function(tid){ var t=TECHNOLOGIES.find(function(x){return x.id===tid;}); return t?t.label:''; }).filter(Boolean);
     if (!labels.length) return '';
     var rows = labels.map(function(l, i){
-      return (i>0?'<div style="width:100%;height:0.3mm;background:#e0dbd4;margin:1.5mm 0"></div>':'')+
-             '<div style="font-size:4mm;color:#444;letter-spacing:0.03em;padding:1mm 0">'+l.split(' ').map(function(w){return w.charAt(0).toUpperCase()+w.slice(1).toLowerCase();}).join(' ')+'</div>';
+      return (i>0?'<div style="width:100%;height:0.3mm;background:#e0dbd4;margin:1mm 0"></div>':'')+
+             '<div style="font-size:3.5mm;color:#444;letter-spacing:0.03em;padding:0.8mm 0">'+l.split(' ').map(function(w){return w.charAt(0).toUpperCase()+w.slice(1).toLowerCase();}).join(' ')+'</div>';
     }).join('');
     return '<div style="margin-top:0">' +
       '<div style="font-size:4.5mm;letter-spacing:0.15em;text-transform:uppercase;color:#C4A882;margin-bottom:3mm">TECHNOLOGIES</div>' +
@@ -3871,14 +3871,14 @@ function buildPdfPageHTML(pair) {
   }
 
   function infoPanel(p) {
-    return '<div style="padding:4mm 6mm;display:flex;flex-direction:column;justify-content:flex-start;overflow:hidden;height:100%;box-sizing:border-box">' +
-      (_pdfCollection==='outdoor'&&p.layer?'<div style="font-size:2.5mm;letter-spacing:0.15em;text-transform:uppercase;color:#888;border:0.3mm solid #bbb;border-radius:20mm;padding:1mm 3mm;margin-bottom:4mm;width:fit-content">'+(p.layer==='base'?'Base Layer':p.layer==='mid'?'Mid Layer':p.layer)+'</div>':'') +
-      ((p.special||p.desc)?'<div style="font-size:4.5mm;letter-spacing:0.15em;text-transform:uppercase;color:#C4A882;margin-bottom:3mm">WHAT MAKES IT SPECIAL</div><div style="font-size:3.5mm;color:#222;line-height:1.85;margin-bottom:5mm">'+(p.special||p.desc||'')+'</div>':'') +
-      (p.warmth||p.dry||p.breath?'<div style="margin-bottom:5mm">'+ratingRowPDF('w',p.warmth,'Warmth')+ratingRowPDF('d',p.dry,'Dry Rate')+ratingRowPDF('b',p.breath,'Airflow')+'</div>':'') +
-      '<div style="width:100%;height:0.3mm;background:#e0dbd4;margin-bottom:5mm"></div>' +
-      '<div style="font-size:4.5mm;letter-spacing:0.15em;text-transform:uppercase;color:#C4A882;margin-bottom:3mm">FABRIC COMPOSITION</div>' +
-      '<div style="font-size:4mm;color:#444;margin-bottom:5mm;line-height:1.7">'+(p.fabric||'')+'</div>' +
-      (p.machine?'<div style="font-size:4.5mm;letter-spacing:0.15em;text-transform:uppercase;color:#C4A882;margin-bottom:3mm">MACHINE</div><div style="font-size:4mm;color:#444;margin-bottom:5mm;line-height:1.7">'+p.machine+'</div>':'<div style="margin-bottom:5mm"></div>') +
+    return '<div style="padding:3mm 5mm;display:flex;flex-direction:column;justify-content:flex-start;overflow:hidden;height:100%;box-sizing:border-box">' +
+      (_pdfCollection==='outdoor'&&p.layer?'<div style="font-size:2.5mm;letter-spacing:0.15em;text-transform:uppercase;color:#888;border:0.3mm solid #bbb;border-radius:20mm;padding:0.8mm 2.5mm;margin-bottom:2mm;width:fit-content">'+(p.layer==='base'?'Base Layer':p.layer==='mid'?'Mid Layer':p.layer)+'</div>':'') +
+      ((p.special||p.desc)?'<div style="font-size:4.5mm;letter-spacing:0.15em;text-transform:uppercase;color:#C4A882;margin-bottom:2mm">WHAT MAKES IT SPECIAL</div><div style="font-size:3.5mm;color:#222;line-height:1.7;margin-bottom:3mm">'+(p.special||p.desc||'')+'</div>':'') +
+      (p.warmth||p.dry||p.breath?'<div style="margin-bottom:3mm">'+ratingRowPDF('w',p.warmth,'Warmth')+ratingRowPDF('d',p.dry,'Dry Rate')+ratingRowPDF('b',p.breath,'Airflow')+'</div>':'') +
+      '<div style="width:100%;height:0.3mm;background:#e0dbd4;margin-bottom:3mm"></div>' +
+      '<div style="font-size:4.5mm;letter-spacing:0.15em;text-transform:uppercase;color:#C4A882;margin-bottom:2mm">FABRIC COMPOSITION</div>' +
+      '<div style="font-size:4mm;color:#444;margin-bottom:3mm;line-height:1.5">'+(p.fabric||'')+'</div>' +
+      (p.machine?'<div style="font-size:4.5mm;letter-spacing:0.15em;text-transform:uppercase;color:#C4A882;margin-bottom:2mm">MACHINE</div><div style="font-size:4mm;color:#444;margin-bottom:3mm;line-height:1.5">'+p.machine+'</div>':'<div style="margin-bottom:3mm"></div>') +
       techBadgesPDF(p) +
     '</div>';
   }
