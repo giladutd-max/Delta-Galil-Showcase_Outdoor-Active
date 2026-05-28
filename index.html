@@ -3272,13 +3272,18 @@ function openDetail(id, list) {
     <button class="gallery-nav next" style="z-index:20;position:absolute" onclick="event.stopPropagation();event.preventDefault();galleryNext();return false;">&#8250;</button>
     <div class="gallery-dots" style="z-index:20;position:absolute">${allImgs.map((_,i)=>`<button class="gallery-dot${i===0?' active':''}" onclick="event.stopPropagation();event.preventDefault();galleryGoto(${i});return false;"></button>`).join('')}</div>` : '';
 
+  // Capture IDs at render time so PREV/NEXT are stable regardless of _detailList changes
+  const _dl = _detailList && _detailList.length ? _detailList : (_activeMode ? state.activeProducts : state.products) || [];
+  const _di = _dl.findIndex(x=>x.id===p.id);
+  const prevId = _di > 0 ? _dl[_di-1].id : null;
+  const nextId = _di < _dl.length-1 ? _dl[_di+1].id : null;
   det.innerHTML=`<div class="detail-layout" style="position:relative">
     <div class="detail-img-col" style="background:${imgBg};overflow:hidden">
       <div class="gallery-wrap" onclick="openLightboxFromGallery(${id})" style="background:${imgBg};cursor:zoom-in">${slides}${p.video ? '<video id="detail-video" src="'+p.video+'" autoplay muted playsinline style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;z-index:1;transition:opacity 0.8s ease" onended="fadeOutVideo()"></video>' : ''}${nav}</div>
     </div>
     <div style="position:absolute;top:0;right:0;display:flex;gap:0;z-index:10">
-      ${(_detailList&&_detailList.findIndex(function(x){return x.id===p.id;})>0)?'<button onclick="openDetail(_detailList['+(_detailList.findIndex(function(x){return x.id===p.id;})-1)+'].id)" style="font-size:11px;letter-spacing:0.12em;text-transform:uppercase;color:#fff;background:rgba(30,30,30,0.92);border:none;border-bottom:1px solid rgba(255,255,255,0.12);padding:14px 20px;cursor:pointer;font-family:DM Sans,sans-serif;font-weight:600">← Prev</button>':''}
-      ${(_detailList&&_detailList.findIndex(function(x){return x.id===p.id;})<_detailList.length-1)?'<button onclick="openDetail(_detailList['+(_detailList.findIndex(function(x){return x.id===p.id;})+1)+'].id)" style="font-size:11px;letter-spacing:0.12em;text-transform:uppercase;color:#fff;background:rgba(30,30,30,0.92);border:none;border-left:1px solid rgba(255,255,255,0.12);border-bottom:1px solid rgba(255,255,255,0.12);padding:14px 20px;cursor:pointer;font-family:DM Sans,sans-serif;font-weight:600">Next →</button>':''}
+      ${prevId!==null?'<button onclick="openDetail('+prevId+')" style="font-size:11px;letter-spacing:0.12em;text-transform:uppercase;color:#fff;background:rgba(30,30,30,0.92);border:none;border-bottom:1px solid rgba(255,255,255,0.12);padding:14px 20px;cursor:pointer;font-family:DM Sans,sans-serif;font-weight:600">← Prev</button>':''}
+      ${nextId!==null?'<button onclick="openDetail('+nextId+')" style="font-size:11px;letter-spacing:0.12em;text-transform:uppercase;color:#fff;background:rgba(30,30,30,0.92);border:none;border-left:1px solid rgba(255,255,255,0.12);border-bottom:1px solid rgba(255,255,255,0.12);padding:14px 20px;cursor:pointer;font-family:DM Sans,sans-serif;font-weight:600">Next →</button>':''}
     </div>
     <div class="detail-info-col" style="background:${bg};border-left:1px solid ${borderColor}">
       <div style="margin-bottom:8px">
