@@ -2352,6 +2352,7 @@ function renderActiveTechItems() {
       +'<input class="field-input" style="margin-bottom:6px" placeholder="Label (e.g. DryTech)" value="'+(t.label||'').replace(/"/g,'&quot;')+'" oninput="updateActiveTechItem('+t.id+',\'label\',this.value)" />'
       +'<input class="field-input" style="margin-bottom:6px" placeholder="Name" value="'+(t.name||'').replace(/"/g,'&quot;')+'" oninput="updateActiveTechItem('+t.id+',\'name\',this.value)" />'
       +'<textarea class="field-input" style="margin-bottom:6px;min-height:56px" placeholder="Description (max 120 chars)" oninput="updateActiveTechItem('+t.id+',\'desc\',this.value);this.value=this.value.slice(0,120)" maxlength="180">'+(t.desc||'')+'</textarea>'
+      +'<input class="field-input" style="margin-bottom:6px" placeholder="Image URL" value="'+(t.img||'').replace(/"/g,'&quot;')+'" oninput="updateActiveTechItem('+t.id+',\'img\',this.value)" />'
       +'<input class="field-input" style="margin-bottom:8px" placeholder="Video URL (.mp4)" value="'+(t.video||'').replace(/"/g,'&quot;')+'" oninput="updateActiveTechItem('+t.id+',\'video\',this.value)" />'
       +'<div style="display:flex;align-items:center;gap:10px">'
         +'<span style="font-size:10px;letter-spacing:0.08em;text-transform:uppercase;color:var(--mid);flex-shrink:0">Hover colour</span>'
@@ -2546,6 +2547,7 @@ function renderTechItems() {
       +'<input class="field-input" style="margin-bottom:6px" placeholder="Label (e.g. Seamless)" value="'+(t.label||'').replace(/"/g,'&quot;')+'" oninput="updateTechItem('+t.id+',\'label\',this.value)" />'
       +'<input class="field-input" style="margin-bottom:6px" placeholder="Name (e.g. Seamless Construction)" value="'+(t.name||'').replace(/"/g,'&quot;')+'" oninput="updateTechItem('+t.id+',\'name\',this.value)" />'
       +'<textarea class="field-input" style="margin-bottom:6px;min-height:56px" placeholder="Description (max 120 chars)" oninput="updateTechItem('+t.id+',\'desc\',this.value);this.value=this.value.slice(0,120)" maxlength="180">'+(t.desc||'')+'</textarea>'
+      +'<input class="field-input" style="margin-bottom:6px" placeholder="Image URL" value="'+(t.img||'').replace(/"/g,'&quot;')+'" oninput="updateTechItem('+t.id+',\'img\',this.value)" />'
       +'<input class="field-input" style="margin-bottom:8px" placeholder="Video URL (.mp4)" value="'+(t.video||'').replace(/"/g,'&quot;')+'" oninput="updateTechItem('+t.id+',\'video\',this.value)" />'
       +'<div style="display:flex;align-items:center;gap:10px">'
         +'<span style="font-size:10px;letter-spacing:0.08em;text-transform:uppercase;color:var(--mid);flex-shrink:0">Hover colour</span>'
@@ -3236,7 +3238,9 @@ function updatePreview() {
 
 // ── DETAIL PAGE ──
 function openDetail(id) {
-  navPush(function(){ closeDetail(); });
+  // Only push if we're not already in a detail (PREV/NEXT navigation)
+  var detailVisible = document.getElementById('product-detail') && document.getElementById('product-detail').style.display !== 'none';
+  if (!detailVisible) navPush(function(){ closeDetail(); });
     // stop any playing video immediately
   const existingVid=document.getElementById('detail-video');
   if(existingVid){existingVid.pause();existingVid.style.opacity='0';}
@@ -3942,6 +3946,60 @@ function buildPdfPageHTML(pair) {
 }
 
 
+
+function buildTechPageHTML() {
+  var techs = (_pdfCollection==='outdoor' ? state.techItems : state.activeTechItems) || [];
+  if (!techs.length) return '';
+  var collLabel = _pdfCollection==='outdoor' ? (state.title||'Outdoor Collection') : (state.activeTitle||'Active Collection');
+  var defaultImg = state.techDefaultImg || (_pdfCollection==='outdoor' ? state.techDefaultImg : state.activeTechDefaultImg) || '';
+
+  var header =
+    '<div style="display:flex;align-items:center;justify-content:space-between;padding:4mm 8mm;border-bottom:0.3mm solid #ddd;flex-shrink:0;background:#fff;-webkit-print-color-adjust:exact;print-color-adjust:exact">' +
+      '<img src="https://dkgzhmpuqzykzebzcqdr.supabase.co/storage/v1/object/public/product-images/DELTA%20LOGO2.png" style="height:30mm;object-fit:contain;display:block" />' +
+      '<div style="text-align:center">' +
+        '<div style="font-family:Cormorant Garamond,serif;font-size:14mm;font-weight:300;color:#1C1C1A;line-height:1">'+collLabel+'</div>' +
+        '<div style="font-size:3mm;letter-spacing:0.15em;text-transform:uppercase;color:#A0722A;margin-top:2mm">Spring Summer 2028</div>' +
+      '</div>' +
+      '<img src="https://dkgzhmpuqzykzebzcqdr.supabase.co/storage/v1/object/public/product-images/LULU%20OGO%202.png" style="height:30mm;object-fit:contain;display:block" />' +
+    '</div>';
+
+  // All techs on ONE page in a 2x2 grid (max 4 shown)
+  var pages = [techs.slice(0, 4)];
+  var totalPages = 1;
+
+  return pages.map(function(pageTechs, pi) {
+    var cells = pageTechs.map(function(t) {
+      var img = t.img || defaultImg || '';
+      var color = t.color || '#A0722A';
+      var imgBlock = img
+        ? '<div style="height:35mm;overflow:hidden;border-radius:1.5mm;background:#f0ede8;margin-bottom:3mm"><img src="'+img+'" style="width:100%;height:100%;object-fit:cover;display:block"/></div>'
+        : '<div style="height:35mm;border-radius:1.5mm;background:#f0ede8;margin-bottom:3mm;display:flex;align-items:center;justify-content:center"><div style="font-size:3mm;letter-spacing:0.1em;text-transform:uppercase;color:#bbb">No image</div></div>';
+      return '<div style="flex:1;min-width:0;padding:4mm;border:0.3mm solid #e8e4df;border-radius:2mm;display:flex;flex-direction:column;-webkit-print-color-adjust:exact;print-color-adjust:exact">'+
+        imgBlock+
+        '<div style="font-size:2.3mm;letter-spacing:0.18em;text-transform:uppercase;color:'+color+';margin-bottom:1.5mm">'+(t.label||'')+'</div>'+
+        '<div style="font-family:Cormorant Garamond,serif;font-size:5.5mm;color:#1C1C1A;line-height:1.2;margin-bottom:2mm">'+(t.name||t.label||'')+'</div>'+
+        '<div style="font-size:3mm;color:#555;line-height:1.6;flex:1">'+(t.desc||'')+'</div>'+
+      '</div>';
+    });
+
+    // Fill remaining slots so grid is even
+    while (cells.length < perPage) {
+      cells.push('<div style="flex:1;min-width:0"></div>');
+    }
+
+    var row1 = '<div style="display:flex;gap:4mm;flex:1">'+cells[0]+cells[1]+'</div>';
+    var row2 = '<div style="display:flex;gap:4mm;flex:1">'+cells[2]+cells[3]+'</div>';
+
+    return '<div class="pdf-page" style="width:297mm;height:210mm;display:flex;flex-direction:column;background:#fff;font-family:DM Sans,sans-serif;box-sizing:border-box;overflow:hidden;-webkit-print-color-adjust:exact;print-color-adjust:exact">'+
+      header+
+      '<div style="flex:1;padding:4mm 6mm;display:flex;flex-direction:column;gap:3mm;overflow:hidden">'+
+        '<div style="font-size:2.8mm;letter-spacing:0.2em;text-transform:uppercase;color:#A0722A;margin-bottom:1mm">The Technology'+(totalPages>1?' · Part '+(pi+1):'')+'</div>'+
+        row1+row2+
+      '</div>'+
+    '</div>';
+  }).join('');
+}
+
 function previewPDF() {
   var root = document.getElementById('pdf-print-root');
   if (!root) { root = document.createElement('div'); root.id='pdf-print-root'; document.body.appendChild(root); }
@@ -3958,7 +4016,11 @@ function previewPDF() {
       if (p && p.img) imgUrls.push(p.img);
     });
   });
-  imgUrls = imgUrls.filter(function(u,i,a){ return a.indexOf(u)===i; }); // dedupe
+  // Also add tech item images
+  var techItems = (_pdfCollection==='outdoor' ? state.techItems : state.activeTechItems) || [];
+  if (state.techDefaultImg) imgUrls.push(state.techDefaultImg);
+  techItems.forEach(function(t){ if(t.img) imgUrls.push(t.img); });
+  imgUrls = imgUrls.filter(function(u,i,a){ return u && a.indexOf(u)===i; }); // dedupe
 
   // Convert all images to base64 so they print correctly
   var imgCache = {};
@@ -3987,7 +4049,8 @@ function previewPDF() {
         '<button onclick="window.print()" style="padding:10px 22px;background:#C4A882;border:none;cursor:pointer;font-family:DM Sans,sans-serif;font-size:11px;letter-spacing:0.08em;text-transform:uppercase;border-radius:2px;font-weight:500;color:#1C1C1A">Print / Save PDF</button>'+
       '</div>'+
       '<div id="pdf-pages-wrapper" style="margin-top:52px;padding:24px;display:flex;flex-direction:column;align-items:center;gap:16px">'+
-        validPairs.map(buildPdfPageHTML).join('')+
+        validPairs.map(buildPdfPageHTML).join('') +
+        buildTechPageHTML() +
       '</div>';
     // Replace img srcs with cached base64
     root.querySelectorAll('img').forEach(function(img){
