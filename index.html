@@ -590,6 +590,7 @@ img { image-rendering: auto; }
       <span class="save-status" id="save-status">All saved</span>
       <button class="header-back" id="header-back" onclick="closeDetail()">← Back</button>
       <button class="btn btn-primary" onclick="copyShareLink()">Present Link</button>
+      <button class="btn" onclick="copyPublicLink()" style="background:var(--border);color:var(--text);border:1px solid var(--border)">Public Link (no password)</button>
     </div>
   </header>
   <div class="app-body">
@@ -1987,6 +1988,10 @@ async function savePitch() {
   setTimeout(()=>setSaveStatus(''),2500);
 }
 
+function copyPublicLink() {
+  const url=`${window.location.origin}${window.location.pathname}?view=${state.shareToken}`;
+  navigator.clipboard.writeText(url).then(()=>showToast('Public link copied! No password required.'));
+}
 function copyShareLink() {
   const url=`${window.location.origin}${window.location.pathname}?present=${state.shareToken}`;
   navigator.clipboard.writeText(url).then(()=>showToast('Presentation link copied!'));
@@ -3678,8 +3683,13 @@ async function loadSharedView(token) {
 async function init() {
   const params=new URLSearchParams(window.location.search);
   const shareToken=params.get('share');
-  const {data:{session}}=await sb.auth.getSession();
   const presentToken=params.get('present');
+  const viewToken=params.get('view');
+
+  // Public link - skip login entirely
+  if (viewToken) { await loadPresentationView(viewToken); return; }
+
+  const {data:{session}}=await sb.auth.getSession();
 
   // Only hide loading screen immediately if not loading a pitch (which hides it after render)
   if (!presentToken && !shareToken) g('loading-screen').classList.add('hidden');
