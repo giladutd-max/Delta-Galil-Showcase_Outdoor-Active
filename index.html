@@ -1721,7 +1721,7 @@ function showCat(cat){
     smartScroll(split);
     return;
   }
-  const prods=(_activeMode ? state.activeProducts : state.products)||[];
+  const prods=((_activeMode ? state.activeProducts : state.products)||[]).filter(p=>!p.hidden);
   const catProds=prods.filter(p=>p.category===cat||(cat==='warm'&&(p.layer==='base'||p.layer==='Base Layer'))||(cat==='air'&&(p.layer==='mid'||p.layer==='Mid Layer')));
   _detailList = catProds; // track current list for PREV/NEXT in detail view
   // Preload all extra/hover images in background so detail panel opens instantly
@@ -2215,6 +2215,8 @@ async function saveProduct() {
   }
 }
 function removeProduct(id){state.products=state.products.filter(p=>p.id!==id);renderProductsList();updatePreview();scheduleAutoSave();}
+function toggleHideProduct(id){const p=state.products.find(x=>x.id===id);if(p){p.hidden=!p.hidden;renderProductsList();updatePreview();scheduleAutoSave();}}
+function toggleHideActiveProduct(id){const p=state.activeProducts.find(x=>x.id===id);if(p){p.hidden=!p.hidden;renderActiveProductsList();scheduleAutoSave();}}
 
 const SP_ICONS = ['⭐','🎯','💡','🔥','✨','💎','🚀','🌿','👁','💪','🎨','📐'];
 function addSellingPoint(text='', icon='⭐') {
@@ -2406,6 +2408,7 @@ function renderActiveProductsList() {
       <div class="product-thumb">${p.img?'<img src="'+p.img+'" loading="lazy" />':p.emoji}</div>
       <div class="product-info"><div class="product-info-name">${p.name}</div><div class="product-info-fabric">${p.fabric||'No fabric info'}</div></div>
       <div style="display:flex;gap:4px;flex-shrink:0">
+        <button class="product-remove" style="color:var(--mid);font-size:13px;padding:4px 6px;opacity:${p.hidden?0.4:1}" onclick="toggleHideActiveProduct(${p.id})" title="${p.hidden?'Show':'Hide'}">${p.hidden?'👁‍🗨':'👁'}</button>
         <button class="product-remove" style="color:var(--mid);font-size:13px;padding:4px 6px" onclick="editActiveProduct(${p.id})" title="Edit">✎</button>
         <button class="product-remove" onclick="removeActiveProduct(${p.id})" title="Remove">×</button>
       </div>
@@ -2793,6 +2796,7 @@ function renderProductsList() {
       <div class="product-thumb">${p.img?'<img src="'+p.img+'" loading="lazy" />':p.emoji}</div>
       <div class="product-info"><div class="product-info-name">${p.name}</div><div class="product-info-fabric">${p.fabric||'No fabric info'}</div></div>
       <div style="display:flex;gap:4px;flex-shrink:0">
+        <button class="product-remove" style="color:var(--mid);font-size:13px;padding:4px 6px;opacity:${p.hidden?0.4:1}" onclick="toggleHideProduct(${p.id})" title="${p.hidden?'Show':'Hide'}">${p.hidden?'👁‍🗨':'👁'}</button>
         <button class="product-remove" style="color:var(--mid);font-size:13px;padding:4px 6px" onclick="editProduct(${p.id})" title="Edit">✎</button>
         <button class="product-remove" onclick="removeProduct(${p.id})" title="Remove">×</button>
       </div>
