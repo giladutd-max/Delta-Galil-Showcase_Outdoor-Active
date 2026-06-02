@@ -3975,6 +3975,7 @@ function buildPdfPageHTML(pair) {
 
 
 function buildTechPageHTML() {
+  try {
   var techs = (_pdfCollection==='outdoor' ? state.techItems : state.activeTechItems) || [];
   if (!techs.length) return '';
   var collLabel = _pdfCollection==='outdoor' ? (state.title||'Outdoor Collection') : (state.activeTitle||'Active Collection');
@@ -4025,6 +4026,7 @@ function buildTechPageHTML() {
       '</div>'+
     '</div>';
   }).join('');
+  } catch(e) { console.error('buildTechPageHTML error:', e); return ''; }
 }
 
 function previewPDF() {
@@ -4065,7 +4067,6 @@ function previewPDF() {
     img.src = url + (url.includes('?')?'&':'?') + '_t=' + Date.now();
   }
 
-  var pending = imgUrls.length;
   function buildAndShow() {
     root.innerHTML =
       '<div id="pdf-controls" style="position:fixed;top:0;left:0;right:0;height:52px;background:#1C1C1A;display:flex;align-items:center;justify-content:space-between;padding:0 24px;z-index:10;box-shadow:0 2px 12px rgba(0,0,0,0.3)">'+
