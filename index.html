@@ -3797,6 +3797,21 @@ function initPdfPairs() {
       for (var i=0; i<prods.length; i+=2) {
         _pdfPairs.push([prods[i] ? prods[i].id : null, prods[i+1] ? prods[i+1].id : null]);
       }
+    } else {
+      // Re-sort saved pairs to match correct layer/category order
+      var prodMap = {};
+      prods.forEach(function(p){ prodMap[p.id]=p; });
+      var allPairedIds = [];
+      _pdfPairs.forEach(function(pair){ pair.forEach(function(id){ if(id) allPairedIds.push(id); }); });
+      // Sort allPairedIds by the same order as prods
+      var prodOrder = {};
+      prods.forEach(function(p,i){ prodOrder[p.id]=i; });
+      allPairedIds.sort(function(a,b){ return (prodOrder[a]||0)-(prodOrder[b]||0); });
+      // Rebuild pairs in sorted order, preserving solo/pair structure
+      _pdfPairs = [];
+      for (var i=0; i<allPairedIds.length; i+=2) {
+        _pdfPairs.push([allPairedIds[i]||null, allPairedIds[i+1]||null]);
+      }
     }
   } else {
     _pdfPairs = [];
