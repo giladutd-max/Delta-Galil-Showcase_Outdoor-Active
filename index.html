@@ -3768,7 +3768,22 @@ function savePdfPairsToStorage() {
 }
 
 function initPdfPairs() {
-  var prods = (_pdfCollection==='outdoor' ? state.products : state.activeProducts) || [];
+  var allProds = (_pdfCollection==='outdoor' ? state.products : state.activeProducts) || [];
+  // Filter hidden products
+  allProds = allProds.filter(function(p){ return !p.hidden; });
+  // Sort: outdoor = base layer first, then mid layer; active = apparel first, then accessories
+  var prods;
+  if (_pdfCollection==='outdoor') {
+    var base = allProds.filter(function(p){ return p.layer==='base'||p.layer==='Base Layer'; });
+    var mid = allProds.filter(function(p){ return p.layer==='mid'||p.layer==='Mid Layer'; });
+    var other = allProds.filter(function(p){ return p.layer!=='base'&&p.layer!=='Base Layer'&&p.layer!=='mid'&&p.layer!=='Mid Layer'; });
+    prods = base.concat(mid).concat(other);
+  } else {
+    var apparel = allProds.filter(function(p){ return (p.category||'').toLowerCase()==='apparel'; });
+    var accessories = allProds.filter(function(p){ return (p.category||'').toLowerCase()==='accessories'; });
+    var other = allProds.filter(function(p){ var c=(p.category||'').toLowerCase(); return c!=='apparel'&&c!=='accessories'; });
+    prods = apparel.concat(accessories).concat(other);
+  }
   var saved = null;
   try { saved = JSON.parse(localStorage.getItem('pdfPairs_'+_pdfCollection)); } catch(e) {}
   if (saved && Array.isArray(saved) && saved.length) {
@@ -3852,7 +3867,7 @@ function addPdfPair() { _pdfPairs.push([null, null]); savePdfPairsToStorage(); r
 function removePdfPair(pi) { _pdfPairs.splice(pi, 1); savePdfPairsToStorage(); renderPdfPairs(); }
 
 function buildPdfPageHTML(pair) {
-  var prods = (_pdfCollection==='outdoor' ? state.products : state.activeProducts) || [];
+  var prods = ((_pdfCollection==='outdoor' ? state.products : state.activeProducts) || []).filter(function(p){ return !p.hidden; });
   var p1 = pair[0] ? prods.find(function(p){ return p.id===pair[0]; }) : null;
   var p2 = pair[1] ? prods.find(function(p){ return p.id===pair[1]; }) : null;
   var isSolo = !p2;
