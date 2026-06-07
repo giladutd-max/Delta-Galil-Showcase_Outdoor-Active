@@ -3779,9 +3779,9 @@ function initPdfPairs() {
     var other = allProds.filter(function(p){ return p.layer!=='base'&&p.layer!=='Base Layer'&&p.layer!=='mid'&&p.layer!=='Mid Layer'; });
     prods = base.concat(mid).concat(other);
   } else {
-    var apparel = allProds.filter(function(p){ return (p.category||'').toLowerCase()==='apparel'; });
-    var accessories = allProds.filter(function(p){ return (p.category||'').toLowerCase()==='accessories'; });
-    var other = allProds.filter(function(p){ var c=(p.category||'').toLowerCase(); return c!=='apparel'&&c!=='accessories'; });
+    var apparel = allProds.filter(function(p){ return p.category==='warm'; });
+    var accessories = allProds.filter(function(p){ return p.category==='air'; });
+    var other = allProds.filter(function(p){ return p.category!=='warm'&&p.category!=='air'; });
     prods = apparel.concat(accessories).concat(other);
   }
   // Always rebuild from scratch in correct order - never use stale localStorage
