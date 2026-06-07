@@ -3784,33 +3784,12 @@ function initPdfPairs() {
     var other = allProds.filter(function(p){ var c=(p.category||'').toLowerCase(); return c!=='apparel'&&c!=='accessories'; });
     prods = apparel.concat(accessories).concat(other);
   }
-  var saved = null;
-  try { saved = JSON.parse(localStorage.getItem('pdfPairs_'+_pdfCollection)); } catch(e) {}
-  if (saved && Array.isArray(saved) && saved.length) {
-    var validIds = {};
-    prods.forEach(function(p){ validIds[p.id]=true; });
-    _pdfPairs = saved.map(function(pair){
-      return [pair[0] && validIds[pair[0]] ? pair[0] : null, pair[1] && validIds[pair[1]] ? pair[1] : null];
-    }).filter(function(pair){ return pair[0]!==null || pair[1]!==null; });
-    if (!_pdfPairs.length) {
-      _pdfPairs = [];
-      for (var i=0; i<prods.length; i+=2) {
-        _pdfPairs.push([prods[i] ? prods[i].id : null, prods[i+1] ? prods[i+1].id : null]);
-      }
-    } else {
-      // Always rebuild pairs in correct sorted order
-      _pdfPairs = [];
-      for (var i=0; i<prods.length; i+=2) {
-        _pdfPairs.push([prods[i] ? prods[i].id : null, prods[i+1] ? prods[i+1].id : null]);
-      }
-      savePdfPairsToStorage();
-    }
-  } else {
-    _pdfPairs = [];
-    for (var i=0; i<prods.length; i+=2) {
-      _pdfPairs.push([prods[i] ? prods[i].id : null, prods[i+1] ? prods[i+1].id : null]);
-    }
+  // Always rebuild from scratch in correct order - never use stale localStorage
+  _pdfPairs = [];
+  for (var i=0; i<prods.length; i+=2) {
+    _pdfPairs.push([prods[i] ? prods[i].id : null, prods[i+1] ? prods[i+1].id : null]);
   }
+  savePdfPairsToStorage();
   renderPdfPairs();
 }
 
